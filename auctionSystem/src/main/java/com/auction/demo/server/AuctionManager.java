@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class AuctionManager {
-    private static AuctionManager instance;
+    private static volatile AuctionManager instance;
     private Map<String, Auction> activeAuctions;
 
     private AuctionManager() {

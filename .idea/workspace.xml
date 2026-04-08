@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6dccaf98-a119-4b45-9dc6-d7859342a0d2" name="Changes" comment="Thêm cách khởi động App" />
+    <list default="true" id="6dccaf98-a119-4b45-9dc6-d7859342a0d2" name="Changes" comment="Sửa AuctionManager double checked locking">
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/server/AuctionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/server/AuctionManager.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -171,7 +173,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775646712242</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Sửa AuctionManager double checked locking">
+      <option name="closed" value="true" />
+      <created>1775647026300</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1775647026300</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -179,6 +189,7 @@
     <MESSAGE value="Chia rõ các file Entity" />
     <MESSAGE value="Thêm khóa AuctionLockManager" />
     <MESSAGE value="Thêm cách khởi động App" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thêm cách khởi động App" />
+    <MESSAGE value="Sửa AuctionManager double checked locking" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sửa AuctionManager double checked locking" />
   </component>
 </project>
