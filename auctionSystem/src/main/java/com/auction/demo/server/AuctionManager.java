@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class AuctionManager {
-    private static AuctionManager instance;
+    private static volatile AuctionManager instance;
     private Map<String, Auction> activeAuctions;
 
     private AuctionManager() {
@@ -15,7 +15,14 @@ public class AuctionManager {
 
     public static synchronized AuctionManager getInstance() {
         if (instance == null) {
-            instance = new AuctionManager();
+            // Chỉ lock khi bắt đầu khởi tạo lần đầu tiên
+            synchronized (AuctionManager.class) {
+                // Kiểm tra lần 2: Đề phòng trường hợp luồng khác đã kịp khởi tạo instance
+                // trong lúc luồng này đang chờ lấy lock
+                if (instance == null) {
+                    instance = new AuctionManager();
+                }
+            }
         }
         return instance;
     }
