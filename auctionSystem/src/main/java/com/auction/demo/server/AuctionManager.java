@@ -1,6 +1,6 @@
-package com.auction.server;
+package com.auction.demo.server;
 
-import com.auction.common.model.Auction;
+import com.auction.demo.common.model.Auction;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.Map;
