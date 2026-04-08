@@ -1,4 +1,4 @@
-package com.auction.shared;
+package com.auction.demo.common.model;
 
 import java.io.Serializable;
 import java.util.UUID;

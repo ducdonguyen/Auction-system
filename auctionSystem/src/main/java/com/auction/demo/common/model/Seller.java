@@ -1,4 +1,4 @@
-package com.auction.shared;
+package com.auction.demo.common.model;
 
 public class Seller extends User {
     private double rating; // Đánh giá uy tín (ví dụ: từ 1.0 đến 5.0)

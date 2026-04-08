@@ -1,4 +1,4 @@
-package com.auction.shared;
+package com.auction.demo.common.model;
 
 public class Vehicle extends Item {
     private String brand;
