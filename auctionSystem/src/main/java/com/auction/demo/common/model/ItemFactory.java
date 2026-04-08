@@ -1,4 +1,4 @@
-package com.auction.common.model;
+package com.auction.demo.common.model;
 
 public class ItemFactory {
     public static Item createItem(String type, String name, String description, double price, String extraParam) {
