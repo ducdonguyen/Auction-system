@@ -1,7 +1,6 @@
-package com.auction.server.service;
+package com.auction.demo.server;
 
-import com.auction.shared.*;
-
+import com.auction.demo.common.model.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

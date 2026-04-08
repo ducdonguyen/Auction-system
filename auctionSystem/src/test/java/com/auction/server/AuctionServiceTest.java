@@ -1,6 +1,8 @@
-package com.auction.server.service;
+package com.auction.server;
 
-import com.auction.shared.*;
+import com.auction.demo.common.model.*;
+import com.auction.demo.server.AuctionService;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
