@@ -1,4 +1,4 @@
-package com.auction.shared;
+package com.auction.common.model;
 
 public class Electronics extends Item {
     private int warrantyMonths;
