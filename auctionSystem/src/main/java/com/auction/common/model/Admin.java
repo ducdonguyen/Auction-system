@@ -1,4 +1,4 @@
-package com.auction.shared;
+package com.auction.common.model;
 
 public class Admin extends User {
     private String employeeId;

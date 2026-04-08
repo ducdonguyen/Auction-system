@@ -1,10 +1,8 @@
 package com.auction.server;
 
-import com.auction.shared.Auction;
+import com.auction.common.model.Auction;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.auction.shared.Auction;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class AuctionManager {

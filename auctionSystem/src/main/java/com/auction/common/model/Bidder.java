@@ -1,4 +1,4 @@
-package com.auction.shared;
+package com.auction.common.model;
 
 public class Bidder extends User {
     private double balance;
