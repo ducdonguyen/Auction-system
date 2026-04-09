@@ -25,7 +25,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="34" />
+    <option name="cachedIndexableFilesCount" value="27" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -69,12 +69,12 @@
     &quot;assignee&quot;: &quot;ducdonguyen&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ducdonguyen/Auction-system.git&quot;,
-    &quot;accountId&quot;: &quot;14eb6f36-dc60-4db6-b758-b1ceb04d1fe9&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ducdonguyen/Auction-system.git",
+    "accountId": "572a6d18-1e6d-41e3-b884-8baeb227d69d"
   }
-}</component>
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
