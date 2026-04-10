@@ -4,22 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6dccaf98-a119-4b45-9dc6-d7859342a0d2" name="Changes" comment="Thêm các file&#10;+)AuctionService: tạo phiên đấu giá, đặt giá(có kiểm tra logic), xử lý đấu giá đồng thời.&#10;+)AuctionServiceTest: Kiểm thử AuctionService&#10;+)Sửa lại 1 vài thuộc tính trong phần shared">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/service/AuctionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/server/service/AuctionServiceTest.java" beforeDir="false" />
+    <list default="true" id="6dccaf98-a119-4b45-9dc6-d7859342a0d2" name="Changes" comment="Refractor lại cấu trúc">
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/RegisterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/Login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/Register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Register.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/hungdomanh/Desktop/Auction-system/auctionSystem" value="3BnckjKJ15xBd8nZYcDEeSHqAFs" />
+    </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedChatMode">
+    <option name="chatModeId" value="Ask" />
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="chat-panel" value="GPT-4.1" />
+      <entry key="agent-panel" value="GPT-4.1" />
+    </selectedModels>
+  </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="19" />
+    <option name="cachedIndexableFilesCount" value="34" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="FxmlFile" />
         <option value="Class" />
       </list>
     </option>
@@ -79,26 +96,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.AppLauncher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.MainApp.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/LTNC/Auction-system&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.AppLauncher.executor": "Run",
+    "Application.ClientApp.executor": "Run",
+    "Application.ClientLauncher.executor": "Run",
+    "Application.MainApp.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.ServerApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/LTNC/Auction-system",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.JavaFX",
+    "to.speed.mode.migration.done": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql_aurora"
+    ]
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -170,7 +197,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775647026300</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Thêm các file&#10;+)AuctionService: tạo phiên đấu giá, đặt giá(có kiểm tra logic), xử lý đấu giá đồng thời.&#10;+)AuctionServiceTest: Kiểm thử AuctionService&#10;+)Sửa lại 1 vài thuộc tính trong phần shared">
+      <option name="closed" value="true" />
+      <created>1775734317961</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1775734317961</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Refractor lại cấu trúc">
+      <option name="closed" value="true" />
+      <created>1775818838123</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1775818838124</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -179,6 +222,20 @@
     <MESSAGE value="Thêm khóa AuctionLockManager" />
     <MESSAGE value="Thêm cách khởi động App" />
     <MESSAGE value="Sửa AuctionManager double checked locking" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sửa AuctionManager double checked locking" />
+    <MESSAGE value="Thêm các file&#10;+)AuctionService: tạo phiên đấu giá, đặt giá(có kiểm tra logic), xử lý đấu giá đồng thời.&#10;+)AuctionServiceTest: Kiểm thử AuctionService&#10;+)Sửa lại 1 vài thuộc tính trong phần shared" />
+    <MESSAGE value="Refractor lại cấu trúc" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refractor lại cấu trúc" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

@@ -1,30 +1,22 @@
-package com.auction.demo.server;
+package com.auction.server.core;
 
-import com.auction.demo.common.model.*;
+import com.auction.server.concurrency.AuctionLockManager;
+import com.auction.shared.models.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
  * Lớp dịch vụ điều phối các hoạt động của phiên đấu giá.
  * Đây là nơi tập trung logic nghiệp vụ và xử lý tranh chấp đa luồng.
+ * Sử dụng AuctionLockManager để quản lý locking an toàn cho từng phiên.
  */
+@Service
 public class AuctionService {
 
-    /**
-     * Xử lý đặt giá cho một phiên đấu giá cụ thể.
-     * Sử dụng từ khóa 'synchronized' để đảm bảo tính Thread-safe.
-     * * TẠI SAO DÙNG SYNCHRONIZED?
-     * Khi có 2 người cùng đặt giá tại cùng 1 phần nghìn giây, từ khóa này sẽ tạo ra
-     * một cơ chế "xếp hàng". Luồng vào trước sẽ giữ khóa (lock), luồng vào sau phải
-     * đợi luồng trước xử lý xong mới được kiểm tra giá. Điều này loại bỏ hoàn toàn
-     * tình trạng "Lost Update" (cập nhật đè lên nhau).
-     *
-     * @param auction Đối tượng phiên đấu giá đang xét
-     * @param bidder Người tham gia đặt giá
-     * @param bidAmount Số tiền đặt giá
-     * @return true nếu đặt giá thành công, false nếu không hợp lệ
-     */
-
+    @Autowired
+    private AuctionLockManager lockManager;
 
     /**
      * CHỨC NĂNG 1: TẠO PHIÊN ĐẤU GIÁ MỚI
@@ -47,10 +39,23 @@ public class AuctionService {
     /**
      * CHỨC NĂNG 2: ĐẶT GIÁ (PLACE BID)
      * Công dụng: Xử lý tranh chấp và cập nhật giá hiện tại.
-     * (Giữ nguyên đoạn code synchronized bạn đã viết ở trên)
+     * Sử dụng AuctionLockManager để lock từng phiên đấu giá, đảm bảo thread-safe.
      */
-    public synchronized boolean placeBid(Auction auction, Bidder bidder, double bidAmount) {
+    public boolean placeBid(Auction auction, Bidder bidder, double bidAmount) {
+        final boolean[] success = {false};
 
+        // Sử dụng lock manager để đảm bảo chỉ một người có thể đặt giá cho phiên này tại một thời điểm
+        lockManager.executeWithLock(auction.getAuctionId(), () -> {
+            success[0] = performPlaceBid(auction, bidder, bidAmount);
+        });
+
+        return success[0];
+    }
+
+    /**
+     * Xử lý logic đặt giá (chạy bên trong lock)
+     */
+    private boolean performPlaceBid(Auction auction, Bidder bidder, double bidAmount) {
         // 1. Kiểm tra trạng thái phiên đấu giá (Phải đang RUNNING mới được đặt)
         // Lưu ý: Tạm thời bạn có thể kiểm tra khác FINISHED là được
         if ("FINISHED".equals(auction.getStatus())) {

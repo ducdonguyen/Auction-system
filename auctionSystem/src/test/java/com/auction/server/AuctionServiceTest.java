@@ -1,7 +1,7 @@
 package com.auction.server;
 
-import com.auction.demo.common.model.*;
-import com.auction.demo.server.AuctionService;
+import com.auction.server.core.AuctionService;
+import com.auction.shared.models.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

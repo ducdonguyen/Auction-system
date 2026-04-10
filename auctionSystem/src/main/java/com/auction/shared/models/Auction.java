@@ -1,4 +1,4 @@
-package com.auction.demo.common.model;
+package com.auction.shared.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
