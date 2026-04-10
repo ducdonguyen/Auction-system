@@ -91,7 +91,7 @@ public class RegisterController {
     @FXML
     private void handleBackToLogin() {
         try {
-            switchScene(backToLoginButton, "/Login.fxml", "Auction System - Client", 600, 400);
+            switchScene(backToLoginButton, "/views/Login.fxml", "Auction System - Client", 600, 400);
         } catch (IOException exception) {
             showMessage("Không thể quay lại màn hình đăng nhập.", false);
         }

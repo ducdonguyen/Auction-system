@@ -4,38 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6dccaf98-a119-4b45-9dc6-d7859342a0d2" name="Changes" comment="Thêm các file&#10;+)AuctionService: tạo phiên đấu giá, đặt giá(có kiểm tra logic), xử lý đấu giá đồng thời.&#10;+)AuctionServiceTest: Kiểm thử AuctionService&#10;+)Sửa lại 1 vài thuộc tính trong phần shared">
-      <change afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/network/A.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/.gitkeep" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/AppLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientLauncher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/ClientApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/config/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/config/DatabaseConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/controller/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/dao/UserDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/dao/UserDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/model/AuthUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/client/util/PasswordUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/utils/PasswordUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/dto/A.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Admin.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Admin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Art.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Art.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Auction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/BidTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/BidTransaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Bidder.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Bidder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Electronics.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Electronics.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Entity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Item.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/ItemFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/ItemFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Seller.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Seller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/common/model/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Vehicle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/server/AuctionLockManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/AuctionLockManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/server/AuctionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/server/AuctionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/demo/server/ServerApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/ServerApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/Login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/Login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/Register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/Register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/server/AuctionServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/server/AuctionServiceTest.java" afterDir="false" />
+    <list default="true" id="6dccaf98-a119-4b45-9dc6-d7859342a0d2" name="Changes" comment="Refractor lại cấu trúc">
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/RegisterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/Login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/Register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Register.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -231,7 +205,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775734317961</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Refractor lại cấu trúc">
+      <option name="closed" value="true" />
+      <created>1775818838123</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1775818838124</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -241,7 +223,8 @@
     <MESSAGE value="Thêm cách khởi động App" />
     <MESSAGE value="Sửa AuctionManager double checked locking" />
     <MESSAGE value="Thêm các file&#10;+)AuctionService: tạo phiên đấu giá, đặt giá(có kiểm tra logic), xử lý đấu giá đồng thời.&#10;+)AuctionServiceTest: Kiểm thử AuctionService&#10;+)Sửa lại 1 vài thuộc tính trong phần shared" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thêm các file&#10;+)AuctionService: tạo phiên đấu giá, đặt giá(có kiểm tra logic), xử lý đấu giá đồng thời.&#10;+)AuctionServiceTest: Kiểm thử AuctionService&#10;+)Sửa lại 1 vài thuộc tính trong phần shared" />
+    <MESSAGE value="Refractor lại cấu trúc" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refractor lại cấu trúc" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

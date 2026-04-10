@@ -69,7 +69,7 @@ public class LoginController {
     @FXML
     private void handleGoToRegister() {
         try {
-            switchScene(goToRegisterButton, "/Register.fxml", "Auction System - Register", 600, 560);
+            switchScene(goToRegisterButton, "/views/Register.fxml", "Auction System - Register", 600, 560);
         } catch (IOException exception) {
             showMessage("Không thể mở màn hình đăng ký.", false);
         }

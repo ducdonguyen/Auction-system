@@ -16,7 +16,7 @@ public class ClientMain extends Application {
         initializeDatabase();
 
         // Load Login.fxml
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Login.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
         AnchorPane loginView = loader.load();
 
         // Tạo scene
