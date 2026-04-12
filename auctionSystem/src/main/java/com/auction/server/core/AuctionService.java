@@ -19,6 +19,13 @@ public class AuctionService {
     @Autowired
     private AuctionLockManager lockManager;
 
+    public AuctionService() {
+    }
+
+    public AuctionService(AuctionLockManager lockManager) {
+        this.lockManager = lockManager;
+    }
+
     /**
      * CHỨC NĂNG 1: TẠO PHIÊN ĐẤU GIÁ MỚI
      * Công dụng: Khởi tạo một phiên đấu giá và đưa nó vào hệ thống.
