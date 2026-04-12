@@ -13,7 +13,7 @@ public class AuctionManager {
         activeAuctions = new ConcurrentHashMap<>();
     }
 
-    public static synchronized AuctionManager getInstance() {
+    public static AuctionManager getInstance() {
         if (instance == null) {
             // Chỉ lock khi bắt đầu khởi tạo lần đầu tiên
             synchronized (AuctionManager.class) {
