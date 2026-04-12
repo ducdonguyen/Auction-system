@@ -1,5 +1,6 @@
 package com.auction.server;
 
+import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.core.AuctionService;
 import com.auction.shared.models.*;
 
@@ -10,8 +11,9 @@ import java.util.concurrent.TimeUnit;
 public class AuctionServiceTest {
 
     public static void main(String[] args) throws InterruptedException {
-        // 1. Khởi tạo dịch vụ
-        AuctionService auctionService = new AuctionService();
+        // 1. Khởi tạo dịch vụ cùng với LockManager (Tránh NullPointerException)
+        AuctionLockManager lockManager = new AuctionLockManager();
+        AuctionService auctionService = new AuctionService(lockManager);
 
         // 2. Kiểm thử việc TẠO PHIÊN (Sử dụng auctionService thay vì service)
         // Lưu ý: Item là abstract nên ta dùng class ẩn danh {}
