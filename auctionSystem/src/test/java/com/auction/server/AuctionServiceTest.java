@@ -4,6 +4,7 @@ import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.core.AuctionService;
 import com.auction.shared.models.*;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +22,7 @@ public class AuctionServiceTest {
         Seller seller = new Seller("S01", "Cửa hàng điện máy");
 
         // Gọi đúng tên biến auctionService
-        Auction myAuction = auctionService.createAuction(laptop, seller, 1000.0, 50.0);
+        Auction myAuction = auctionService.createAuction(laptop, seller, 1000.0, 50.0, LocalDateTime.parse("2026-04-13T10:30:00"), LocalDateTime.parse("2026-05-13T10:30:00"));
 
         System.out.println("========== KIỂM THỬ TẠO PHIÊN ==========");
         if (myAuction != null && myAuction.getAuctionId() != null) {
@@ -57,7 +58,7 @@ public class AuctionServiceTest {
         // --- TEST 4: KIỂM THỬ ĐỒNG THỜI (CONCURRENCY) ---
         System.out.println("\n========== BẮT ĐẦU KIỂM THỬ ĐA LUỒNG ==========");
         // Tạo một phiên đấu giá mới hoàn toàn để test đa luồng
-        Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0);
+        Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0, LocalDateTime.parse("2026-04-13T10:30:00"), LocalDateTime.parse("2026-5-13T10:30:00"));
         syncAuction.setStatus(AuctionStatus.RUNNING);
 
         System.out.println("Giá khởi điểm: 2000.0. 5 người cùng đặt 2100.0...");

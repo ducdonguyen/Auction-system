@@ -4,11 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 // Chỉ định Spring quét các Entity và Repository trong toàn bộ dự án
 @EntityScan(basePackages = {"com.auction"})
 @EnableJpaRepositories(basePackages = {"com.auction"})
+@EnableScheduling
 public class ServerApplication {
 
     public static void main(String[] args) {

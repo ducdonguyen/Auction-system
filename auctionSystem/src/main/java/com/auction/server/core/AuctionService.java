@@ -1,6 +1,7 @@
 package com.auction.server.core;
 
 import com.auction.server.concurrency.AuctionLockManager;
+import com.auction.server.repository.AuctionRepository;
 import com.auction.shared.models.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class AuctionService {
     @Autowired
     private AuctionLockManager lockManager;
 
+    @Autowired
+    private AuctionRepository auctionRepository;
+
     public AuctionService() {
     }
 
@@ -31,18 +35,18 @@ public class AuctionService {
      * Công dụng: Khởi tạo một phiên đấu giá và đưa nó vào hệ thống.
      */
     @Transactional
-    public Auction createAuction(Item item, Seller seller, double startingPrice, double stepPrice) {
+    public Auction createAuction(Item item, Seller seller, double startingPrice, double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
         // Tạo một ID duy nhất bằng UUID (tránh trùng lặp ID phiên)
         String auctionId = "AUC -" + UUID.randomUUID().toString().substring(0, 8);
 
         // Khởi tạo đối tượng Auction
-        Auction newAuction = new Auction(auctionId, item, seller, startingPrice, stepPrice);
+        Auction newAuction = new Auction(auctionId, item, seller, startingPrice, stepPrice, startTime, endTime);
 
         // Mặc định phiên mới tạo sẽ ở trạng thái OPEN
         newAuction.setStatus(AuctionStatus.OPEN);
 
         System.out.println("[INFO] Đã tạo phiên đấu giá mới: " + auctionId + " cho mặt hàng " + item.getName());
-        return newAuction;
+        return auctionRepository.save(newAuction);
     }
 
     /**
@@ -58,6 +62,10 @@ public class AuctionService {
         lockManager.executeWithLock(auction.getAuctionId(), () -> {
             success[0] = performPlaceBid(auction, bidder, bidAmount);
         });
+
+        if (success[0]) {
+            auctionRepository.save(auction);
+        }
 
         return success[0];
     }
@@ -94,5 +102,44 @@ public class AuctionService {
 
         System.out.println("[SUCCESS] " + bidder.getUsername() + " đã đặt giá thành công: " + bidAmount);
         return true;
+    }
+    /**
+     * CHỨC NĂNG 3: CHUYỂN ĐỔI TRẠNG THÁI (STATUS TRANSITION)
+     * Công dụng: Đảm bảo phiên đấu giá tuân thủ đúng vòng đời (OPEN -> RUNNING -> FINISHED).
+     */
+    @Transactional
+    public boolean updateAuctionStatus(Auction auction, AuctionStatus nextStatus) {
+        // Kiểm tra xem việc chuyển từ trạng thái hiện tại sang trạng thái mới có hợp lệ không
+        if (isValidTransition(auction.getStatus(), nextStatus)) {
+            AuctionStatus oldStatus = auction.getStatus();
+            auction.setStatus(nextStatus);
+            auctionRepository.save(auction);
+
+            System.out.println("[INFO] Auction " + auction.getAuctionId()
+                    + ": " + oldStatus + " -> " + nextStatus);
+
+            // TODO: Nơi đây bạn có thể thêm logic Broadcast qua Socket sau này
+            // broadcastStatusUpdate(auction);
+
+            return true;
+        } else {
+            System.err.println("[FAILED] Không thể chuyển trạng thái từ "
+                    + auction.getStatus() + " sang " + nextStatus);
+            return false;
+        }
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ của máy trạng thái (State Machine)
+     */
+    private boolean isValidTransition(AuctionStatus current, AuctionStatus next) {
+        if (current == next) return true; // Không thay đổi gì
+
+        return switch (current) {
+            case OPEN -> (next == AuctionStatus.RUNNING || next == AuctionStatus.CANCELED);
+            case RUNNING -> (next == AuctionStatus.FINISHED || next == AuctionStatus.CANCELED);
+            case FINISHED -> (next == AuctionStatus.PAID || next == AuctionStatus.CANCELED);
+            default -> false; // PAID hoặc CANCELED là trạng thái cuối, không thể chuyển đi tiếp
+        };
     }
 }
