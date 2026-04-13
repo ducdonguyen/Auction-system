@@ -42,9 +42,8 @@ public class Auction implements Serializable {
 
     /**
      * status đại diện cho trạng thái vòng đời của phiên đấu giá.
-     * Các giá trị dự kiến: "OPEN" (mới tạo), "RUNNING" (đang diễn ra), "FINISHED" (kết thúc).
      */
-    private String status;
+    private AuctionStatus status;
 
     /**
      * Constructor khởi tạo một phiên đấu giá mới.
@@ -61,7 +60,7 @@ public class Auction implements Serializable {
         this.currentPrice = startingPrice; // Gán giá khởi điểm vào giá hiện tại để bắt đầu đấu giá
         this.stepPrice = stepPrice;
         this.bidHistory = new ArrayList<>(); // Khởi tạo danh sách rỗng để tránh NullPointerException
-        this.status = "OPEN";                // Mặc định phiên mới tạo sẽ ở trạng thái chờ mở
+        this.status = AuctionStatus.OPEN;    // Mặc định phiên mới tạo sẽ ở trạng thái chờ mở
     }
 
     // --- LOGIC NGHIỆP VỤ (BUSINESS LOGIC) ---
@@ -124,11 +123,11 @@ public class Auction implements Serializable {
     public Seller getSeller() { return seller; }
     public void setSeller(Seller seller) { this.seller = seller; }
 
-    public String getStatus() { return status; }
+    public AuctionStatus getStatus() { return status; }
 
     /**
      * Cập nhật trạng thái phiên đấu giá (Ví dụ: Chuyển từ RUNNING sang FINISHED)
-     * @param status Trạng thái mới (Nên dùng hằng số hoặc Enum ở các tuần tiếp theo)
+     * @param status Trạng thái mới
      */
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(AuctionStatus status) { this.status = status; }
 }

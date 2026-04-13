@@ -2,6 +2,7 @@ package com.auction.server.core;
 
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.shared.models.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -18,19 +19,27 @@ public class AuctionService {
     @Autowired
     private AuctionLockManager lockManager;
 
+    public AuctionService() {
+    }
+
+    public AuctionService(AuctionLockManager lockManager) {
+        this.lockManager = lockManager;
+    }
+
     /**
      * CHỨC NĂNG 1: TẠO PHIÊN ĐẤU GIÁ MỚI
      * Công dụng: Khởi tạo một phiên đấu giá và đưa nó vào hệ thống.
      */
+    @Transactional
     public Auction createAuction(Item item, Seller seller, double startingPrice, double stepPrice) {
         // Tạo một ID duy nhất bằng UUID (tránh trùng lặp ID phiên)
-        String auctionId = "AUC-" + UUID.randomUUID().toString().substring(0, 8);
+        String auctionId = "AUC -" + UUID.randomUUID().toString().substring(0, 8);
 
         // Khởi tạo đối tượng Auction
         Auction newAuction = new Auction(auctionId, item, seller, startingPrice, stepPrice);
 
         // Mặc định phiên mới tạo sẽ ở trạng thái OPEN
-        newAuction.setStatus("OPEN");
+        newAuction.setStatus(AuctionStatus.OPEN);
 
         System.out.println("[INFO] Đã tạo phiên đấu giá mới: " + auctionId + " cho mặt hàng " + item.getName());
         return newAuction;
@@ -41,6 +50,7 @@ public class AuctionService {
      * Công dụng: Xử lý tranh chấp và cập nhật giá hiện tại.
      * Sử dụng AuctionLockManager để lock từng phiên đấu giá, đảm bảo thread-safe.
      */
+    @Transactional
     public boolean placeBid(Auction auction, Bidder bidder, double bidAmount) {
         final boolean[] success = {false};
 
@@ -57,9 +67,8 @@ public class AuctionService {
      */
     private boolean performPlaceBid(Auction auction, Bidder bidder, double bidAmount) {
         // 1. Kiểm tra trạng thái phiên đấu giá (Phải đang RUNNING mới được đặt)
-        // Lưu ý: Tạm thời bạn có thể kiểm tra khác FINISHED là được
-        if ("FINISHED".equals(auction.getStatus())) {
-            System.out.println("[FAILED] Đấu giá đã kết thúc. Người dùng: " + bidder.getUsername());
+        if (auction.getStatus() != AuctionStatus.RUNNING) {
+            System.out.println("[FAILED] Đấu giá không ở trạng thái RUNNING. Trạng thái hiện tại: " + auction.getStatus());
             return false;
         }
 
@@ -74,7 +83,7 @@ public class AuctionService {
         // 3. Nếu vượt qua các bước trên, tiến hành cập nhật trạng thái
         // Tạo một đối tượng giao dịch mới để lưu vào lịch sử
         BidTransaction transaction = new BidTransaction(
-                "TX-" + System.currentTimeMillis(), // Tạo mã giao dịch tạm thời dựa trên thời gian
+                "TX -" + System.currentTimeMillis(), // Tạo mã giao dịch tạm thời dựa trên thời gian
                 bidder,
                 bidAmount,
                 LocalDateTime.now()

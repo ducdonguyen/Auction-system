@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>vn.edu.uet</groupId>
+    <groupId>com.auction</groupId>
     <artifactId>auction-system</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -80,7 +80,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>vn.edu.uet.auction.client.MainApp</mainClass>
+                    <mainClass>com.auction.client.ClientLauncher</mainClass>
                 </configuration>
             </plugin>
 
