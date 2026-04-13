@@ -2,6 +2,7 @@ package com.auction.server;
 
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.core.AuctionService;
+import com.auction.server.repository.AuctionRepository;
 import com.auction.shared.models.*;
 
 import java.time.LocalDateTime;
@@ -9,12 +10,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.mockito.Mockito;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 public class AuctionServiceTest {
 
     public static void main(String[] args) throws InterruptedException {
-        // 1. Khởi tạo dịch vụ cùng với LockManager (Tránh NullPointerException)
+        // 1. Khởi tạo dịch vụ cùng với LockManager và Mock Repository
         AuctionLockManager lockManager = new AuctionLockManager();
-        AuctionService auctionService = new AuctionService(lockManager);
+        AuctionRepository auctionRepository = Mockito.mock(AuctionRepository.class);
+        
+        // Cấu hình mock: Khi gọi save() thì trả về chính đối tượng đó
+        when(auctionRepository.save(any(Auction.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AuctionService auctionService = new AuctionService(lockManager, auctionRepository);
 
         // 2. Kiểm thử việc TẠO PHIÊN (Sử dụng auctionService thay vì service)
         // Lưu ý: Item là abstract nên ta dùng class ẩn danh {}
@@ -58,7 +68,7 @@ public class AuctionServiceTest {
         // --- TEST 4: KIỂM THỬ ĐỒNG THỜI (CONCURRENCY) ---
         System.out.println("\n========== BẮT ĐẦU KIỂM THỬ ĐA LUỒNG ==========");
         // Tạo một phiên đấu giá mới hoàn toàn để test đa luồng
-        Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0, LocalDateTime.parse("2026-04-13T10:30:00"), LocalDateTime.parse("2026-5-13T10:30:00"));
+        Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0, LocalDateTime.parse("2026-04-13T10:30:00"), LocalDateTime.parse("2026-05-13T10:30:00"));
         syncAuction.setStatus(AuctionStatus.RUNNING);
 
         System.out.println("Giá khởi điểm: 2000.0. 5 người cùng đặt 2100.0...");

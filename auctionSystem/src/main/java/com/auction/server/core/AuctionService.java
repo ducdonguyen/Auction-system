@@ -17,17 +17,16 @@ import java.util.UUID;
 @Service
 public class AuctionService {
 
-    @Autowired
     private AuctionLockManager lockManager;
-
-    @Autowired
     private AuctionRepository auctionRepository;
 
     public AuctionService() {
     }
 
-    public AuctionService(AuctionLockManager lockManager) {
+    @Autowired
+    public AuctionService(AuctionLockManager lockManager, AuctionRepository auctionRepository) {
         this.lockManager = lockManager;
+        this.auctionRepository = auctionRepository;
     }
 
     /**
