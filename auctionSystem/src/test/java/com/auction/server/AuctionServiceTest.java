@@ -35,7 +35,7 @@ public class AuctionServiceTest {
 
         System.out.println("\n========== BẮT ĐẦU KIỂM THỬ NGHIỆP VỤ ==========");
         // Đảm bảo phiên đấu giá đang chạy
-        myAuction.setStatus("RUNNING");
+        myAuction.setStatus(AuctionStatus.RUNNING);
         System.out.println("Giá hiện tại: " + myAuction.getCurrentPrice() + ", Bước giá: " + myAuction.getStepPrice());
 
         // --- TEST 1: Đặt giá thấp hơn mức tối thiểu (1000 + 50 = 1050) ---
@@ -50,7 +50,7 @@ public class AuctionServiceTest {
 
         // --- TEST 3: Đặt giá khi phiên đã kết thúc ---
         System.out.println("\n[Test 3] Đặt giá khi trạng thái là 'FINISHED':");
-        myAuction.setStatus("FINISHED");
+        myAuction.setStatus(AuctionStatus.FINISHED);
         boolean res3 = auctionService.placeBid(myAuction, bidderB, 1500.0);
         checkResult(!res3, "Hệ thống đã chặn đặt giá thành công.");
 
@@ -58,7 +58,7 @@ public class AuctionServiceTest {
         System.out.println("\n========== BẮT ĐẦU KIỂM THỬ ĐA LUỒNG ==========");
         // Tạo một phiên đấu giá mới hoàn toàn để test đa luồng
         Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0);
-        syncAuction.setStatus("RUNNING");
+        syncAuction.setStatus(AuctionStatus.RUNNING);
 
         System.out.println("Giá khởi điểm: 2000.0. 50 người cùng đặt 2100.0...");
 
