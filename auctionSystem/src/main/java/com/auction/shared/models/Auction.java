@@ -1,6 +1,7 @@
 package com.auction.shared.models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +16,8 @@ public class Auction implements Serializable {
     private String auctionId;      // Mã định danh duy nhất cho mỗi phiên đấu giá
     private Item item;             // Món hàng đang được đem ra đấu giá (Electronics, Art, hoặc Vehicle)
     private Seller seller;         // Người tạo ra phiên đấu giá này
-
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     /**
      * currentPrice lưu trữ mức giá cao nhất hiện tại.
      * Ban đầu nó sẽ bằng giá khởi điểm (startingPrice).
@@ -53,7 +55,7 @@ public class Auction implements Serializable {
      * @param startingPrice Giá khởi điểm ban đầu
      * @param stepPrice Bước giá tối thiểu định trước
      */
-    public Auction(String auctionId, Item item, Seller seller, double startingPrice, double stepPrice) {
+    public Auction(String auctionId, Item item, Seller seller, double startingPrice, double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
         this.auctionId = auctionId;
         this.item = item;
         this.seller = seller;
@@ -61,6 +63,8 @@ public class Auction implements Serializable {
         this.stepPrice = stepPrice;
         this.bidHistory = new ArrayList<>(); // Khởi tạo danh sách rỗng để tránh NullPointerException
         this.status = AuctionStatus.OPEN;    // Mặc định phiên mới tạo sẽ ở trạng thái chờ mở
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     // --- LOGIC NGHIỆP VỤ (BUSINESS LOGIC) ---
@@ -130,4 +134,8 @@ public class Auction implements Serializable {
      * @param status Trạng thái mới
      */
     public void setStatus(AuctionStatus status) { this.status = status; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public  LocalDateTime getStartTime() { return startTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+    public LocalDateTime getEndTime() {return endTime;}
 }
