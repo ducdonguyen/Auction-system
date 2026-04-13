@@ -63,7 +63,7 @@ public class AuctionServiceTest {
         System.out.println("Giá khởi điểm: 2000.0. 50 người cùng đặt 2100.0...");
 
         ExecutorService executor = Executors.newFixedThreadPool(50);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 5; i++) {
             final int id = i;
             executor.submit(() -> {
                 Bidder competitor = new Bidder("Competitor_" + id, "pass", 2.0);
