@@ -39,7 +39,7 @@ public class AuctionService {
         Auction newAuction = new Auction(auctionId, item, seller, startingPrice, stepPrice);
 
         // Mặc định phiên mới tạo sẽ ở trạng thái OPEN
-        newAuction.setStatus("OPEN");
+        newAuction.setStatus(AuctionStatus.OPEN);
 
         System.out.println("[INFO] Đã tạo phiên đấu giá mới: " + auctionId + " cho mặt hàng " + item.getName());
         return newAuction;
@@ -67,9 +67,8 @@ public class AuctionService {
      */
     private boolean performPlaceBid(Auction auction, Bidder bidder, double bidAmount) {
         // 1. Kiểm tra trạng thái phiên đấu giá (Phải đang RUNNING mới được đặt)
-        // Lưu ý: Tạm thời bạn có thể kiểm tra khác FINISHED là được
-        if ("FINISHED".equals(auction.getStatus())) {
-            System.out.println("[FAILED] Đấu giá đã kết thúc. Người dùng: " + bidder.getUsername());
+        if (auction.getStatus() != AuctionStatus.RUNNING) {
+            System.out.println("[FAILED] Đấu giá không ở trạng thái RUNNING. Trạng thái hiện tại: " + auction.getStatus());
             return false;
         }
 

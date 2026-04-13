@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 // Chỉ định Spring quét các Entity và Repository trong toàn bộ dự án
-@EntityScan(basePackages = {"vn.edu.uet.auction"})
-@EnableJpaRepositories(basePackages = {"vn.edu.uet.auction"})
+@EntityScan(basePackages = {"com.auction"})
+@EnableJpaRepositories(basePackages = {"com.auction"})
 public class ServerApplication {
 
     public static void main(String[] args) {
