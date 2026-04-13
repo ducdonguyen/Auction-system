@@ -60,7 +60,7 @@ public class AuctionServiceTest {
         Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0);
         syncAuction.setStatus(AuctionStatus.RUNNING);
 
-        System.out.println("Giá khởi điểm: 2000.0. 50 người cùng đặt 2100.0...");
+        System.out.println("Giá khởi điểm: 2000.0. 5 người cùng đặt 2100.0...");
 
         ExecutorService executor = Executors.newFixedThreadPool(50);
         for (int i = 0; i < 5; i++) {
