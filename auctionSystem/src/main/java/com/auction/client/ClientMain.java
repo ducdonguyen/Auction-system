@@ -1,6 +1,6 @@
 package com.auction.client;
 
-import com.auction.client.dao.UserDao;
+import com.auction.server.dao.UserDao;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
