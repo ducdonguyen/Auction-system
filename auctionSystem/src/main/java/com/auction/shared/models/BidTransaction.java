@@ -17,8 +17,19 @@ public class BidTransaction implements Serializable {
     }
 
     // --- Getters ---
-    public String getTransactionId() { return transactionId; }
-    public Bidder getBidder() { return bidder; }
-    public double getBidAmount() { return bidAmount; }
-    public LocalDateTime getTimestamp() { return timestamp; }
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public Bidder getBidder() {
+        return bidder;
+    }
+
+    public double getBidAmount() {
+        return bidAmount;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 }
