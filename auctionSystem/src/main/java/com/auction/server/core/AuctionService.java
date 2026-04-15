@@ -36,7 +36,7 @@ public class AuctionService {
     @Transactional
     public Auction createAuction(Item item, Seller seller, double startingPrice, double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
         // Tạo một ID duy nhất bằng UUID (tránh trùng lặp ID phiên)
-        String auctionId = "AUC -" + UUID.randomUUID().toString().substring(0, 8);
+        String auctionId = "AUC-" + UUID.randomUUID().toString().substring(0, 8);
 
         // Khởi tạo đối tượng Auction
         Auction newAuction = new Auction(auctionId, item, seller, startingPrice, stepPrice, startTime, endTime);
@@ -90,7 +90,7 @@ public class AuctionService {
         // 3. Nếu vượt qua các bước trên, tiến hành cập nhật trạng thái
         // Tạo một đối tượng giao dịch mới để lưu vào lịch sử
         BidTransaction transaction = new BidTransaction(
-                "TX -" + System.currentTimeMillis(), // Tạo mã giao dịch tạm thời dựa trên thời gian
+                "TX-" + System.currentTimeMillis(), // Tạo mã giao dịch tạm thời dựa trên thời gian
                 bidder,
                 bidAmount,
                 LocalDateTime.now()
