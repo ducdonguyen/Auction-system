@@ -3,46 +3,46 @@ package com.auction.server.core;
 import com.auction.server.repository.AuctionRepository;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-@Component
 public class AuctionScheduler {
+    private final AuctionRepository repository;
+    private final AuctionService auctionService;
+    private final ScheduledExecutorService scheduler;
 
-    @Autowired
-    private AuctionRepository repository;
+    // S.O.L.I.D (DIP): Tiêm (Inject) scheduler từ bên ngoài vào
+    // Giúp class này dễ dàng được kiểm thử (Unit Test) bằng các mock scheduler.
+    public AuctionScheduler(AuctionRepository repository, AuctionService auctionService,
+                            ScheduledExecutorService scheduler) {
+        this.repository = repository;
+        this.auctionService = auctionService;
+        this.scheduler = scheduler;
+    }
 
-    @Autowired
-    private AuctionService auctionService;
+    public void startScheduling() {
+        // Chạy hàm autoUpdateAuctions() mỗi 10 giây
+        scheduler.scheduleAtFixedRate(this::autoUpdateAuctions, 0, 10, TimeUnit.SECONDS);
+        System.out.println("[SCHEDULER] Hệ thống tự động cập nhật thời gian đã khởi động.");
+    }
 
-    /**
-     * Tự động quét và cập nhật trạng thái các phiên đấu giá.
-     * Chạy mỗi 10 giây một lần.
-     */
-    @Scheduled(fixedRate = 10000)
-    public void autoUpdateAuctions() {
+    private void autoUpdateAuctions() {
         LocalDateTime now = LocalDateTime.now();
 
-        // 1. Tự động MỞ các phiên đã đến giờ bắt đầu (OPEN -> RUNNING)
+        // 1. MỞ phiên
         List<Auction> toStart = repository.findByStatusAndStartTimeBefore(AuctionStatus.OPEN, now);
-        if (!toStart.isEmpty()) {
-            System.out.println("[SCHEDULER] Đang kích hoạt " + toStart.size() + " phiên đấu giá mới...");
-            toStart.forEach(auction -> {
-                auctionService.updateAuctionStatus(auction, AuctionStatus.RUNNING);
-            });
+        if (toStart != null && !toStart.isEmpty()) {
+            toStart.forEach(auction -> auctionService.updateAuctionStatus(auction, AuctionStatus.RUNNING));
         }
 
-        // 2. Tự động ĐÓNG các phiên đã hết thời gian (RUNNING -> FINISHED)
+        // 2. ĐÓNG phiên
         List<Auction> toFinish = repository.findByStatusAndEndTimeBefore(AuctionStatus.RUNNING, now);
-        if (!toFinish.isEmpty()) {
-            System.out.println("[SCHEDULER] Đang kết thúc " + toFinish.size() + " phiên đấu giá đã hết giờ...");
-            toFinish.forEach(auction -> {
-                auctionService.updateAuctionStatus(auction, AuctionStatus.FINISHED);
-            });
+        if (toFinish != null && !toFinish.isEmpty()) {
+            toFinish.forEach(auction -> auctionService.updateAuctionStatus(auction, AuctionStatus.FINISHED));
         }
     }
 }

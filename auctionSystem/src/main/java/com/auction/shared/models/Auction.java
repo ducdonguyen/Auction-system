@@ -49,13 +49,15 @@ public class Auction implements Serializable {
 
     /**
      * Constructor khởi tạo một phiên đấu giá mới.
-     * @param auctionId Mã phiên
-     * @param item Đối tượng hàng hóa
-     * @param seller Người bán
+     *
+     * @param auctionId     Mã phiên
+     * @param item          Đối tượng hàng hóa
+     * @param seller        Người bán
      * @param startingPrice Giá khởi điểm ban đầu
-     * @param stepPrice Bước giá tối thiểu định trước
+     * @param stepPrice     Bước giá tối thiểu định trước
      */
-    public Auction(String auctionId, Item item, Seller seller, double startingPrice, double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
+    public Auction(String auctionId, Item item, Seller seller, double startingPrice, double stepPrice,
+                   LocalDateTime startTime, LocalDateTime endTime) {
         this.auctionId = auctionId;
         this.item = item;
         this.seller = seller;
@@ -73,6 +75,7 @@ public class Auction implements Serializable {
      * Kiểm tra tính hợp lệ của một lệnh đặt giá mới.
      * Nguyên lý: Giá mới phải lớn hơn hoặc bằng (Giá hiện tại + Bước giá).
      * * @param amount Số tiền người dùng muốn đặt
+     *
      * @return true nếu giá đặt hợp lệ, false nếu thấp hơn quy định.
      */
     public boolean isValidBid(double amount) {
@@ -85,7 +88,8 @@ public class Auction implements Serializable {
      * Lưu ý: Hàm này không chứa 'synchronized' vì việc đồng bộ luồng sẽ được quản lý
      * bởi lớp AuctionService để đảm bảo tính tập trung.
      * * @param bidder Người vừa đặt giá cao nhất thành công
-     * @param amount Mức giá mới đã được phê duyệt
+     *
+     * @param amount      Mức giá mới đã được phê duyệt
      * @param transaction Đối tượng giao dịch chứa chi tiết thời gian/thông tin để lưu lịch sử
      */
     public void updateAuctionState(Bidder bidder, double amount, BidTransaction transaction) {
@@ -104,9 +108,17 @@ public class Auction implements Serializable {
 
     // --- CÁC PHƯƠNG THỨC TRUY XUẤT (GETTERS & SETTERS) ---
 
-    public double getCurrentPrice() { return currentPrice; }
-    public double getStepPrice() { return stepPrice; }
-    public Bidder getHighestBidder() { return highestBidder; }
+    public double getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public double getStepPrice() {
+        return stepPrice;
+    }
+
+    public Bidder getHighestBidder() {
+        return highestBidder;
+    }
 
     /**
      * Trả về danh sách lịch sử đặt giá.
@@ -118,24 +130,56 @@ public class Auction implements Serializable {
         return Collections.unmodifiableList(bidHistory);
     }
 
-    public String getAuctionId() { return auctionId; }
-    public void setAuctionId(String auctionId) { this.auctionId = auctionId; }
+    public String getAuctionId() {
+        return auctionId;
+    }
 
-    public Item getItem() { return item; }
-    public void setItem(Item item) { this.item = item; }
+    public void setAuctionId(String auctionId) {
+        this.auctionId = auctionId;
+    }
 
-    public Seller getSeller() { return seller; }
-    public void setSeller(Seller seller) { this.seller = seller; }
+    public Item getItem() {
+        return item;
+    }
 
-    public AuctionStatus getStatus() { return status; }
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public Seller getSeller() {
+        return seller;
+    }
+
+    public void setSeller(Seller seller) {
+        this.seller = seller;
+    }
+
+    public AuctionStatus getStatus() {
+        return status;
+    }
 
     /**
      * Cập nhật trạng thái phiên đấu giá (Ví dụ: Chuyển từ RUNNING sang FINISHED)
+     *
      * @param status Trạng thái mới
      */
-    public void setStatus(AuctionStatus status) { this.status = status; }
-    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
-    public  LocalDateTime getStartTime() { return startTime; }
-    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
-    public LocalDateTime getEndTime() {return endTime;}
+    public void setStatus(AuctionStatus status) {
+        this.status = status;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
 }
