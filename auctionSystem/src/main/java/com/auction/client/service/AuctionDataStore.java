@@ -1,4 +1,4 @@
-package com.auction.demo.client.service;
+package com.auction.client.service;
 import com.auction.shared.models.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,2 +1,2 @@
-package com.auction.demo.client.model;
+package com.auction.client.model;
 public record LoginRequest(String username, String password) {}

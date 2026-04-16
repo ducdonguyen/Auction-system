@@ -1,4 +1,4 @@
-package com.auction.demo.client.service;
+package com.auction.client.service;
 import com.auction.shared.models.AuthUser;
 public class SessionContext {
     private static AuthUser currentUser;

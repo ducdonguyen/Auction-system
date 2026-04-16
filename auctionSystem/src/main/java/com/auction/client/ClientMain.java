@@ -1,5 +1,5 @@
-package com.auction.demo.client;
-import com.auction.demo.client.service.AuthService;
+package com.auction.client;
+import com.auction.client.service.AuthService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

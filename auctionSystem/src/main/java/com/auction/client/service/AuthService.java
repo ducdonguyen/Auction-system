@@ -1,10 +1,10 @@
-package com.auction.demo.client.service;
+package com.auction.client.service;
 
-import com.auction.demo.client.dao.UserDao;
-import com.auction.demo.client.model.LoginRequest;
-import com.auction.demo.client.model.RegistrationRequest;
-import com.auction.demo.client.model.ServiceResult;
-import com.auction.demo.client.util.PasswordUtil;
+import com.auction.client.dao.UserDao;
+import com.auction.client.model.LoginRequest;
+import com.auction.client.model.RegistrationRequest;
+import com.auction.client.model.ServiceResult;
+import com.auction.client.util.PasswordUtil;
 import com.auction.shared.models.AuthUser;
 
 import java.sql.SQLException;

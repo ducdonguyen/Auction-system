@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="720.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom, #ecfccb, #f8fafc);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.demo.client.controller.RegisterController">
+<AnchorPane prefHeight="720.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom, #ecfccb, #f8fafc);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
    <children>
       <HBox alignment="CENTER" prefHeight="720.0" prefWidth="980.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>

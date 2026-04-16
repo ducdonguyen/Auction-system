@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="640.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #dbeafe);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.demo.client.controller.LoginController">
+<AnchorPane prefHeight="640.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #dbeafe);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.LoginController">
    <children>
       <HBox alignment="CENTER" prefHeight="640.0" prefWidth="980.0" spacing="28.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding><Insets bottom="28.0" left="28.0" right="28.0" top="28.0" /></padding>

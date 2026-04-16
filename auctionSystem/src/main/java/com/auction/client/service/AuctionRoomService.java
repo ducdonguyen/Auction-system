@@ -1,7 +1,7 @@
-package com.auction.demo.client.service;
+package com.auction.client.service;
 
-import com.auction.demo.client.model.AuctionRoomViewModel;
-import com.auction.demo.client.model.ServiceResult;
+import com.auction.client.model.AuctionRoomViewModel;
+import com.auction.client.model.ServiceResult;
 import com.auction.shared.models.*;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;

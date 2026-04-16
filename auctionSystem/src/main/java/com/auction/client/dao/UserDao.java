@@ -1,5 +1,5 @@
-package com.auction.demo.client.dao;
-import com.auction.demo.client.config.DatabaseConfig;
+package com.auction.client.dao;
+import com.auction.client.config.DatabaseConfig;
 import com.auction.shared.models.AuthUser;
 import java.sql.*;
 public class UserDao {

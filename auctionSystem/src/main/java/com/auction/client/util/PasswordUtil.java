@@ -1,4 +1,4 @@
-package com.auction.demo.client.util;
+package com.auction.client.util;
 import org.mindrot.jbcrypt.BCrypt;
 public class PasswordUtil {
     public static String hashPassword(String p) { return BCrypt.hashpw(p, BCrypt.gensalt()); }

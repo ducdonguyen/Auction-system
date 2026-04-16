@@ -1,7 +1,7 @@
-package com.auction.demo.client.controller;
-import com.auction.demo.client.util.SceneNavigator;
+package com.auction.client.controller;
+import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionRow;
-import com.auction.demo.client.service.AuctionCatalogService;
+import com.auction.client.service.AuctionCatalogService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

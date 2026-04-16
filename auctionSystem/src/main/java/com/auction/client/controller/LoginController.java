@@ -1,9 +1,9 @@
-package com.auction.demo.client.controller;
+package com.auction.client.controller;
 
-import com.auction.demo.client.model.LoginRequest;
-import com.auction.demo.client.model.ServiceResult;
-import com.auction.demo.client.service.AuthService;
-import com.auction.demo.client.util.SceneNavigator;
+import com.auction.client.model.LoginRequest;
+import com.auction.client.model.ServiceResult;
+import com.auction.client.service.AuthService;
+import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuthUser;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
