@@ -1,6 +1,7 @@
 package com.auction.client;
 
-import com.auction.client.dao.UserDao;
+import com.auction.server.config.DatabaseConfig;
+import com.auction.server.dao.UserDao;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -34,6 +35,6 @@ public class ClientMain extends Application {
 
     private void initializeDatabase() throws SQLException {
         UserDao userDao = new UserDao();
-        userDao.initializeDatabase();
+        DatabaseConfig.initializeDatabase();
     }
 }

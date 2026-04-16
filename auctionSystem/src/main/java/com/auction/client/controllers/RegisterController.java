@@ -1,18 +1,14 @@
 package com.auction.client.controllers;
 
-import com.auction.client.dao.UserDao;
-import com.auction.shared.models.AuthUser;
 import com.auction.client.utils.PasswordUtil;
+import com.auction.client.utils.ViewUtil;
+import com.auction.server.dao.UserDao;
+import com.auction.shared.models.AuthUser;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -53,24 +49,25 @@ public class RegisterController {
         String password = passwordField.getText().trim();
         String confirmPassword = confirmPasswordField.getText().trim();
 
-        if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            showMessage("Vui lòng nhập đầy đủ thông tin.", false);
+        if (fullName.isEmpty() || username.isEmpty() || email.isEmpty()
+                || password.isEmpty() || confirmPassword.isEmpty()) {
+            ViewUtil.showMessage(messageLabel, "Vui lòng nhập đầy đủ thông tin.", false);
             return;
         }
 
         if (!email.contains("@")) {
-            showMessage("Email không hợp lệ.", false);
+            ViewUtil.showMessage(messageLabel, "Email không hợp lệ.", false);
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            showMessage("Mật khẩu xác nhận không khớp.", false);
+            ViewUtil.showMessage(messageLabel, "Mật khẩu xác nhận không khớp.", false);
             return;
         }
 
         try {
             if (userDao.existsByUsernameOrEmail(username, email)) {
-                showMessage("Tên đăng nhập hoặc email đã tồn tại.", false);
+                ViewUtil.showMessage(messageLabel, "Tên đăng nhập hoặc email đã tồn tại.", false);
                 return;
             }
 
@@ -82,24 +79,20 @@ public class RegisterController {
             );
             userDao.register(user);
             clearForm();
-            showMessage("Đăng ký thành công.", true);
+            ViewUtil.showMessage(messageLabel, "Đăng ký thành công.", true);
         } catch (SQLException exception) {
-            showMessage("Không thể lưu tài khoản vào database.", false);
+            ViewUtil.showMessage(messageLabel, "Không thể lưu tài khoản vào database.", false);
         }
     }
 
     @FXML
     private void handleBackToLogin() {
         try {
-            switchScene(backToLoginButton, "/views/Login.fxml", "Auction System - Client", 600, 400);
+            ViewUtil.switchScene(backToLoginButton, "/views/Login.fxml",
+                    "Auction System - Client", 600, 400);
         } catch (IOException exception) {
-            showMessage("Không thể quay lại màn hình đăng nhập.", false);
+            ViewUtil.showMessage(messageLabel, "Không thể quay lại màn hình đăng nhập.", false);
         }
-    }
-
-    private void showMessage(String message, boolean success) {
-        messageLabel.setStyle(success ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
-        messageLabel.setText(message);
     }
 
     private void clearForm() {
@@ -108,13 +101,5 @@ public class RegisterController {
         emailField.clear();
         passwordField.clear();
         confirmPasswordField.clear();
-    }
-
-    private void switchScene(Node sourceNode, String fxmlPath, String title, double width, double height) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-        AnchorPane view = loader.load();
-        Stage stage = (Stage) sourceNode.getScene().getWindow();
-        stage.setScene(new Scene(view, width, height));
-        stage.setTitle(title);
     }
 }

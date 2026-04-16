@@ -14,6 +14,7 @@ public abstract class Item extends Entity {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -21,6 +22,7 @@ public abstract class Item extends Entity {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -28,6 +30,7 @@ public abstract class Item extends Entity {
     public double getStartingPrice() {
         return startingPrice;
     }
+
     public void setStartingPrice(double startingPrice) {
         this.startingPrice = startingPrice;
     }
