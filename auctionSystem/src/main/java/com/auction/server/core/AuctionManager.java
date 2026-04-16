@@ -1,5 +1,6 @@
 package com.auction.server.core;
 
+import com.auction.shared.exceptions.AuthenticationException;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.BidTransaction;
 
@@ -32,7 +33,12 @@ public class AuctionManager {
         return instance;
     }
 
-    public void addAuction(Auction auction) {
+    public void addAuction(Auction auction, String authToken) throws AuthenticationException {
+        // Giả lập kiểm tra token để "cấy" AuthenticationException
+        if (authToken == null || !authToken.equals("ADMIN_SECRET_TOKEN")) {
+            throw new AuthenticationException("Phiên làm việc không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
+        }
+
         if (auction == null) {
             throw new IllegalArgumentException("Auction không thể null");
         }

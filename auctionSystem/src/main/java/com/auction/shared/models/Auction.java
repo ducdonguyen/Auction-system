@@ -1,5 +1,7 @@
 package com.auction.shared.models;
 
+import com.auction.shared.exceptions.AuctionClosedException;
+import com.auction.shared.exceptions.InvalidBidException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -73,13 +75,25 @@ public class Auction implements Serializable {
 
     /**
      * Kiểm tra tính hợp lệ của một lệnh đặt giá mới.
-     * Nguyên lý: Giá mới phải lớn hơn hoặc bằng (Giá hiện tại + Bước giá).
-     * * @param amount Số tiền người dùng muốn đặt
-     *
+     * @param amount Số tiền người dùng muốn đặt
+     * @throws AuctionClosedException nếu phiên đấu giá không ở trạng thái RUNNING
+     * @throws InvalidBidException nếu số tiền đặt không hợp lệ
+     */
+    public void validateBid(double amount) throws AuctionClosedException, InvalidBidException {
+        if (this.status != AuctionStatus.RUNNING) {
+            throw new AuctionClosedException("Phiên đấu giá " + auctionId + " hiện không trong trạng thái cho phép đặt giá.");
+        }
+        if (amount < (this.currentPrice + this.stepPrice)) {
+            throw new InvalidBidException("Giá đặt " + amount + " không hợp lệ. Phải lớn hơn hoặc bằng " + (this.currentPrice + this.stepPrice));
+        }
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ của một lệnh đặt giá mới (trả về boolean).
+     * @param amount Số tiền người dùng muốn đặt
      * @return true nếu giá đặt hợp lệ, false nếu thấp hơn quy định.
      */
     public boolean isValidBid(double amount) {
-        // Đây là quy tắc quan trọng nhất của nghiệp vụ đấu giá
         return amount >= (this.currentPrice + this.stepPrice);
     }
 
