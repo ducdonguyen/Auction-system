@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thêm các Exception">
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/dao/UserDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/dao/UserDao.java" afterDir="false" />
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thêm AuctionRepository, AuctionScheduler">
+      <change afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/exceptions/InvalidBidException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,10 +106,6 @@
       <workItem from="1776041862057" duration="1260000" />
       <workItem from="1776139235955" duration="126000" />
       <workItem from="1776250118772" duration="1682000" />
-      <workItem from="1776269719992" duration="1913000" />
-      <workItem from="1776304796506" duration="192000" />
-      <workItem from="1776331795128" duration="101000" />
-      <workItem from="1776334973961" duration="811000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -182,23 +179,7 @@
       <option name="project" value="LOCAL" />
       <updated>1776250407666</updated>
     </task>
-    <task id="LOCAL-00010" summary="Thêm AuctionRepository, AuctionScheduler">
-      <option name="closed" value="true" />
-      <created>1776269936656</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1776269936656</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Thêm các Exception">
-      <option name="closed" value="true" />
-      <created>1776339793865</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1776339793865</updated>
-    </task>
-    <option name="localTasksCounter" value="12" />
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -7,32 +7,33 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class UserDao {
 
-    private static final String SQL_CHECK_EXISTS = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
-    private static final String SQL_INSERT_USER = "INSERT INTO users (full_name, username, email, password_hash) " +
-            "VALUES (?, ?, ?, ?)";
-    private static final String SQL_FIND_USER = "SELECT id, full_name, username, email, password_hash " +
-            "FROM users WHERE username = ?";
-
     public void initializeDatabase() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                "full_name VARCHAR(100), " +
-                "username VARCHAR(50) UNIQUE, " +
-                "email VARCHAR(100) UNIQUE, " +
-                "password_hash VARCHAR(255))";
-        try (Connection conn = DatabaseConfig.getConnection();
-             java.sql.Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
+        String sql = """
+                CREATE TABLE IF NOT EXISTS users (
+                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                    full_name VARCHAR(100) NOT NULL,
+                    username VARCHAR(50) NOT NULL UNIQUE,
+                    email VARCHAR(100) NOT NULL UNIQUE,
+                    password_hash VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """;
+
+        try (Connection connection = DatabaseConfig.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute(sql);
         }
     }
 
     public boolean existsByUsernameOrEmail(String username, String email) throws SQLException {
-        try (Connection connection = DatabaseConfig.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SQL_CHECK_EXISTS)) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
 
+        try (Connection connection = DatabaseConfig.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
             statement.setString(2, email);
 
@@ -46,9 +47,10 @@ public class UserDao {
     }
 
     public void register(AuthUser user) throws SQLException {
-        try (Connection connection = DatabaseConfig.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USER)) {
+        String sql = "INSERT INTO users (full_name, username, email, password_hash) VALUES (?, ?, ?, ?)";
 
+        try (Connection connection = DatabaseConfig.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getFullName());
             statement.setString(2, user.getUsername());
             statement.setString(3, user.getEmail());
@@ -58,9 +60,10 @@ public class UserDao {
     }
 
     public AuthUser findByUsername(String username) throws SQLException {
-        try (Connection connection = DatabaseConfig.getConnection();
-                PreparedStatement statement = connection.prepareStatement(SQL_FIND_USER)) {
+        String sql = "SELECT id, full_name, username, email, password_hash FROM users WHERE username = ?";
 
+        try (Connection connection = DatabaseConfig.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
 
             try (ResultSet resultSet = statement.executeQuery()) {

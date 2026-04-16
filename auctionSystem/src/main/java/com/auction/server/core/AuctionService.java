@@ -87,7 +87,7 @@ public class AuctionService {
 
         // Nếu vượt qua validateBid (không ném exception), tiến hành cập nhật trạng thái
         BidTransaction transaction = new BidTransaction(
-                "TX-" + System.currentTimeMillis(),
+                "TX-" + System.currentTimeMillis(), // Tạo mã giao dịch tạm thời dựa trên thời gian
                 bidder,
                 bidAmount,
                 LocalDateTime.now()
