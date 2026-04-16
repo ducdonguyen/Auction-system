@@ -1,6 +1,6 @@
 package com.auction.client.service;
 
-import com.auction.client.dao.UserDao;
+import com.auction.server.dao.UserDao;
 import com.auction.client.model.LoginRequest;
 import com.auction.client.model.RegistrationRequest;
 import com.auction.client.model.ServiceResult;
