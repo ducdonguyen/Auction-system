@@ -26,10 +26,26 @@ public final class DatabaseConfig {
         return DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
     }
 
-    private static void initializeDatabase() throws SQLException {
+    public static void initializeDatabase() throws SQLException {
         try (Connection connection = DriverManager.getConnection(BASE_URL, USERNAME, PASSWORD);
-             Statement statement = connection.createStatement()) {
+                Statement statement = connection.createStatement()) {
             statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
+        }
+        String sqlCreateTable = """
+                CREATE TABLE IF NOT EXISTS users (
+                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                    full_name VARCHAR(100) NOT NULL,
+                    username VARCHAR(50) NOT NULL UNIQUE,
+                    email VARCHAR(100) NOT NULL UNIQUE,
+                    password_hash VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """;
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                Statement statement = connection.createStatement()) {
+            statement.execute(sqlCreateTable);
+            System.out.println("[DB] Đã đảm bảo bảng 'users' tồn tại.");
         }
     }
 }

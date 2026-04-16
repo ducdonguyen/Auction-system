@@ -200,7 +200,8 @@
     <MESSAGE value="Thêm @Transactional" />
     <MESSAGE value="Sửa AuctionServiceTest" />
     <MESSAGE value="Thêm AuctionRepository, AuctionScheduler" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thêm AuctionRepository, AuctionScheduler" />
+    <MESSAGE value="Thêm các Exception" />
+    <option name="LAST_COMMIT_MESSAGE" value="Thêm các Exception" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

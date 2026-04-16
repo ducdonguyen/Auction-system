@@ -3,36 +3,46 @@ package com.auction.server;
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.repository.AuctionRepository;
-import com.auction.shared.models.*;
+import com.auction.shared.models.Auction;
+import com.auction.shared.models.AuctionStatus;
+import com.auction.shared.models.Bidder;
+import com.auction.shared.models.Item;
+import com.auction.shared.models.Seller;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.mockito.Mockito;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 public class AuctionServiceTest {
 
-    public static void main(String[] args) throws InterruptedException {
+    @Test
+    public void testConcurrency() throws InterruptedException {
         // 1. Khởi tạo dịch vụ cùng với LockManager và Mock Repository
         AuctionLockManager lockManager = new AuctionLockManager();
-        AuctionRepository auctionRepository = Mockito.mock(AuctionRepository.class);
-        
-        // Cấu hình mock: Khi gọi save() thì trả về chính đối tượng đó
-        when(auctionRepository.save(any(Auction.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        AuctionRepository fakeRepository = new AuctionRepository() {
+            @Override
+            public Auction save(Auction auction) {
+                // Giả lập hệ thống lưu Database thành công và trả về chính nó
+                return auction;
+            }
 
-        AuctionService auctionService = new AuctionService(lockManager, auctionRepository);
+        };
+
+        AuctionService auctionService = new AuctionService(lockManager, fakeRepository);
 
         // 2. Kiểm thử việc TẠO PHIÊN (Sử dụng auctionService thay vì service)
         // Lưu ý: Item là abstract nên ta dùng class ẩn danh {}
-        Item laptop = new Item("IT01", "Macbook Air", 1000.0) {};
+        Item laptop = new Item("IT01", "Macbook Air", 1000.0) {
+        };
         Seller seller = new Seller("S01", "Cửa hàng điện máy");
 
         // Gọi đúng tên biến auctionService
-        Auction myAuction = auctionService.createAuction(laptop, seller, 1000.0, 50.0, LocalDateTime.parse("2026-04-13T10:30:00"), LocalDateTime.parse("2026-05-13T10:30:00"));
+        Auction myAuction =
+                auctionService.createAuction(laptop, seller, 1000.0, 50.0, LocalDateTime.parse("2026-04-13T10:30:00"),
+                        LocalDateTime.parse("2026-05-13T10:30:00"));
 
         System.out.println("========== KIỂM THỬ TẠO PHIÊN ==========");
         if (myAuction != null && myAuction.getAuctionId() != null) {
@@ -57,7 +67,8 @@ public class AuctionServiceTest {
         // --- TEST 2: Đặt giá hợp lệ ---
         System.out.println("\n[Test 2] Đặt giá 1100.0:");
         boolean res2 = auctionService.placeBid(myAuction, bidderA, 1100.0);
-        checkResult(res2 && myAuction.getCurrentPrice() == 1100.0, "Đặt giá thành công. Giá mới: " + myAuction.getCurrentPrice());
+        checkResult(res2 && myAuction.getCurrentPrice() == 1100.0,
+                "Đặt giá thành công. Giá mới: " + myAuction.getCurrentPrice());
 
         // --- TEST 3: Đặt giá khi phiên đã kết thúc ---
         System.out.println("\n[Test 3] Đặt giá khi trạng thái là 'FINISHED':");
@@ -68,7 +79,9 @@ public class AuctionServiceTest {
         // --- TEST 4: KIỂM THỬ ĐỒNG THỜI (CONCURRENCY) ---
         System.out.println("\n========== BẮT ĐẦU KIỂM THỬ ĐA LUỒNG ==========");
         // Tạo một phiên đấu giá mới hoàn toàn để test đa luồng
-        Auction syncAuction = auctionService.createAuction(laptop, seller, 2000.0, 100.0, LocalDateTime.parse("2026-04-13T10:30:00"), LocalDateTime.parse("2026-05-13T10:30:00"));
+        Auction syncAuction =
+                auctionService.createAuction(laptop, seller, 2000.0, 100.0, LocalDateTime.parse("2026-04-13T10:30:00"),
+                        LocalDateTime.parse("2026-05-13T10:30:00"));
         syncAuction.setStatus(AuctionStatus.RUNNING);
 
         System.out.println("Giá khởi điểm: 2000.0. 5 người cùng đặt 2100.0...");
@@ -96,7 +109,7 @@ public class AuctionServiceTest {
         }
     }
 
-    private static void checkResult(boolean condition, String message) {
+    private void checkResult(boolean condition, String message) {
         if (condition) {
             System.out.println("   [PASS] " + message);
         } else {
