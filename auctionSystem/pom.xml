@@ -80,7 +80,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.auction.client.ClientLauncher</mainClass>
+                    <mainClass>com.auction.demo.client.ClientLauncher</mainClass>
                 </configuration>
             </plugin>
 

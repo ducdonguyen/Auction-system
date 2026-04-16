@@ -1,26 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-
-<AnchorPane prefHeight="366.0" prefWidth="512.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controllers.LoginController">
+<AnchorPane prefHeight="640.0" prefWidth="980.0" style="-fx-background-color: linear-gradient(to bottom right, #f8fafc, #dbeafe);" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.demo.client.controller.LoginController">
    <children>
-      <Label layoutX="185.0" layoutY="20.0" text="Đăng nhập">
-         <font>
-            <Font size="34.0" />
-         </font>
-      </Label>
-      <Label layoutX="105.0" layoutY="119.0" text="Tên đăng nhập" />
-      <TextField fx:id="usernameField" layoutX="105.0" layoutY="136.0" prefHeight="26.0" prefWidth="183.0" promptText="Nhập tên đăng nhập" />
-      <Label layoutX="105.0" layoutY="202.0" text="Mật khẩu" />
-      <PasswordField fx:id="passwordField" layoutX="105.0" layoutY="219.0" prefHeight="26.0" prefWidth="183.0" promptText="Nhập mật khẩu" />
-      <Button fx:id="loginButton" layoutX="105.0" layoutY="275.0" mnemonicParsing="false" onAction="#handleLoginAction" prefHeight="32.0" prefWidth="183.0" text="Đăng nhập" />
-      <Button fx:id="goToRegisterButton" layoutX="301.0" layoutY="275.0" mnemonicParsing="false" onAction="#handleGoToRegister" prefHeight="32.0" prefWidth="106.0" text="Đăng ký" />
-      <Label fx:id="errorLabel" layoutX="105.0" layoutY="319.0" prefWidth="302.0" style="-fx-text-fill: red;" />
+      <HBox alignment="CENTER" prefHeight="640.0" prefWidth="980.0" spacing="28.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding><Insets bottom="28.0" left="28.0" right="28.0" top="28.0" /></padding>
+         <children>
+            <VBox prefWidth="420.0" spacing="14.0" style="-fx-background-color: #0f172a; -fx-background-radius: 28;">
+               <padding><Insets bottom="34.0" left="32.0" right="32.0" top="34.0" /></padding>
+               <children>
+                  <Label text="Auction System" textFill="WHITE"><font><Font size="34.0" /></font></Label>
+                  <Label style="-fx-text-fill: #93c5fd;" text="Không gian đấu giá thời gian thực chuyên nghiệp dành cho thành viên và nhà đấu thầu." wrapText="true" />
+                  <Region prefHeight="36.0" />
+                  <Label style="-fx-text-fill: #cbd5e1;" text="Tham gia đấu giá các sản phẩm đa dạng từ Điện tử, Xe cộ đến Nghệ thuật với hệ thống an toàn và minh bạch." wrapText="true" />
+               </children>
+            </VBox>
+            <VBox prefWidth="420.0" spacing="16.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 28; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.18), 30, 0.2, 0, 12);">
+               <padding><Insets bottom="34.0" left="32.0" right="32.0" top="34.0" /></padding>
+               <children>
+                  <Label text="Đăng nhập"><font><Font size="30.0" /></font></Label>
+                  <Label text="Sử dụng tài khoản đã đăng ký để vào hệ thống đấu giá." wrapText="true" />
+                  <VBox spacing="8.0">
+                     <children><Label text="Tên đăng nhập" /><TextField fx:id="usernameField" prefHeight="42.0" promptText="Nhập tên đăng nhập" style="-fx-background-radius: 14;" /></children>
+                  </VBox>
+                  <VBox spacing="8.0">
+                     <children><Label text="Mật khẩu" /><PasswordField fx:id="passwordField" prefHeight="42.0" promptText="Nhập mật khẩu" style="-fx-background-radius: 14;" /></children>
+                  </VBox>
+                  <HBox spacing="12.0">
+                     <children>
+                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#handleLoginAction" prefHeight="44.0" prefWidth="190.0" style="-fx-background-color: #0f766e; -fx-text-fill: white; -fx-background-radius: 14;" text="Đăng nhập" />
+                        <Button fx:id="goToRegisterButton" mnemonicParsing="false" onAction="#handleGoToRegister" prefHeight="44.0" prefWidth="160.0" style="-fx-background-color: #e2e8f0; -fx-text-fill: #0f172a; -fx-background-radius: 14;" text="Đăng ký tài khoản" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="errorLabel" prefWidth="360.0" style="-fx-text-fill: #b91c1c;" wrapText="true" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

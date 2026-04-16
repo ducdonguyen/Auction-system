@@ -1,4 +1,4 @@
-package com.auction.client.config;
+package com.auction.demo.client.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

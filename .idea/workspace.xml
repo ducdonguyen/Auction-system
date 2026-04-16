@@ -6,7 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thêm AuctionRepository, AuctionScheduler">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientLauncher.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/ClientMain.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/config/DatabaseConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/LoginController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controllers/RegisterController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/dao/UserDao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/utils/PasswordUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/views/Register.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
