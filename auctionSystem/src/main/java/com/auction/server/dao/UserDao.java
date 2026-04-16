@@ -16,6 +16,19 @@ public class UserDao {
     private static final String SQL_FIND_USER = "SELECT id, full_name, username, email, password_hash " +
             "FROM users WHERE username = ?";
 
+    public void initializeDatabase() throws SQLException {
+        String sql = "CREATE TABLE IF NOT EXISTS users (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                "full_name VARCHAR(100), " +
+                "username VARCHAR(50) UNIQUE, " +
+                "email VARCHAR(100) UNIQUE, " +
+                "password_hash VARCHAR(255))";
+        try (Connection conn = DatabaseConfig.getConnection();
+             java.sql.Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        }
+    }
+
     public boolean existsByUsernameOrEmail(String username, String email) throws SQLException {
         try (Connection connection = DatabaseConfig.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SQL_CHECK_EXISTS)) {
