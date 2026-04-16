@@ -1,11 +1,11 @@
 package com.auction.server.concurrency;
 
-import org.springframework.stereotype.Component;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.TimeUnit;
 
-@Component
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
+
 public class AuctionLockManager {
     // Lưu trữ danh sách ổ khóa cho từng AuctionId.
     // ConcurrentHashMap đảm bảo việc quản lý các ổ khóa này cũng an toàn đa luồng.
@@ -13,8 +13,9 @@ public class AuctionLockManager {
 
     /**
      * Thực hiện logic đặt giá trong một khối khóa an toàn.
+     *
      * @param lockKey ID của phiên đấu giá (auctionId hoặc itemId)
-     * @param action Đoạn code xử lý logic (kiểm tra giá, lưu DB)
+     * @param action  Đoạn code xử lý logic (kiểm tra giá, lưu DB)
      */
     public void executeWithLock(String lockKey, Runnable action) {
         // Lấy ổ khóa hiện có hoặc tạo mới nếu chưa có cho lockKey này

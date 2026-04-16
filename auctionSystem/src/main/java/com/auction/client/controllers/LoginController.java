@@ -1,8 +1,8 @@
 package com.auction.client.controllers;
 
-import com.auction.client.dao.UserDao;
+import com.auction.server.dao.UserDao;
 import com.auction.shared.models.AuthUser;
-import com.auction.client.utils.PasswordUtil;
+import com.auction.client.util.PasswordUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;

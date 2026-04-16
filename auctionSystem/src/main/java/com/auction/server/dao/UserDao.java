@@ -1,6 +1,6 @@
-package com.auction.client.dao;
+package com.auction.server.dao;
 
-import com.auction.client.config.DatabaseConfig;
+import com.auction.server.config.DatabaseConfig;
 import com.auction.shared.models.AuthUser;
 
 import java.sql.Connection;
