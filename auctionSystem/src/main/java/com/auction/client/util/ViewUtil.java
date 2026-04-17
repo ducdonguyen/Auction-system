@@ -1,4 +1,4 @@
-package com.auction.client.utils;
+package com.auction.client.util;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
