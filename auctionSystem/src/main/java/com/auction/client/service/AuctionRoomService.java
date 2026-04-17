@@ -2,6 +2,9 @@ package com.auction.client.service;
 
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.model.ServiceResult;
+import com.auction.shared.exceptions.AuctionClosedException;
+import com.auction.shared.exceptions.AuthenticationException;
+import com.auction.shared.exceptions.InvalidBidException;
 import com.auction.shared.models.*;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
@@ -50,8 +53,10 @@ public class AuctionRoomService {
                 a.updateAuctionState(bidder, val, transaction);
                 
                 return new ServiceResult<>(true, "Đặt giá thành công cho phiên " + id + "!", toVM(a));
-            } catch (Exception e) { 
-                return new ServiceResult<AuctionRoomViewModel>(false, "Lỗi xử lý: Số tiền không hợp lệ.", toVM(a)); 
+            } catch (InvalidBidException e) {
+                return new ServiceResult<AuctionRoomViewModel>(false, "Số tiền đấu giá không hợp lệ.", toVM(a));
+            } catch (AuctionClosedException e){
+                return new ServiceResult<AuctionRoomViewModel>(false, "Phiên đấu giá đã kết thúc.", toVM(a));
             }
         }).orElse(new ServiceResult<>(false, "Không tìm thấy phiên đấu giá.", null));
     }

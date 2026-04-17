@@ -14,6 +14,8 @@ public class AuctionDataStore {
         Item i2 = ItemFactory.createItem("VEHICLE", "VinFast VF8", "Xe điện thông minh", 1000000000, "29A-123.45");
         Auction a2 = new Auction("AUC002", i2, s, 1000000000, 10000000, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2));
         auctions.add(a1); auctions.add(a2);
+        a1.setStatus(AuctionStatus.FINISHED);
+        a2.setStatus(AuctionStatus.RUNNING);
     }
     public static List<Auction> getAuctions() { return auctions; }
     public static Optional<Auction> findById(String id) { return auctions.stream().filter(a -> a.getAuctionId().equals(id)).findFirst(); }

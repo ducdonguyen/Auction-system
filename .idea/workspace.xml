@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thêm AuctionRepository, AuctionScheduler">
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Sửa isValidBid">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionDataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionDataStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionRoomService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionRoomService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +109,7 @@
       <workItem from="1776041862057" duration="1260000" />
       <workItem from="1776139235955" duration="126000" />
       <workItem from="1776250118772" duration="1682000" />
-      <workItem from="1776388377072" duration="900000" />
+      <workItem from="1776388377072" duration="1784000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -182,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776250407666</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Sửa isValidBid">
+      <option name="closed" value="true" />
+      <created>1776389498687</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1776389498687</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -202,9 +211,10 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Thêm @Transactional" />
     <MESSAGE value="Sửa AuctionServiceTest" />
-    <MESSAGE value="Thêm AuctionRepository, AuctionScheduler" />
     <MESSAGE value="Thêm các Exception" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thêm các Exception" />
+    <MESSAGE value="Thêm AuctionRepository, AuctionScheduler" />
+    <MESSAGE value="Sửa isValidBid" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sửa isValidBid" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
