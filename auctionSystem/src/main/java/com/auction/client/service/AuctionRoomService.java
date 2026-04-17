@@ -30,7 +30,7 @@ public class AuctionRoomService {
                 double val = Double.parseDouble(cleanAmt);
                 
                 // Kiểm tra logic đặt giá từ lớp Auction
-                if (!a.isValidBid(val)) {
+                if (!a.validateBid(val)) {
                     return new ServiceResult<AuctionRoomViewModel>(false, "Giá đặt phải ít nhất bằng: " + cur.format(a.getCurrentPrice() + a.getStepPrice()), toVM(a));
                 }
 
