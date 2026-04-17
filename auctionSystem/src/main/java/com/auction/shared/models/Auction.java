@@ -79,12 +79,15 @@ public class Auction implements Serializable {
      * @throws AuctionClosedException nếu phiên đấu giá không ở trạng thái RUNNING
      * @throws InvalidBidException nếu số tiền đặt không hợp lệ
      */
-    public void validateBid(double amount) throws AuctionClosedException, InvalidBidException {
+    public boolean validateBid(double amount) throws AuctionClosedException, InvalidBidException {
         if (this.status != AuctionStatus.RUNNING) {
             throw new AuctionClosedException("Phiên đấu giá " + auctionId + " hiện không trong trạng thái cho phép đặt giá.");
         }
         if (amount < (this.currentPrice + this.stepPrice)) {
             throw new InvalidBidException("Giá đặt " + amount + " không hợp lệ. Phải lớn hơn hoặc bằng " + (this.currentPrice + this.stepPrice));
+        }
+        else{
+            return true;
         }
     }
 
@@ -93,9 +96,7 @@ public class Auction implements Serializable {
      * @param amount Số tiền người dùng muốn đặt
      * @return true nếu giá đặt hợp lệ, false nếu thấp hơn quy định.
      */
-    public boolean isValidBid(double amount) {
-        return amount >= (this.currentPrice + this.stepPrice);
-    }
+
 
     /**
      * Cập nhật trạng thái mới cho phiên đấu giá khi có một lượt đặt giá thành công.
