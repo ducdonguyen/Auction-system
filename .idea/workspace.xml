@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thêm các Exception">
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Cấu hình thư viện JUnit5 vào file pom.xml">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auctionSystem/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/pom.xml" afterDir="false" />
     </list>
@@ -38,12 +38,12 @@
     &quot;assignee&quot;: &quot;ducdonguyen&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ducdonguyen/Auction-system.git",
-    "accountId": "7dae0bae-ce59-46f7-9535-e39d0cc90aab"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ducdonguyen/Auction-system.git&quot;,
+    &quot;accountId&quot;: &quot;7dae0bae-ce59-46f7-9535-e39d0cc90aab&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <McpServerCommand sourceId="UserConfigurationSource">
       <option name="allowedToolsNames" />
@@ -212,7 +212,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776339793865</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Cấu hình thư viện JUnit5 vào file pom.xml">
+      <option name="closed" value="true" />
+      <created>1776425410475</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1776425410475</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -234,7 +242,8 @@
     <MESSAGE value="Sửa AuctionServiceTest" />
     <MESSAGE value="Thêm AuctionRepository, AuctionScheduler" />
     <MESSAGE value="Thêm các Exception" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thêm các Exception" />
+    <MESSAGE value="Cấu hình thư viện JUnit5 vào file pom.xml" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cấu hình thư viện JUnit5 vào file pom.xml" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
