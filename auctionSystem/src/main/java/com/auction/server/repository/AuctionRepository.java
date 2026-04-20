@@ -10,7 +10,6 @@ import java.util.List;
 public class AuctionRepository {
 
     /**
-     * Hàm này thay thế cho JpaRepository.save() của Spring.
      * Nhiệm vụ: Lưu mới (INSERT) hoặc cập nhật (UPDATE) thông tin vào MySQL.
      */
     public Auction save(Auction auction) {

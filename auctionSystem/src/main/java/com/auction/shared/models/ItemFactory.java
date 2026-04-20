@@ -23,7 +23,6 @@ public class ItemFactory {
 
     /**
      * Cho phép các Module khác tự do thêm loại sản phẩm mới từ bên ngoài
-     * mà KHÔNG CẦN chạm vào mã nguồn của class này (Đúng chuẩn Open/Closed).
      */
     public static void registerNewItemType(String type, ItemCreator creator) {
         ITEM_REGISTRY.put(type.toUpperCase(), creator);

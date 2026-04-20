@@ -17,7 +17,6 @@ public class BidTransaction implements Serializable {
         this.timestamp = timestamp;
     }
 
-    // --- Getters ---
     public String getTransactionId() {
         return transactionId;
     }

@@ -19,10 +19,8 @@ public class ClientMain extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
         AnchorPane loginView = loader.load();
 
-        // Tạo scene
         Scene scene = new Scene(loginView, 600, 400);
 
-        // Setup stage
         primaryStage.setTitle("Auction System - Client");
         primaryStage.setScene(scene);
         primaryStage.show();

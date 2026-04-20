@@ -21,10 +21,7 @@ public class AuctionManager {
 
     public static AuctionManager getInstance() {
         if (instance == null) {
-            // Chỉ lock khi bắt đầu khởi tạo lần đầu tiên
             synchronized (AuctionManager.class) {
-                // Kiểm tra lần 2: Đề phòng trường hợp luồng khác đã kịp khởi tạo instance
-                // trong lúc luồng này đang chờ lấy lock
                 if (instance == null) {
                     instance = new AuctionManager();
                 }
@@ -34,7 +31,6 @@ public class AuctionManager {
     }
 
     public void addAuction(Auction auction, String authToken) throws AuthenticationException {
-        // Giả lập kiểm tra token để "cấy" AuthenticationException
         if (authToken == null || !authToken.equals("ADMIN_SECRET_TOKEN")) {
             throw new AuthenticationException("Phiên làm việc không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
         }
