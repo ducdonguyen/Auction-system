@@ -16,9 +16,12 @@ public class ItemFactory {
 
     // Khởi tạo các công thức mặc định một lần duy nhất
     static {
-        ITEM_REGISTRY.put("ELECTRONICS", (n, d, p, e) -> new Electronics(n, d, p, Integer.parseInt(e)));
-        ITEM_REGISTRY.put("ART", (n, d, p, e) -> new Art(n, d, p, e));
-        ITEM_REGISTRY.put("VEHICLE", (n, d, p, e) -> new Vehicle(n, d, p, e));
+        ITEM_REGISTRY.put("ELECTRONICS", (name, description, price, extraParam) ->
+                new Electronics(name, description, price, Integer.parseInt(extraParam)));
+        ITEM_REGISTRY.put("ART", (name, description, price, extraParam) ->
+                new Art(name, description, price, extraParam));
+        ITEM_REGISTRY.put("VEHICLE", (name, description, price, extraParam) ->
+                new Vehicle(name, description, price, extraParam));
     }
 
     /**

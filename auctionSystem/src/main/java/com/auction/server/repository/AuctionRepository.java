@@ -9,6 +9,11 @@ import java.util.List;
 
 public class AuctionRepository {
 
+    public Auction findById(String auctionId) {
+        // TODO: Viết câu lệnh SELECT * FROM auctions WHERE id = ?
+        return null; // Giả lập chưa tìm thấy
+    }
+
     /**
      * Nhiệm vụ: Lưu mới (INSERT) hoặc cập nhật (UPDATE) thông tin vào MySQL.
      */

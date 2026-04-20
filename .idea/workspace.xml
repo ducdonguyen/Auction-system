@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Cho các Entity implement Serializable">
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionLockManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionLockManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/BidTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/BidTransaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Bidder.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Bidder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Entity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/ItemFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/ItemFactory.java" afterDir="false" />
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Xóa code smell, theem các file trong network">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/RequestRouter.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/RequestRouter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,42 +51,72 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.AuctionServiceTest.executor": "Run",
-    "Application.ClientLauncher.executor": "Run",
-    "Application.ClientMain.executor": "Run",
-    "Application.SerializationTest.executor": "Run",
-    "JUnit.AuctionServiceTest.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.ServerApplication.executor": "Run",
-    "git-widget-placeholder": "dev",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/BTL",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ClientLauncher.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ClientMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SerializationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/BTL&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql_aurora"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql_aurora&quot;
     ]
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="AuctionServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.server" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.server.AuctionServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.AuctionServiceTest" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -114,7 +140,10 @@
       <workItem from="1776139235955" duration="126000" />
       <workItem from="1776250118772" duration="1682000" />
       <workItem from="1776388377072" duration="4398000" />
-      <workItem from="1776679199931" duration="1766000" />
+      <workItem from="1776679199931" duration="2258000" />
+      <workItem from="1776685642421" duration="1489000" />
+      <workItem from="1776687234231" duration="2607000" />
+      <workItem from="1776698168466" duration="3572000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -212,7 +241,31 @@
       <option name="project" value="LOCAL" />
       <updated>1776680556586</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Xóa code smell">
+      <option name="closed" value="true" />
+      <created>1776681297210</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1776681297210</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Xóa code smell, theem các file trong network">
+      <option name="closed" value="true" />
+      <created>1776689517797</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1776689517797</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Xóa code smell, theem các file trong network">
+      <option name="closed" value="true" />
+      <created>1776699127495</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1776699127496</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -237,7 +290,9 @@
     <MESSAGE value="Sửa isValidBid" />
     <MESSAGE value="Thêm các catch lỗi" />
     <MESSAGE value="Cho các Entity implement Serializable" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cho các Entity implement Serializable" />
+    <MESSAGE value="Xóa code smell" />
+    <MESSAGE value="Xóa code smell, theem các file trong network" />
+    <option name="LAST_COMMIT_MESSAGE" value="Xóa code smell, theem các file trong network" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

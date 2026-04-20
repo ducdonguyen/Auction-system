@@ -1,9 +1,9 @@
 package com.auction.client.service;
 
 import com.auction.server.dao.UserDao;
-import com.auction.client.model.LoginRequest;
-import com.auction.client.model.RegistrationRequest;
-import com.auction.client.model.ServiceResult;
+import com.auction.shared.network.LoginRequest;
+import com.auction.shared.network.RegistrationRequest;
+import com.auction.shared.network.ServiceResult;
 import com.auction.client.util.PasswordUtil;
 import com.auction.shared.models.AuthUser;
 
