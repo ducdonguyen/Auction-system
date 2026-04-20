@@ -57,7 +57,7 @@ public class AuctionService {
             Bidder bidder = new Bidder(bidderUsername, "", 0); // Simplified for now
 
             // Ensure only one person can bid at a time for this auction
-            lockManager.executeWithLock(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, bidAmount));
+            lockManager.lockAndRun(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, bidAmount));
 
             auctionRepository.save(auction);
 
@@ -77,7 +77,7 @@ public class AuctionService {
     public boolean placeBid(Auction auction, Bidder bidder, double bidAmount) {
         try {
             // Sử dụng lock manager để đảm bảo chỉ một người có thể đặt giá cho phiên này tại một thời điểm
-            lockManager.executeWithLock(auction.getAuctionId(), () -> {
+            lockManager.lockAndRun(auction.getAuctionId(), () -> {
                 performPlaceBid(auction, bidder, bidAmount);
             });
 

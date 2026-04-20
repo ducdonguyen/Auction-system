@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AuctionLockManager {
     private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
-    public void executeWithLock(String lockKey, Runnable action) {
+    public void lockAndRun(String lockKey, Runnable action) {
         ReentrantLock lock = locks.computeIfAbsent(lockKey, k -> new ReentrantLock());
 
         try {
