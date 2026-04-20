@@ -1,6 +1,7 @@
 package com.auction.shared.models;
 
 public class Seller extends User {
+    private static final long serialVersionUID = 1L;
     private double rating; // Đánh giá uy tín (ví dụ: từ 1.0 đến 5.0)
 
     public Seller(String username, String password) {

@@ -1,6 +1,7 @@
 package com.auction.shared.models;
 
 public class Vehicle extends Item {
+    private static final long serialVersionUID = 1L;
     private String brand;
     private int productionYear;
 

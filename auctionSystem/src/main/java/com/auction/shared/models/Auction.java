@@ -13,6 +13,7 @@ import java.util.List;
  * Triển khai Serializable để có thể gửi đối tượng qua Socket giữa Client và Server.
  */
 public class Auction implements Serializable {
+    private static final long serialVersionUID = 1L;
     // --- THUỘC TÍNH (ATTRIBUTES) ---
 
     private String auctionId;      // Mã định danh duy nhất cho mỗi phiên đấu giá
