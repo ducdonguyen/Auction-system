@@ -1,10 +1,10 @@
 package com.auction.shared.models;
 
 public class Bidder extends User {
+    private static final long serialVersionUID = 1L;
     private double balance;
 
     public Bidder(String username, String password, double initialBalance) {
-        // Gọi constructor của lớp cha (User) để khởi tạo username và password
         super(username, password);
         this.balance = initialBalance;
     }

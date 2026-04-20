@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public abstract class Entity implements Serializable {
-    // Đóng gói (Encapsulation): Thuộc tính phải là private
+    private static final long serialVersionUID = 1L;
     private String id;
 
     public Entity() {
