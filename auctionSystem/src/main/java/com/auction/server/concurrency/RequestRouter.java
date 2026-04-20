@@ -15,16 +15,11 @@ public class RequestRouter {
 
     public static void route(Object request, ClientHandler handler, ObjectOutputStream out, AuctionService auctionService) {
         try {
-            if (request instanceof LoginRequest loginRequest) {
-                handleLogin(loginRequest, out);
-            } else if (request instanceof RegistrationRequest registrationRequest) {
-                handleRegister(registrationRequest, out);
-            } else if (request instanceof JoinRoomRequest joinRequest) {
-                handleJoinRoom(joinRequest, handler, out);
-            } else if (request instanceof BidRequest bidRequest) {
-                handleBid(bidRequest, out, auctionService);
-            } else {
-                System.out.println("[RequestRouter] Unknown request type: " + request.getClass().getName());
+            switch (request) {
+                case LoginRequest login -> handleLogin(login, out);
+                case BidRequest bid -> handleBid(bid, out, auctionService);
+                case JoinRoomRequest join -> handleJoinRoom(join, handler, out);
+                default -> System.out.println("Unknown request");
             }
         } catch (Exception e) {
             System.err.println("[RequestRouter] Error routing request: " + e.getMessage());
