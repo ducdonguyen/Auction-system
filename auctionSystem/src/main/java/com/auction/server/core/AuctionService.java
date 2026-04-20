@@ -118,8 +118,8 @@ public class AuctionService {
             System.out.println("[INFO] Auction " + auction.getAuctionId()
                     + ": " + oldStatus + " -> " + nextStatus);
 
-            // TODO: Nơi đây bạn có thể thêm logic Broadcast qua Socket sau này
-            // broadcastStatusUpdate(auction);
+            // Broadcast cập nhật trạng thái tới tất cả các Client đang theo dõi
+            AuctionManager.getInstance().notifyStatusUpdate(auction.getAuctionId(), nextStatus);
 
             return true;
         } else {

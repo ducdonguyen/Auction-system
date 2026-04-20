@@ -3,6 +3,7 @@ package com.auction.server.concurrency;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionObserver;
 import com.auction.server.core.AuctionService;
+import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
 
 import java.io.IOException;
@@ -73,7 +74,19 @@ public class ClientHandler implements Runnable, AuctionObserver {
             out.flush(); // Đẩy đi ngay lập tức
             System.out.println("[ClientHandler] Đã gửi thông báo giá mới về cho Client.");
         } catch (Exception e) {
-            System.err.println("[ClientHandler] Lỗi khi gửi thông báo qua mạng: " + e.getMessage());
+            System.err.println("[ClientHandler] Lỗi khi gửi thông báo giá mới: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateStatus(String auctionId, AuctionStatus newStatus) {
+        try {
+            // Gửi cập nhật trạng thái mới về cho Client qua Socket
+            out.writeObject(newStatus);
+            out.flush();
+            System.out.println("[ClientHandler] Đã gửi thông báo cập nhật trạng thái (" + newStatus + ") về cho Client.");
+        } catch (Exception e) {
+            System.err.println("[ClientHandler] Lỗi khi gửi thông báo trạng thái: " + e.getMessage());
         }
     }
 }

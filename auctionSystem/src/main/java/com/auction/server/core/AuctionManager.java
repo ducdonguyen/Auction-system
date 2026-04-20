@@ -2,6 +2,7 @@ package com.auction.server.core;
 
 import com.auction.shared.exceptions.AuthenticationException;
 import com.auction.shared.models.Auction;
+import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
 
 import java.util.List;
@@ -67,6 +68,15 @@ public class AuctionManager {
         if (observers != null) {
             for (AuctionObserver observer : observers) {
                 observer.updateNewBid(auctionId, newBid);
+            }
+        }
+    }
+
+    public void notifyStatusUpdate(String auctionId, AuctionStatus newStatus) {
+        List<AuctionObserver> observers = observersMap.get(auctionId);
+        if (observers != null) {
+            for (AuctionObserver observer : observers) {
+                observer.updateStatus(auctionId, newStatus);
             }
         }
     }
