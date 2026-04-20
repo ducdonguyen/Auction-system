@@ -4,13 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Cho các Entity implement Serializable">
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionLockManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionLockManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Auction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/BidTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/BidTransaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Bidder.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Bidder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Entity.java" afterDir="false" />
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Xóa code smell">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/AuctionRoomController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/AuctionRoomController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/RegisterController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/model/LoginRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/model/RegistrationRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/model/ServiceResult.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionRoomService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionRoomService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/ServerApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/ServerApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/ItemFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/ItemFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/network/A.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/resources/mysql-users.sql" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/resources/sql/mysql-users.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +28,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="81" />
+    <option name="cachedIndexableFilesCount" value="79" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -73,8 +83,10 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.ServerApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "dev",
     "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/BTL",
     "node.js.detected.package.eslint": "true",
@@ -83,6 +95,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
+    "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -91,6 +104,33 @@
     ]
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="AuctionServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.server" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.server.AuctionServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.AuctionServiceTest" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -114,7 +154,9 @@
       <workItem from="1776139235955" duration="126000" />
       <workItem from="1776250118772" duration="1682000" />
       <workItem from="1776388377072" duration="4398000" />
-      <workItem from="1776679199931" duration="1766000" />
+      <workItem from="1776679199931" duration="2258000" />
+      <workItem from="1776685642421" duration="1489000" />
+      <workItem from="1776687234231" duration="2230000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -212,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776680556586</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Xóa code smell">
+      <option name="closed" value="true" />
+      <created>1776681297210</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1776681297210</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -237,7 +287,8 @@
     <MESSAGE value="Sửa isValidBid" />
     <MESSAGE value="Thêm các catch lỗi" />
     <MESSAGE value="Cho các Entity implement Serializable" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cho các Entity implement Serializable" />
+    <MESSAGE value="Xóa code smell" />
+    <option name="LAST_COMMIT_MESSAGE" value="Xóa code smell" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

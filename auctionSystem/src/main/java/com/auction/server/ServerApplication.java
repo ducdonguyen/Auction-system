@@ -45,7 +45,7 @@ public class ServerApplication {
 
                     // Bước 3: Chấp nhận và Cử nhân viên phục vụ (Accepting & Serving)
                     // Tạo một ClientHandler (đã tích hợp AuctionObserver) để tiếp khách
-                    ClientHandler handler = new ClientHandler(clientSocket);
+                    ClientHandler handler = new ClientHandler(clientSocket, auctionService);
 
                     // Giao việc cho một Luồng (Thread) mới để Main Thread quay lại cửa đón khách tiếp theo
                     Thread thread = new Thread(handler);

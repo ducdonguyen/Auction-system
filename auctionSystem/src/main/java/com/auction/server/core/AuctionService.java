@@ -46,6 +46,34 @@ public class AuctionService {
         return auctionRepository.save(newAuction);
     }
 
+    public boolean placeBid(String auctionId, String bidderUsername, double bidAmount) {
+        try {
+            Auction auction = auctionRepository.findById(auctionId);
+            if (auction == null) {
+                System.err.println("[FAILED] Auction không tồn tại: " + auctionId);
+                return false;
+            }
+
+            Bidder bidder = new Bidder(bidderUsername, "", 0); // Simplified for now
+
+            // Ensure only one person can bid at a time for this auction
+            lockManager.executeWithLock(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, bidAmount));
+
+            auctionRepository.save(auction);
+
+            // Notify observers via AuctionManager
+            BidTransaction lastBid = auction.getBidHistory().get(auction.getBidHistory().size() - 1);
+            AuctionManager.getInstance().notifyObservers(auctionId, lastBid);
+            return true;
+        } catch (AuctionClosedException | InvalidBidException e) {
+            System.err.println("[FAILED] Bid rejected: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("[ERROR] Unknown error during bidding: " + e.getMessage());
+            throw new RuntimeException("Lỗi đặt giá: " + e.getMessage());
+        }
+    }
+
     public boolean placeBid(Auction auction, Bidder bidder, double bidAmount) {
         try {
             // Sử dụng lock manager để đảm bảo chỉ một người có thể đặt giá cho phiên này tại một thời điểm

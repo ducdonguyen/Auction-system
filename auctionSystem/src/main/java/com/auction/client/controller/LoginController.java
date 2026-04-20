@@ -1,7 +1,7 @@
 package com.auction.client.controller;
 
-import com.auction.client.model.LoginRequest;
-import com.auction.client.model.ServiceResult;
+import com.auction.shared.network.LoginRequest;
+import com.auction.shared.network.ServiceResult;
 import com.auction.client.service.AuthService;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuthUser;
@@ -34,29 +34,30 @@ public class LoginController {
 
     @FXML
     private void handleLoginAction() {
-        // Gọi Service xử lý đăng nhập
-        ServiceResult<AuthUser> result = authService.login(new LoginRequest(
-                usernameField.getText(),
-                passwordField.getText()
-        ));
+        // Request login via Service
+        LoginRequest request = new LoginRequest(usernameField.getText(), passwordField.getText());
+        ServiceResult<AuthUser> result = authService.login(request);
         
-        // Hiển thị thông báo phản hồi từ Service
+        // Display feedback to user
         errorLabel.setText(result.message());
         errorLabel.setStyle(result.success() ? "-fx-text-fill: #059669;" : "-fx-text-fill: #dc2626;");
         
         if (result.success()) {
-            try {
-                // Chuyển hướng sang màn hình Danh sách đấu giá khi thành công
-                SceneNavigator.switchScene(
-                        loginButton, 
-                        "/views/AuctionList.fxml",
-                        "Hệ thống đấu giá - Danh sách phiên đấu giá", 
-                        1200, 760
-                );
-            } catch (IOException e) {
-                errorLabel.setText("Lỗi: Không thể mở danh sách phiên đấu giá.");
-                errorLabel.setStyle("-fx-text-fill: #dc2626;");
-            }
+            navigateToAuctionList();
+        }
+    }
+
+    private void navigateToAuctionList() {
+        try {
+            SceneNavigator.switchScene(
+                    loginButton, 
+                    "/views/AuctionList.fxml",
+                    "Hệ thống đấu giá - Danh sách phiên đấu giá", 
+                    1200, 760
+            );
+        } catch (IOException e) {
+            errorLabel.setText("Lỗi: Không thể mở danh sách phiên đấu giá.");
+            errorLabel.setStyle("-fx-text-fill: #dc2626;");
         }
     }
 
