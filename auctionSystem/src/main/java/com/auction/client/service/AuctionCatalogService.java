@@ -3,6 +3,7 @@ package com.auction.client.service;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionRow;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,17 +18,29 @@ public class AuctionCatalogService {
     }
 
     public List<AuctionRow> filterAuctions(String keyword, String status) {
-        String kw = (keyword == null) ? "" : keyword.trim().toLowerCase(Locale.ROOT);
-        return AuctionDataStore.getAuctions().stream()
-                .filter(a -> kw.isEmpty() || a.getAuctionId().toLowerCase().contains(kw) || a.getItem().getName().toLowerCase().contains(kw))
-                .filter(a -> status == null || "Tất cả".equals(status) || a.getStatus().name().equalsIgnoreCase(status))
-                .map(this::toRow)
-                .toList();
+        String kw = (keyword == null) ? "" : keyword.toLowerCase().trim();
+        boolean isFilterAll = (status == null || "Tất cả".equals(status));
+
+        List<AuctionRow> result = new ArrayList<>();
+        for (Auction a : AuctionDataStore.getAuctions()) {
+            if (matchesKeyword(a, kw)) {
+                if (isFilterAll || a.getStatus().name().equalsIgnoreCase(status)) {
+                    result.add(toRow(a)); // map + collect
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean matchesKeyword(Auction a, String kw) {
+        if (kw.isEmpty()) return true;
+        return a.getAuctionId().toLowerCase().contains(kw) 
+                || a.getItem().getName().toLowerCase().contains(kw);
     }
 
     private AuctionRow toRow(Auction a) {
         String bidder = (a.getHighestBidder() == null) ? "Chưa có" : a.getHighestBidder().getUsername();
-        String summary = a.getItem().getDescription() + " | Người dẫn đầu: " + bidder;
+        
         return new AuctionRow(
                 a.getAuctionId(),
                 a.getItem().getName(),
@@ -35,7 +48,7 @@ public class AuctionCatalogService {
                 currencyFormat.format(a.getCurrentPrice()),
                 currencyFormat.format(a.getStepPrice()),
                 a.getStatus().name(),
-                summary,
+                String.format("%s | Người dẫn đầu: %s", a.getItem().getDescription(), bidder),
                 bidder
         );
     }

@@ -4,15 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Sửa file AuctionLockManager">
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thêm đa hình">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Art.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Art.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Electronics.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Electronics.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Item.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Vehicle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionCatalogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionCatalogService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/server/AuctionServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/server/AuctionServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +59,7 @@
     &quot;Application.ClientMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.SerializationTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ObjectSerializationTest.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
@@ -117,8 +113,24 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ObjectSerializationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.shared.network.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.shared.network" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.shared.network.ObjectSerializationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ObjectSerializationTest" />
         <item itemvalue="JUnit.AuctionServiceTest" />
       </list>
     </recent_temporary>
@@ -150,7 +162,8 @@
       <workItem from="1776685642421" duration="1489000" />
       <workItem from="1776687234231" duration="2607000" />
       <workItem from="1776698168466" duration="5003000" />
-      <workItem from="1776734361515" duration="6059000" />
+      <workItem from="1776734361515" duration="6088000" />
+      <workItem from="1776744240374" duration="11670000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -288,7 +301,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776703204025</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Thêm đa hình">
+      <option name="closed" value="true" />
+      <created>1776740528806</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1776740528806</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -317,7 +338,8 @@
     <MESSAGE value="Xóa code smell, theem các file trong network" />
     <MESSAGE value="Refractor Class RequestRouter" />
     <MESSAGE value="Sửa file AuctionLockManager" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sửa file AuctionLockManager" />
+    <MESSAGE value="Thêm đa hình" />
+    <option name="LAST_COMMIT_MESSAGE" value="Thêm đa hình" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
