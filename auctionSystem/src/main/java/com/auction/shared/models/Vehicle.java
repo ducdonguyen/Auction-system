@@ -10,11 +10,10 @@ public class Vehicle extends Item {
         this.brand = brand;
     }
 
-    public String getBrand() {
-        return brand;
-    }
-
     public void setBrand(String brand) {
         this.brand = brand;
     }
+
+    public String getItemType() { return "ELECTRONICS"; }
+    public String getExtraInfo() { return brand; }
 }

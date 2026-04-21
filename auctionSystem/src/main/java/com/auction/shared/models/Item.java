@@ -35,4 +35,8 @@ public abstract class Item extends Entity {
     public void setStartingPrice(double startingPrice) {
         this.startingPrice = startingPrice;
     }
+
+    public abstract String getItemType();
+
+    public abstract String getExtraInfo();
 }

@@ -4,10 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Refractor Class RequestRouter">
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Sửa file AuctionLockManager">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionLockManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/concurrency/AuctionLockManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/core/AuctionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Art.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Art.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Electronics.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Electronics.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Item.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Vehicle.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/Vehicle.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +149,8 @@
       <workItem from="1776679199931" duration="2258000" />
       <workItem from="1776685642421" duration="1489000" />
       <workItem from="1776687234231" duration="2607000" />
-      <workItem from="1776698168466" duration="4973000" />
+      <workItem from="1776698168466" duration="5003000" />
+      <workItem from="1776734361515" duration="6059000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -274,7 +280,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776701860309</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Sửa file AuctionLockManager">
+      <option name="closed" value="true" />
+      <created>1776703204025</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1776703204025</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -302,7 +316,8 @@
     <MESSAGE value="Xóa code smell" />
     <MESSAGE value="Xóa code smell, theem các file trong network" />
     <MESSAGE value="Refractor Class RequestRouter" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refractor Class RequestRouter" />
+    <MESSAGE value="Sửa file AuctionLockManager" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sửa file AuctionLockManager" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

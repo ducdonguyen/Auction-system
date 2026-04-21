@@ -9,11 +9,10 @@ public class Electronics extends Item {
         this.warrantyMonths = warrantyMonths;
     }
 
-    public int getWarrantyMonths() {
-        return warrantyMonths;
-    }
-
     public void setWarrantyMonths(int warrantyMonths) {
         this.warrantyMonths = warrantyMonths;
     }
+
+    public String getItemType() { return "ELECTRONICS"; }
+    public String getExtraInfo() { return String.valueOf(warrantyMonths); }
 }
