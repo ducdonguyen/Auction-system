@@ -13,6 +13,11 @@ public class Electronics extends Item {
         this.warrantyMonths = warrantyMonths;
     }
 
-    public String getItemType() { return "ELECTRONICS"; }
-    public String getExtraInfo() { return String.valueOf(warrantyMonths); }
+    public String getItemType() {
+        return "ELECTRONICS";
+    }
+
+    public String getExtraInfo() {
+        return String.valueOf(warrantyMonths);
+    }
 }

@@ -1,11 +1,11 @@
 package com.auction.client.service;
 
+import com.auction.client.util.PasswordUtil;
 import com.auction.server.dao.UserDao;
+import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
-import com.auction.client.util.PasswordUtil;
-import com.auction.shared.models.AuthUser;
 
 import java.sql.SQLException;
 
@@ -17,7 +17,8 @@ public class AuthService {
         userDao.initializeDatabase();
         // Tự động tạo tài khoản mẫu nếu chưa có
         if (userDao.findByUsername("admin") == null) {
-            AuthUser admin = new AuthUser("Quản trị viên", "admin", "admin@auction.com", PasswordUtil.hashPassword("123456"));
+            AuthUser admin =
+                    new AuthUser("Quản trị viên", "admin", "admin@auction.com", PasswordUtil.hashPassword("123456"));
             userDao.register(admin);
         }
     }
@@ -38,7 +39,7 @@ public class AuthService {
             if (!PasswordUtil.matches(password, user.getPasswordHash())) {
                 return new ServiceResult<>(false, "Mật khẩu không chính xác. Vui lòng thử lại.", null);
             }
-            
+
             // Lưu thông tin vào phiên làm việc
             SessionContext.setCurrentUser(user);
             return new ServiceResult<>(true, "Đăng nhập thành công! Đang chuyển hướng...", user);
@@ -54,10 +55,10 @@ public class AuthService {
             }
 
             AuthUser user = new AuthUser(
-                request.fullName(), 
-                request.username(), 
-                request.email(), 
-                PasswordUtil.hashPassword(request.password())
+                    request.fullName(),
+                    request.username(),
+                    request.email(),
+                    PasswordUtil.hashPassword(request.password())
             );
             userDao.register(user);
             return new ServiceResult<>(true, "Đăng ký thành công! Hãy đăng nhập ngay.", user);

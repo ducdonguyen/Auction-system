@@ -2,6 +2,7 @@ package com.auction.client.service;
 
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionRow;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +34,16 @@ public class AuctionCatalogService {
     }
 
     private boolean matchesKeyword(Auction a, String kw) {
-        if (kw.isEmpty()) return true;
-        return a.getAuctionId().toLowerCase().contains(kw) 
+        if (kw.isEmpty()) {
+            return true;
+        }
+        return a.getAuctionId().toLowerCase().contains(kw)
                 || a.getItem().getName().toLowerCase().contains(kw);
     }
 
     private AuctionRow toRow(Auction a) {
         String bidder = (a.getHighestBidder() == null) ? "Chưa có" : a.getHighestBidder().getUsername();
-        
+
         return new AuctionRow(
                 a.getAuctionId(),
                 a.getItem().getName(),

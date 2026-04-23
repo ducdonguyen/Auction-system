@@ -24,7 +24,7 @@ public class UserDao {
                 """;
 
         try (Connection connection = DatabaseConfig.getConnection();
-             Statement statement = connection.createStatement()) {
+                Statement statement = connection.createStatement()) {
             statement.execute(sql);
         }
     }
@@ -33,7 +33,7 @@ public class UserDao {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
 
         try (Connection connection = DatabaseConfig.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
             statement.setString(2, email);
 
@@ -50,7 +50,7 @@ public class UserDao {
         String sql = "INSERT INTO users (full_name, username, email, password_hash) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConfig.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getFullName());
             statement.setString(2, user.getUsername());
             statement.setString(3, user.getEmail());
@@ -63,7 +63,7 @@ public class UserDao {
         String sql = "SELECT id, full_name, username, email, password_hash FROM users WHERE username = ?";
 
         try (Connection connection = DatabaseConfig.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
 
             try (ResultSet resultSet = statement.executeQuery()) {

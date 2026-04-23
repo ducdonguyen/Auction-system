@@ -1,19 +1,23 @@
 package com.auction.server.concurrency;
 
+import com.auction.client.util.PasswordUtil;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.dao.UserDao;
-import com.auction.shared.models.*;
-import com.auction.shared.network.*;
-import com.auction.client.util.PasswordUtil;
+import com.auction.shared.models.AuthUser;
+import com.auction.shared.models.BidRequest;
+import com.auction.shared.models.JoinRoomRequest;
+import com.auction.shared.network.LoginRequest;
+import com.auction.shared.network.RegistrationRequest;
+import com.auction.shared.network.ServiceResult;
 
 import java.io.ObjectOutputStream;
-import java.sql.SQLException;
 
 public class RequestRouter {
     private static final UserDao userDao = new UserDao();
 
-    public static void route(Object request, ClientHandler handler, ObjectOutputStream out, AuctionService auctionService) {
+    public static void route(Object request, ClientHandler handler, ObjectOutputStream out,
+                             AuctionService auctionService) {
         try {
             switch (request) {
                 case LoginRequest login -> handleLogin(login, out);
@@ -43,14 +47,16 @@ public class RequestRouter {
         if (userDao.existsByUsernameOrEmail(request.username(), request.email())) {
             result = new ServiceResult<>(false, "Username or email already exists", null);
         } else {
-            AuthUser newUser = new AuthUser(request.fullName(), request.username(), request.email(), PasswordUtil.hashPassword(request.password()));
+            AuthUser newUser = new AuthUser(request.fullName(), request.username(), request.email(),
+                    PasswordUtil.hashPassword(request.password()));
             userDao.register(newUser);
             result = new ServiceResult<>(true, "Registration successful", newUser);
         }
         sendResponse(out, result);
     }
 
-    private static void handleJoinRoom(JoinRoomRequest request, ClientHandler handler, ObjectOutputStream out) throws Exception {
+    private static void handleJoinRoom(JoinRoomRequest request, ClientHandler handler, ObjectOutputStream out)
+            throws Exception {
         String auctionId = request.getAuctionId();
         // Unsubscribe from old room if any
         String oldAuctionId = handler.getCurrentWatchingAuctionId();
@@ -62,7 +68,8 @@ public class RequestRouter {
         sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, null));
     }
 
-    private static void handleBid(BidRequest request, ObjectOutputStream out, AuctionService auctionService) throws Exception {
+    private static void handleBid(BidRequest request, ObjectOutputStream out, AuctionService auctionService)
+            throws Exception {
         ServiceResult<Void> result;
         try {
             auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());

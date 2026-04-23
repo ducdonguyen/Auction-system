@@ -1,10 +1,10 @@
 package com.auction.client.controller;
 
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.ServiceResult;
 import com.auction.client.service.AuthService;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuthUser;
+import com.auction.shared.network.LoginRequest;
+import com.auction.shared.network.ServiceResult;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,11 +37,11 @@ public class LoginController {
         // Request login via Service
         LoginRequest request = new LoginRequest(usernameField.getText(), passwordField.getText());
         ServiceResult<AuthUser> result = authService.login(request);
-        
+
         // Display feedback to user
         errorLabel.setText(result.message());
         errorLabel.setStyle(result.success() ? "-fx-text-fill: #059669;" : "-fx-text-fill: #dc2626;");
-        
+
         if (result.success()) {
             navigateToAuctionList();
         }
@@ -50,9 +50,9 @@ public class LoginController {
     private void navigateToAuctionList() {
         try {
             SceneNavigator.switchScene(
-                    loginButton, 
+                    loginButton,
                     "/views/AuctionList.fxml",
-                    "Hệ thống đấu giá - Danh sách phiên đấu giá", 
+                    "Hệ thống đấu giá - Danh sách phiên đấu giá",
                     1200, 760
             );
         } catch (IOException e) {
@@ -66,9 +66,9 @@ public class LoginController {
         try {
             // Chuyển hướng sang màn hình Đăng ký
             SceneNavigator.switchScene(
-                    loginButton, 
+                    loginButton,
                     "/views/Register.fxml",
-                    "Hệ thống đấu giá - Đăng ký tài khoản", 
+                    "Hệ thống đấu giá - Đăng ký tài khoản",
                     980, 720
             );
         } catch (IOException e) {

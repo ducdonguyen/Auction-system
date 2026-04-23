@@ -2,6 +2,7 @@ package com.auction.shared.models;
 
 import com.auction.shared.exceptions.AuctionClosedException;
 import com.auction.shared.exceptions.InvalidBidException;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,12 +37,13 @@ public class Auction implements Serializable {
 
     public boolean validateBid(double amount) throws AuctionClosedException, InvalidBidException {
         if (this.status != AuctionStatus.RUNNING) {
-            throw new AuctionClosedException("Phiên đấu giá " + auctionId + " hiện không trong trạng thái cho phép đặt giá.");
+            throw new AuctionClosedException(
+                    "Phiên đấu giá " + auctionId + " hiện không trong trạng thái cho phép đặt giá.");
         }
         if (amount < (this.currentPrice + this.stepPrice)) {
-            throw new InvalidBidException("Giá đặt " + amount + " không hợp lệ. Phải lớn hơn hoặc bằng " + (this.currentPrice + this.stepPrice));
-        }
-        else{
+            throw new InvalidBidException("Giá đặt " + amount + " không hợp lệ. Phải lớn hơn hoặc bằng " +
+                    (this.currentPrice + this.stepPrice));
+        } else {
             return true;
         }
     }

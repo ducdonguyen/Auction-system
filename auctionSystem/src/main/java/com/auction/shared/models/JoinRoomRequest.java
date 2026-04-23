@@ -10,5 +10,7 @@ public class JoinRoomRequest implements Serializable {
         this.auctionId = auctionId;
     }
 
-    public String getAuctionId() { return auctionId; }
+    public String getAuctionId() {
+        return auctionId;
+    }
 }

@@ -14,6 +14,11 @@ public class Vehicle extends Item {
         this.brand = brand;
     }
 
-    public String getItemType() { return "ELECTRONICS"; }
-    public String getExtraInfo() { return brand; }
+    public String getItemType() {
+        return "ELECTRONICS";
+    }
+
+    public String getExtraInfo() {
+        return brand;
+    }
 }

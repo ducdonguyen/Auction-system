@@ -13,6 +13,11 @@ public class Art extends Item {
         this.author = author;
     }
 
-    public String getItemType() { return "ART"; }
-    public String getExtraInfo() { return author; }
+    public String getItemType() {
+        return "ART";
+    }
+
+    public String getExtraInfo() {
+        return author;
+    }
 }

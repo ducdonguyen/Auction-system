@@ -84,7 +84,8 @@ public class ClientHandler implements Runnable, AuctionObserver {
             // Gửi cập nhật trạng thái mới về cho Client qua Socket
             out.writeObject(newStatus);
             out.flush();
-            System.out.println("[ClientHandler] Đã gửi thông báo cập nhật trạng thái (" + newStatus + ") về cho Client.");
+            System.out.println(
+                    "[ClientHandler] Đã gửi thông báo cập nhật trạng thái (" + newStatus + ") về cho Client.");
         } catch (Exception e) {
             System.err.println("[ClientHandler] Lỗi khi gửi thông báo trạng thái: " + e.getMessage());
         }

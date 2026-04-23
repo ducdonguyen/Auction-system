@@ -1,9 +1,20 @@
 package com.auction.server.repository;
 
 import com.auction.server.config.DatabaseConfig;
-import com.auction.shared.models.*;
+import com.auction.shared.models.Art;
+import com.auction.shared.models.Auction;
+import com.auction.shared.models.AuctionStatus;
+import com.auction.shared.models.Bidder;
+import com.auction.shared.models.Electronics;
+import com.auction.shared.models.Item;
+import com.auction.shared.models.Seller;
+import com.auction.shared.models.Vehicle;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +33,7 @@ public class AuctionRepository {
     public Auction findById(String auctionId) {
         String sql = "SELECT * FROM auctions WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, auctionId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -50,7 +61,7 @@ public class AuctionRepository {
                 "highest_bidder_username = VALUES(highest_bidder_username), status = VALUES(status)";
 
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, auction.getAuctionId());
             Item item = auction.getItem();
@@ -89,7 +100,7 @@ public class AuctionRepository {
         List<Auction> result = new ArrayList<>();
         String sql = "SELECT * FROM auctions WHERE status = ? AND start_time <= ?";
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, status.name());
             pstmt.setTimestamp(2, Timestamp.valueOf(time));
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -110,7 +121,7 @@ public class AuctionRepository {
         List<Auction> result = new ArrayList<>();
         String sql = "SELECT * FROM auctions WHERE status = ? AND end_time <= ?";
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, status.name());
             pstmt.setTimestamp(2, Timestamp.valueOf(time));
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -135,7 +146,8 @@ public class AuctionRepository {
         Item item = switch (itemType) {
             case "ART" -> new Art(itemName, itemDescription, itemStartingPrice, extraInfo);
 
-            case "ELECTRONICS" -> new Electronics(itemName, itemDescription, itemStartingPrice, Integer.parseInt(extraInfo));
+            case "ELECTRONICS" ->
+                    new Electronics(itemName, itemDescription, itemStartingPrice, Integer.parseInt(extraInfo));
 
             case "VEHICLE" -> new Vehicle(itemName, itemDescription, itemStartingPrice, extraInfo);
 
@@ -155,7 +167,7 @@ public class AuctionRepository {
 
         Auction auction = new Auction(id, item, seller, currentPrice, stepPrice, startTime, endTime);
         auction.setStatus(AuctionStatus.valueOf(statusStr));
-        
+
         String bidderUsername = rs.getString("highest_bidder_username");
         if (bidderUsername != null) {
             auction.updateAuctionState(new Bidder(bidderUsername, "", 0), currentPrice, null);

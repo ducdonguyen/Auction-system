@@ -13,12 +13,35 @@ public record AuctionRow(
         String summary,
         String highestBidder
 ) {
-    public String getAuctionId() { return auctionId; }
-    public String getItemName() { return itemName; }
-    public String getSellerName() { return sellerName; }
-    public String getCurrentPrice() { return currentPrice; }
-    public String getStepPrice() { return stepPrice; }
-    public String getStatus() { return status; }
-    public String getSummary() { return summary; }
-    public String getHighestBidder() { return highestBidder; }
+    public String getAuctionId() {
+        return auctionId;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public String getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public String getStepPrice() {
+        return stepPrice;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public String getHighestBidder() {
+        return highestBidder;
+    }
 }
