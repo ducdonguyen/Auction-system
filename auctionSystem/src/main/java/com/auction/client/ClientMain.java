@@ -1,5 +1,6 @@
 package com.auction.client;
 
+import com.auction.client.network.SocketClient;
 import com.auction.server.dao.UserDao;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,13 +8,18 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.sql.SQLException;
+import java.io.IOException;
 
 public class ClientMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initializeDatabase();
+        try {
+            SocketClient.getInstance().connect();
+        } catch (IOException e) {
+            System.err.println("Không thể kết nối đến Server. Vui lòng bật Server trước!");
+        }
+        SocketClient.getInstance().connect();
 
         // Load Login.fxml
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
@@ -26,12 +32,13 @@ public class ClientMain extends Application {
         primaryStage.show();
     }
 
+    @Override
+    public void stop() {
+        SocketClient.getInstance().disconnect();
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    private void initializeDatabase() throws SQLException {
-        UserDao userDao = new UserDao();
-        userDao.initializeDatabase();
-    }
 }

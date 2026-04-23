@@ -48,13 +48,13 @@ public class AuctionListController {
     public void initialize() {
         statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
         statusFilter.setValue("Tất cả");
-        idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getAuctionId()));
-        itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getItemName()));
-        sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getSellerName()));
-        priceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCurrentPrice()));
-        stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStepPrice()));
-        statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getStatus()));
-        summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getSummary()));
+        idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
+        itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
+        sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
+        priceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().currentPrice()));
+        stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
+        statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
+        summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
         auctionTable.setItems(data);
         reload();
     }
@@ -74,7 +74,7 @@ public class AuctionListController {
         AuctionRow sel = auctionTable.getSelectionModel().getSelectedItem();
         if (sel != null) {
             SceneNavigator.<AuctionRoomController>switchScene(openAuctionButton, "/views/AuctionRoom.fxml",
-                    "Phòng đấu giá", 1180, 780, c -> c.setAuctionId(sel.getAuctionId()));
+                    "Phòng đấu giá", 1180, 780, c -> c.setAuctionId(sel.auctionId()));
         }
     }
 

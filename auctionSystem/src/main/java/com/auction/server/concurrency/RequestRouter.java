@@ -1,12 +1,12 @@
 package com.auction.server.concurrency;
 
-import com.auction.client.util.PasswordUtil;
+import com.auction.server.util.PasswordUtil;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.dao.UserDao;
 import com.auction.shared.models.AuthUser;
-import com.auction.shared.models.BidRequest;
-import com.auction.shared.models.JoinRoomRequest;
+import com.auction.shared.network.BidRequest;
+import com.auction.shared.network.JoinRoomRequest;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;

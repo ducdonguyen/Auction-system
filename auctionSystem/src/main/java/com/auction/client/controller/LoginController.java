@@ -1,5 +1,6 @@
 package com.auction.client.controller;
 
+import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuthService;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuthUser;
@@ -17,7 +18,7 @@ import java.io.IOException;
  * Controller xử lý logic đăng nhập và chuyển hướng sang màn hình đấu giá.
  */
 public class LoginController {
-
+    // Khởi tạo AuthService làm cầu nối
     private final AuthService authService = new AuthService();
 
     @FXML
@@ -34,14 +35,21 @@ public class LoginController {
 
     @FXML
     private void handleLoginAction() {
-        // Request login via Service
-        LoginRequest request = new LoginRequest(usernameField.getText(), passwordField.getText());
+        // Lấy dữ liệu từ giao diện
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        // Đóng gói thành Request theo đúng chuẩn
+        LoginRequest request = new LoginRequest(username, password);
+
+        // Gọi Service xử lý qua mạng
         ServiceResult<AuthUser> result = authService.login(request);
 
-        // Display feedback to user
+        // Hiển thị phản hồi từ Server
         errorLabel.setText(result.message());
-        errorLabel.setStyle(result.success() ? "-fx-text-fill: #059669;" : "-fx-text-fill: #dc2626;");
+        errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
 
+        // Chuyển trang nếu thành công
         if (result.success()) {
             navigateToAuctionList();
         }

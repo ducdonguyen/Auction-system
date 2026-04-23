@@ -7,27 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class UserDao {
-
-    public void initializeDatabase() throws SQLException {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS users (
-                    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    full_name VARCHAR(100) NOT NULL,
-                    username VARCHAR(50) NOT NULL UNIQUE,
-                    email VARCHAR(100) NOT NULL UNIQUE,
-                    password_hash VARCHAR(255) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-                """;
-
-        try (Connection connection = DatabaseConfig.getConnection();
-                Statement statement = connection.createStatement()) {
-            statement.execute(sql);
-        }
-    }
 
     public boolean existsByUsernameOrEmail(String username, String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";

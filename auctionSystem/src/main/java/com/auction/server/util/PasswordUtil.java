@@ -1,4 +1,4 @@
-package com.auction.client.util;
+package com.auction.server.util;
 
 import org.mindrot.jbcrypt.BCrypt;
 
