@@ -40,6 +40,9 @@ public class Auction implements Serializable {
             throw new AuctionClosedException(
                     "Phiên đấu giá " + auctionId + " hiện không trong trạng thái cho phép đặt giá.");
         }
+        if (amount <= 0) {
+            throw new InvalidBidException("Giá đặt không thể nhỏ hơn hoặc bằng 0.");
+        }
         if (amount < (this.currentPrice + this.stepPrice)) {
             throw new InvalidBidException("Giá đặt " + amount + " không hợp lệ. Phải lớn hơn hoặc bằng " +
                     (this.currentPrice + this.stepPrice));
