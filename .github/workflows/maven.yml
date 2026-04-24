@@ -21,11 +21,11 @@ jobs:
         cache: maven
 
     - name: Build and Run Checkstyle
-      run: mvn clean validate
+      run: mvn -f auctionSystem/pom.xml clean validate
 
     - name: Run Tests
-      run: mvn test
+      run: mvn -f auctionSystem/pom.xml test
 
     - name: Run Checkstyle Report
       if: always()
-      run: mvn checkstyle:checkstyle
+      run: mvn -f auctionSystem/pom.xml checkstyle:checkstyle
