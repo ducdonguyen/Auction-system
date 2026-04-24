@@ -90,7 +90,7 @@ public class AuctionRepository {
             e.printStackTrace();
         }
 
-
+        return auction;
     }
 
     /**
