@@ -1,26 +1,14 @@
 package com.auction.client.service;
 
-import com.auction.server.dao.UserDao;
+import com.auction.client.network.SocketClient;
+import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
-import com.auction.client.util.PasswordUtil;
-import com.auction.shared.models.AuthUser;
 
-import java.sql.SQLException;
+import java.io.IOException;
 
 public class AuthService {
-
-    private final UserDao userDao = new UserDao();
-
-    public void initializeDatabase() throws SQLException {
-        userDao.initializeDatabase();
-        // Tự động tạo tài khoản mẫu nếu chưa có
-        if (userDao.findByUsername("admin") == null) {
-            AuthUser admin = new AuthUser("Quản trị viên", "admin", "admin@auction.com", PasswordUtil.hashPassword("123456"));
-            userDao.register(admin);
-        }
-    }
 
     public ServiceResult<AuthUser> login(LoginRequest request) {
         String username = (request.username() == null) ? "" : request.username().trim();
@@ -31,38 +19,37 @@ public class AuthService {
         }
 
         try {
-            AuthUser user = userDao.findByUsername(username);
-            if (user == null) {
-                return new ServiceResult<>(false, "Tài khoản không tồn tại trên hệ thống.", null);
+            // Gửi gói tin Login lên Server
+            SocketClient.getInstance().sendRequest(request);
+
+            // Đợi Server phản hồi
+            @SuppressWarnings("unchecked")
+            ServiceResult<AuthUser> result = (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
+
+            // Nếu đăng nhập thành công, lưu thông tin phiên làm việc
+            if (result.success() && result.data() != null) {
+                SessionContext.setCurrentUser(result.data());
             }
-            if (!PasswordUtil.matches(password, user.getPasswordHash())) {
-                return new ServiceResult<>(false, "Mật khẩu không chính xác. Vui lòng thử lại.", null);
-            }
-            
-            // Lưu thông tin vào phiên làm việc
-            SessionContext.setCurrentUser(user);
-            return new ServiceResult<>(true, "Đăng nhập thành công! Đang chuyển hướng...", user);
-        } catch (SQLException exception) {
-            return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu (MySQL).", null);
+            return result;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
         }
     }
 
     public ServiceResult<AuthUser> register(RegistrationRequest request) {
         try {
-            if (userDao.existsByUsernameOrEmail(request.username(), request.email())) {
-                return new ServiceResult<>(false, "Tên đăng nhập hoặc email đã tồn tại.", null);
-            }
+            // Gửi gói tin Register lên Server
+            SocketClient.getInstance().sendRequest(request);
 
-            AuthUser user = new AuthUser(
-                request.fullName(), 
-                request.username(), 
-                request.email(), 
-                PasswordUtil.hashPassword(request.password())
-            );
-            userDao.register(user);
-            return new ServiceResult<>(true, "Đăng ký thành công! Hãy đăng nhập ngay.", user);
-        } catch (SQLException exception) {
-            return new ServiceResult<>(false, "Lỗi: Không thể lưu tài khoản.", null);
+            // Đợi Server phản hồi
+            @SuppressWarnings("unchecked")
+            ServiceResult<AuthUser> result = (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
+
+            return result;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
         }
     }
 }

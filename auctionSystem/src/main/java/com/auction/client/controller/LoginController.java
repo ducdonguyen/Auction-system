@@ -1,10 +1,11 @@
 package com.auction.client.controller;
 
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuthService;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuthUser;
+import com.auction.shared.network.LoginRequest;
+import com.auction.shared.network.ServiceResult;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,7 +18,7 @@ import java.io.IOException;
  * Controller xử lý logic đăng nhập và chuyển hướng sang màn hình đấu giá.
  */
 public class LoginController {
-
+    // Khởi tạo AuthService làm cầu nối
     private final AuthService authService = new AuthService();
 
     @FXML
@@ -34,14 +35,21 @@ public class LoginController {
 
     @FXML
     private void handleLoginAction() {
-        // Request login via Service
-        LoginRequest request = new LoginRequest(usernameField.getText(), passwordField.getText());
+        // Lấy dữ liệu từ giao diện
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+
+        // Đóng gói thành Request theo đúng chuẩn
+        LoginRequest request = new LoginRequest(username, password);
+
+        // Gọi Service xử lý qua mạng
         ServiceResult<AuthUser> result = authService.login(request);
-        
-        // Display feedback to user
+
+        // Hiển thị phản hồi từ Server
         errorLabel.setText(result.message());
-        errorLabel.setStyle(result.success() ? "-fx-text-fill: #059669;" : "-fx-text-fill: #dc2626;");
-        
+        errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+
+        // Chuyển trang nếu thành công
         if (result.success()) {
             navigateToAuctionList();
         }
@@ -50,9 +58,9 @@ public class LoginController {
     private void navigateToAuctionList() {
         try {
             SceneNavigator.switchScene(
-                    loginButton, 
+                    loginButton,
                     "/views/AuctionList.fxml",
-                    "Hệ thống đấu giá - Danh sách phiên đấu giá", 
+                    "Hệ thống đấu giá - Danh sách phiên đấu giá",
                     1200, 760
             );
         } catch (IOException e) {
@@ -66,9 +74,9 @@ public class LoginController {
         try {
             // Chuyển hướng sang màn hình Đăng ký
             SceneNavigator.switchScene(
-                    loginButton, 
+                    loginButton,
                     "/views/Register.fxml",
-                    "Hệ thống đấu giá - Đăng ký tài khoản", 
+                    "Hệ thống đấu giá - Đăng ký tài khoản",
                     980, 720
             );
         } catch (IOException e) {

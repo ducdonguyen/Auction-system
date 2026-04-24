@@ -19,6 +19,11 @@ public class ServerApplication {
         System.out.println("=== SERVER ĐẤU GIÁ ĐANG KHỞI ĐỘNG ===");
 
         try {
+
+            System.out.println("Đang kiểm tra cấu trúc cơ sở dữ liệu (MySQL)...");
+            com.auction.server.config.DatabaseConfig.initializeDatabase();
+            System.out.println("Khởi tạo Database thành công!");
+
             // 1. KHỞI TẠO CÁC THÀNH PHẦN DÙNG CHUNG (Dựa trên SOLID)
             AuctionRepository auctionRepository = new AuctionRepository();
             AuctionLockManager lockManager = new AuctionLockManager();

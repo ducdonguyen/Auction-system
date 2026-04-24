@@ -1,4 +1,4 @@
-package com.auction.shared.models;
+package com.auction.shared.network;
 
 import java.io.Serializable;
 
@@ -14,7 +14,15 @@ public class BidRequest implements Serializable {
         this.amount = amount;
     }
 
-    public String getAuctionId() { return auctionId; }
-    public String getBidderName() { return bidderName; }
-    public double getAmount() { return amount; }
+    public String getAuctionId() {
+        return auctionId;
+    }
+
+    public String getBidderName() {
+        return bidderName;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
 }

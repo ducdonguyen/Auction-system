@@ -1,4 +1,4 @@
-package com.auction.shared.models;
+package com.auction.shared.network;
 
 import java.io.Serializable;
 
@@ -10,5 +10,7 @@ public class JoinRoomRequest implements Serializable {
         this.auctionId = auctionId;
     }
 
-    public String getAuctionId() { return auctionId; }
+    public String getAuctionId() {
+        return auctionId;
+    }
 }
