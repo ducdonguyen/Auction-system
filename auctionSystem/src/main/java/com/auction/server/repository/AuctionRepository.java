@@ -82,7 +82,7 @@ public class AuctionRepository {
             pstmt.setDouble(11, auction.getCurrentPrice());
             pstmt.setDouble(12, auction.getStepPrice());
             pstmt.setString(13, auction.getHighestBidder() != null ? auction.getHighestBidder().getUsername() : null);
-            ));
+            pstmt.setString(14, auction.getStatus().name());
 
             pstmt.executeUpdate();
             System.out.println("[DB] Đã lưu/cập nhật phiên đấu giá " + auction.getAuctionId());
