@@ -1,7 +1,6 @@
 package com.auction.client;
 
 import com.auction.client.network.SocketClient;
-import com.auction.server.dao.UserDao;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,7 +18,6 @@ public class ClientMain extends Application {
         } catch (IOException e) {
             System.err.println("Không thể kết nối đến Server. Vui lòng bật Server trước!");
         }
-        SocketClient.getInstance().connect();
 
         // Load Login.fxml
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
