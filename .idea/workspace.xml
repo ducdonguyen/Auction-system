@@ -115,7 +115,7 @@
       <command value="mvn clean test " />
     </option>
   </component>
-  <component name="RunManager" selected="Application.ServerApplication">
+  <component name="RunManager">
     <configuration name="ServerApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.auction.server.ServerApplication" />
       <module name="auction-system" />
