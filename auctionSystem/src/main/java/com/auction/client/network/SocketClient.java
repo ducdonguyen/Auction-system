@@ -64,9 +64,8 @@ public class SocketClient {
                         if (realtimeListener != null) {
                             Platform.runLater(() -> realtimeListener.onStatusUpdate(status));
                         }
-                    }
                     // Phân loại: Nếu là phản hồi bình thường (VD: ServiceResult của Login)
-                    else {
+                    } else {
                         responseQueue.put(message); // Nhét vào hàng đợi
                     }
                 }
