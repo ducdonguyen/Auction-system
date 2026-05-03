@@ -6,7 +6,6 @@ import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
 
-import java.io.IOException;
 
 public class AuthService {
 
@@ -31,7 +30,7 @@ public class AuthService {
                 SessionContext.setCurrentUser(result.data());
             }
             return result;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
         }
@@ -47,7 +46,7 @@ public class AuthService {
             ServiceResult<AuthUser> result = (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
 
             return result;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
         }

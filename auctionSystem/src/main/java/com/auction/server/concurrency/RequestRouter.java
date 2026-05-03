@@ -23,6 +23,7 @@ public class RequestRouter {
                 case LoginRequest login -> handleLogin(login, out);
                 case BidRequest bid -> handleBid(bid, out, auctionService);
                 case JoinRoomRequest join -> handleJoinRoom(join, handler, out);
+                case RegistrationRequest register -> handleRegister(register, out);
                 default -> System.out.println("Unknown request");
             }
         } catch (Exception e) {
