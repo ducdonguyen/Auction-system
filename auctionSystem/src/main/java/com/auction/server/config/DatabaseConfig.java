@@ -1,5 +1,7 @@
 package com.auction.server.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -7,6 +9,7 @@ import java.sql.Statement;
 
 public final class DatabaseConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
     private static final String BASE_URL = "jdbc:mysql://localhost:3306"
             + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/auction_system"
@@ -65,7 +68,7 @@ public final class DatabaseConfig {
                 Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
             statement.execute(sqlCreateAuctionsTable);
-            System.out.println("[DB] Đã đảm bảo bảng 'users' và 'auctions' tồn tại.");
+            logger.info("[DB] Đã đảm bảo bảng 'users' và 'auctions' tồn tại.");
         }
     }
 }

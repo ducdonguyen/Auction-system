@@ -1,5 +1,7 @@
 package com.auction.client.network;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
 import javafx.application.Platform;
@@ -10,9 +12,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SocketClient {
-    private static SocketClient instance;
+    private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
+    private static volatile SocketClient instance;
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
@@ -25,7 +29,7 @@ public class SocketClient {
     private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<>();
 
     // Điểm kết nối (Callback) để đẩy dữ liệu Realtime lên giao diện
-    private RealtimeListener realtimeListener;
+    private final AtomicReference<RealtimeListener> realtimeListener = new AtomicReference<>();
 
     public interface RealtimeListener {
         void onNewBid(BidTransaction newBid);
@@ -38,55 +42,69 @@ public class SocketClient {
 
     public static SocketClient getInstance() {
         if (instance == null) {
-            instance = new SocketClient();
+            synchronized (SocketClient.class) {
+                if (instance == null) {
+                    instance = new SocketClient();
+                }
+            }
         }
         return instance;
     }
 
     // Hàm để các Controller (như AuctionRoomController) đăng ký "nghe đài"
     public void setRealtimeListener(RealtimeListener listener) {
-        this.realtimeListener = listener;
+        this.realtimeListener.set(listener);
     }
 
     private void startListeningThread() {
         Thread listenerThread = new Thread(() -> {
             try {
-                while (true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     Object message = in.readObject();
-
-                    // Phân loại: Nếu là thông báo Realtime từ Đài phát thanh Server
-                    if (message instanceof BidTransaction bid) {
-                        if (realtimeListener != null) {
-                            // Ép chạy trên luồng giao diện JavaFX để không bị lỗi văng app
-                            Platform.runLater(() -> realtimeListener.onNewBid(bid));
-                        }
-                    } else if (message instanceof AuctionStatus status) {
-                        if (realtimeListener != null) {
-                            Platform.runLater(() -> realtimeListener.onStatusUpdate(status));
-                        }
-                    // Phân loại: Nếu là phản hồi bình thường (VD: ServiceResult của Login)
-                    } else {
-                        responseQueue.put(message); // Nhét vào hàng đợi
-                    }
+                    handleIncomingMessage(message);
                 }
-            } catch (Exception e) {
-                System.out.println("[Client] Luồng lắng nghe đã dừng.");
+            } catch (IOException | ClassNotFoundException e) {
+                logger.info("[Client] Luồng lắng nghe đã dừng: {}", e.getMessage());
+            } catch (InterruptedException e) {
+                logger.error("[Client] Luồng lắng nghe bị ngắt quãng: ", e);
+                Thread.currentThread().interrupt();
             }
         });
         listenerThread.setDaemon(true); // Luồng tự chết khi tắt App
         listenerThread.start();
     }
 
+    private void handleIncomingMessage(Object message) throws InterruptedException {
+        switch (message) {
+            case BidTransaction bid -> handleBidTransaction(bid);
+            case AuctionStatus status -> handleAuctionStatus(status);
+            default -> responseQueue.put(message); // Nhét vào hàng đợi cho phản hồi bình thường
+        }
+    }
+
+    private void handleBidTransaction(BidTransaction bid) {
+        RealtimeListener listener = realtimeListener.get();
+        if (listener != null) {
+            Platform.runLater(() -> listener.onNewBid(bid));
+        }
+    }
+
+    private void handleAuctionStatus(AuctionStatus status) {
+        RealtimeListener listener = realtimeListener.get();
+        if (listener != null) {
+            Platform.runLater(() -> listener.onStatusUpdate(status));
+        }
+    }
     /**
      * Mở kết nối tới Server. Gọi hàm này lúc Client vừa bật lên.
      */
-    public void connect() throws IOException {
+    public synchronized void connect() throws IOException {
         if (socket == null || socket.isClosed()) {
             socket = new Socket(SERVER_IP, SERVER_PORT);
             // LƯU Ý SỐNG CÒN: Phải tạo Output trước Input để tránh bị Deadlock (treo app)
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
-            System.out.println("[Client] Đã kết nối thành công tới Server " + SERVER_IP + ":" + SERVER_PORT);
+            logger.info("[Client] Đã kết nối thành công tới Server {}:{}", SERVER_IP, SERVER_PORT);
 
             startListeningThread();
         }
@@ -95,7 +113,7 @@ public class SocketClient {
     /**
      * Gửi một gói tin (Object) lên Server
      */
-    public void sendRequest(Object request) throws IOException {
+    public synchronized void sendRequest(Object request) throws IOException {
         if (out != null) {
             out.writeObject(request);
             out.flush();
@@ -105,14 +123,14 @@ public class SocketClient {
     /**
      * Lắng nghe phản hồi từ Server
      */
-    public Object receiveResponse() throws Exception {
+    public Object receiveResponse() throws InterruptedException {
         return responseQueue.take(); // Hàm này sẽ tự động block (chờ) cho đến khi có hàng trong Queue
     }
 
     /**
      * Ngắt kết nối an toàn khi tắt App
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
         try {
             if (in != null) {
                 in.close();
@@ -123,9 +141,9 @@ public class SocketClient {
             if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
-            System.out.println("[Client] Đã ngắt kết nối.");
+            logger.info("[Client] Đã ngắt kết nối.");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("[Client] Lỗi khi ngắt kết nối: ", e);
         }
     }
 }

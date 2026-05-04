@@ -1,6 +1,9 @@
 package com.auction.server.concurrency;
 
 
+import com.auction.shared.exceptions.AuctionClosedException;
+import com.auction.shared.exceptions.InvalidBidException;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -21,11 +24,11 @@ public class AuctionLockManager {
                     lock.unlock(); // Bắt buộc mở khóa trong finally
                 }
             } else {
-                throw new RuntimeException("Hệ thống đang bận xử lý lượt đặt giá khác cho sản phẩm này!");
+                throw new InvalidBidException("Hệ thống đang bận xử lý lượt đặt giá khác cho sản phẩm này!");
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Tiến trình bị gián đoạn.");
+            throw new AuctionClosedException("Tiến trình bị gián đoạn.");
         }
     }
 }

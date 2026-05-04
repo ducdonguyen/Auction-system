@@ -1,6 +1,8 @@
 package com.auction.client.service;
 
 import com.auction.client.network.SocketClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
@@ -8,6 +10,8 @@ import com.auction.shared.network.ServiceResult;
 
 
 public class AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     public ServiceResult<AuthUser> login(LoginRequest request) {
         String username = (request.username() == null) ? "" : request.username().trim();
@@ -31,7 +35,7 @@ public class AuthService {
             }
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi kết nối mạng khi đăng nhập: {}", e.getMessage(), e);
             return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
         }
     }
@@ -47,7 +51,7 @@ public class AuthService {
 
             return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi kết nối mạng khi đăng ký: {}", e.getMessage(), e);
             return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
         }
     }

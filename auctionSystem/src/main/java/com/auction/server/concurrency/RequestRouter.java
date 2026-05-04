@@ -10,10 +10,16 @@ import com.auction.shared.network.JoinRoomRequest;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.sql.SQLException;
 
 public class RequestRouter {
+    private RequestRouter() {}
+    private static final Logger logger = LoggerFactory.getLogger(RequestRouter.class);
     private static final UserDao userDao = new UserDao();
 
     public static void route(Object request, ClientHandler handler, ObjectOutputStream out,
@@ -24,15 +30,14 @@ public class RequestRouter {
                 case BidRequest bid -> handleBid(bid, out, auctionService);
                 case JoinRoomRequest join -> handleJoinRoom(join, handler, out);
                 case RegistrationRequest register -> handleRegister(register, out);
-                default -> System.out.println("Unknown request");
+                default -> logger.warn("Unknown request: {}", request.getClass().getName());
             }
         } catch (Exception e) {
-            System.err.println("[RequestRouter] Error routing request: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("[RequestRouter] Error routing request: {}", e.getMessage(), e);
         }
     }
 
-    private static void handleLogin(LoginRequest request, ObjectOutputStream out) throws Exception {
+    private static void handleLogin(LoginRequest request, ObjectOutputStream out) throws SQLException, IOException {
         AuthUser user = userDao.findByUsername(request.username());
         ServiceResult<AuthUser> result;
         if (user != null && PasswordUtil.matches(request.password(), user.getPasswordHash())) {
@@ -43,7 +48,7 @@ public class RequestRouter {
         sendResponse(out, result);
     }
 
-    private static void handleRegister(RegistrationRequest request, ObjectOutputStream out) throws Exception {
+    private static void handleRegister(RegistrationRequest request, ObjectOutputStream out) throws SQLException, IOException {
         ServiceResult<AuthUser> result;
         if (userDao.existsByUsernameOrEmail(request.username(), request.email())) {
             result = new ServiceResult<>(false, "Username or email already exists", null);
@@ -57,7 +62,7 @@ public class RequestRouter {
     }
 
     private static void handleJoinRoom(JoinRoomRequest request, ClientHandler handler, ObjectOutputStream out)
-            throws Exception {
+            throws IOException{
         String auctionId = request.getAuctionId();
         // Unsubscribe from old room if any
         String oldAuctionId = handler.getCurrentWatchingAuctionId();
@@ -70,7 +75,7 @@ public class RequestRouter {
     }
 
     private static void handleBid(BidRequest request, ObjectOutputStream out, AuctionService auctionService)
-            throws Exception {
+            throws IOException{
         ServiceResult<Void> result;
         try {
             auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
@@ -81,7 +86,7 @@ public class RequestRouter {
         sendResponse(out, result);
     }
 
-    private static void sendResponse(ObjectOutputStream out, Object response) throws Exception {
+    private static void sendResponse(ObjectOutputStream out, Object response) throws IOException {
         out.writeObject(response);
         out.flush();
     }

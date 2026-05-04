@@ -1,5 +1,7 @@
 package com.auction.server.concurrency;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionObserver;
 import com.auction.server.core.AuctionService;
@@ -13,10 +15,10 @@ import java.net.Socket;
 
 // Lớp này vừa là một Luồng (Runnable) vừa là một Người quan sát (AuctionObserver)
 public class ClientHandler implements Runnable, AuctionObserver {
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
     private final Socket socket;
     private final AuctionService auctionService;
     private ObjectOutputStream out;
-    private ObjectInputStream in;
 
     // Biến lưu trữ ID của phiên đấu giá mà Client này đang xem
     private String currentWatchingAuctionId;
@@ -36,23 +38,25 @@ public class ClientHandler implements Runnable, AuctionObserver {
 
     @Override
     public void run() {
-        try {
-            // Khởi tạo ống bơ truyền nhận dữ liệu (Phải tạo Output trước Input để tránh bị treo)
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
+        // Khởi tạo ống bơ truyền nhận dữ liệu (Phải tạo Output trước Input để tránh bị treo)
+        try (Socket s = this.socket;
+             ObjectOutputStream o = new ObjectOutputStream(s.getOutputStream());
+             ObjectInputStream i = new ObjectInputStream(s.getInputStream())) {
+
+            this.out = o;
 
             // Vòng lặp giữ kết nối
-            while (true) {
-                Object request = in.readObject();
+            while (!Thread.currentThread().isInterrupted()) {
+                Object request = i.readObject();
                 // Xử lý request qua RequestRouter
                 RequestRouter.route(request, this, out, auctionService);
 
-                System.out.println("[ClientHandler] Nhận được yêu cầu từ Client: " +
+                logger.info("[ClientHandler] Nhận được yêu cầu từ Client: {}",
                         request.getClass().getSimpleName());
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Client đã ngắt kết nối hoặc dữ liệu truyền lên sai định dạng.");
+            logger.info("Client đã ngắt kết nối hoặc dữ liệu truyền lên sai định dạng: {}", e.getMessage());
         } finally {
             // CỰC KỲ QUAN TRỌNG: Khi Client tắt app, phải xóa họ khỏi danh sách Observer
             // để tránh lỗi rò rỉ bộ nhớ (Memory Leak)
@@ -70,11 +74,13 @@ public class ClientHandler implements Runnable, AuctionObserver {
         try {
             // Khi AuctionManager gọi hàm này, ClientHandler lập tức "nhồi" dữ liệu mới
             // vào đường ống mạng gửi thẳng về màn hình Client.
-            out.writeObject(newBid);
-            out.flush(); // Đẩy đi ngay lập tức
-            System.out.println("[ClientHandler] Đã gửi thông báo giá mới về cho Client.");
-        } catch (Exception e) {
-            System.err.println("[ClientHandler] Lỗi khi gửi thông báo giá mới: " + e.getMessage());
+            if (out != null) {
+                out.writeObject(newBid);
+                out.flush(); // Đẩy đi ngay lập tức
+                logger.info("[ClientHandler] Đã gửi thông báo giá mới về cho Client.");
+            }
+        } catch (IOException e) {
+            logger.error("[ClientHandler] Lỗi khi gửi thông báo giá mới: {}", e.getMessage());
         }
     }
 
@@ -82,12 +88,13 @@ public class ClientHandler implements Runnable, AuctionObserver {
     public void updateStatus(String auctionId, AuctionStatus newStatus) {
         try {
             // Gửi cập nhật trạng thái mới về cho Client qua Socket
-            out.writeObject(newStatus);
-            out.flush();
-            System.out.println(
-                    "[ClientHandler] Đã gửi thông báo cập nhật trạng thái (" + newStatus + ") về cho Client.");
-        } catch (Exception e) {
-            System.err.println("[ClientHandler] Lỗi khi gửi thông báo trạng thái: " + e.getMessage());
+            if (out != null) {
+                out.writeObject(newStatus);
+                out.flush();
+                logger.info("[ClientHandler] Đã gửi thông báo cập nhật trạng thái ({}) về cho Client.", newStatus);
+            }
+        } catch (IOException e) {
+            logger.error("[ClientHandler] Lỗi khi gửi thông báo trạng thái: {}", e.getMessage());
         }
     }
 }

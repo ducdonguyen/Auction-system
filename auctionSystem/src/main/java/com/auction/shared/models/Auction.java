@@ -2,6 +2,8 @@ package com.auction.shared.models;
 
 import com.auction.shared.exceptions.AuctionClosedException;
 import com.auction.shared.exceptions.InvalidBidException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Auction implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(Auction.class);
     private static final long serialVersionUID = 1L;
     private String auctionId;      // Mã định danh duy nhất cho mỗi phiên đấu giá
     private Item item;             // Món hàng đang được đem ra đấu giá (Electronics, Art, hoặc Vehicle)
@@ -62,7 +65,7 @@ public class Auction implements Serializable {
         this.bidHistory.add(transaction);
 
         // In log nhẹ để kiểm tra trạng thái trên Console Server (tùy chọn)
-        System.out.println("[LOG] Auction " + auctionId + " updated: " + amount + " by " + bidder.getUsername());
+        logger.debug("[LOG] Auction {} updated: {} by {}", auctionId, amount, bidder.getUsername());
     }
 
     public double getCurrentPrice() {

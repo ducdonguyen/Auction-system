@@ -1,6 +1,8 @@
 package com.auction.server.core;
 
 import com.auction.server.repository.AuctionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
 
@@ -10,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class AuctionScheduler {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionScheduler.class);
     private final AuctionRepository repository;
     private final AuctionService auctionService;
     private final ScheduledExecutorService scheduler;
@@ -26,7 +29,7 @@ public class AuctionScheduler {
     public void startScheduling() {
         // Chạy hàm autoUpdateAuctions() mỗi 10 giây
         scheduler.scheduleAtFixedRate(this::autoUpdateAuctions, 0, 10, TimeUnit.SECONDS);
-        System.out.println("[SCHEDULER] Hệ thống tự động cập nhật thời gian đã khởi động.");
+        logger.info("[SCHEDULER] Hệ thống tự động cập nhật thời gian đã khởi động.");
     }
 
     private void autoUpdateAuctions() {

@@ -1,5 +1,7 @@
 package com.auction.server.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.auction.shared.exceptions.AuthenticationException;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AuctionManager {
+    private static final Logger logger = LoggerFactory.getLogger(AuctionManager.class);
     private static volatile AuctionManager instance;
     private final Map<String, Auction> activeAuctions;
     private final Map<String, List<AuctionObserver>> observersMap;
@@ -52,14 +55,14 @@ public class AuctionManager {
 
     public void subscribe(String auctionId, AuctionObserver observer) {
         observersMap.computeIfAbsent(auctionId, k -> new CopyOnWriteArrayList<>()).add(observer);
-        System.out.println("Có Client vừa đăng ký xem phiên đấu giá ID: " + auctionId);
+        logger.info("Có Client vừa đăng ký xem phiên đấu giá ID: {}", auctionId);
     }
 
     public void unsubscribe(String auctionId, AuctionObserver observer) {
         List<AuctionObserver> observers = observersMap.get(auctionId);
         if (observers != null) {
             observers.remove(observer);
-            System.out.println("Một Client đã thoát khỏi phiên đấu giá ID: " + auctionId);
+            logger.info("Một Client đã thoát khỏi phiên đấu giá ID: {}", auctionId);
         }
     }
 

@@ -37,24 +37,24 @@ public class RegisterController {
         String email = emailField.getText().trim();
         String password = passwordField.getText().trim();
         String confirmPassword = confirmPasswordField.getText().trim();
-
+        String defaultStyle = "-fx-text-fill: red;";
         // 1. CLIENT-SIDE VALIDATION: Kiểm tra tại chỗ để bảo vệ Server
         if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() ||
                 confirmPassword.isEmpty()) {
             messageLabel.setText("Vui lòng nhập đầy đủ thông tin.");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setStyle(defaultStyle);
             return; // Dừng lại luôn, không gửi lên Server
         }
 
         if (!email.contains("@")) {
             messageLabel.setText("Email không hợp lệ.");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setStyle(defaultStyle);
             return;
         }
 
         if (!password.equals(confirmPassword)) {
             messageLabel.setText("Mật khẩu xác nhận không khớp.");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setStyle(defaultStyle);
             return;
         }
 

@@ -10,6 +10,8 @@ import com.auction.shared.models.BidTransaction;
 import com.auction.shared.models.Bidder;
 import com.auction.shared.models.Item;
 import com.auction.shared.models.Seller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,6 +24,7 @@ import java.util.UUID;
 
 public class AuctionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
     private AuctionLockManager lockManager;
     private AuctionRepository auctionRepository;
 
@@ -42,7 +45,7 @@ public class AuctionService {
 
         newAuction.setStatus(AuctionStatus.OPEN);
 
-        System.out.println("[INFO] Đã tạo phiên đấu giá mới: " + auctionId + " cho mặt hàng " + item.getName());
+        logger.info("[INFO] Đã tạo phiên đấu giá mới: {} cho mặt hàng {}", auctionId, item.getName());
         return auctionRepository.save(newAuction);
     }
 
@@ -50,7 +53,7 @@ public class AuctionService {
         try {
             Auction auction = auctionRepository.findById(auctionId);
             if (auction == null) {
-                System.err.println("[FAILED] Auction không tồn tại: " + auctionId);
+                logger.warn("[FAILED] Auction không tồn tại: {}", auctionId);
                 return false;
             }
 
@@ -66,10 +69,10 @@ public class AuctionService {
             AuctionManager.getInstance().notifyObservers(auctionId, lastBid);
             return true;
         } catch (AuctionClosedException | InvalidBidException e) {
-            System.err.println("[FAILED] Bid rejected: " + e.getMessage());
+            logger.warn("[FAILED] Bid rejected: {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         } catch (Exception e) {
-            System.err.println("[ERROR] Unknown error during bidding: " + e.getMessage());
+            logger.error("[ERROR] Unknown error during bidding: {}", e.getMessage(), e);
             throw new RuntimeException("Lỗi đặt giá: " + e.getMessage());
         }
     }
@@ -82,10 +85,10 @@ public class AuctionService {
             auctionRepository.save(auction);
             return true;
         } catch (AuctionClosedException | InvalidBidException e) {
-            System.err.println("[FAILED] " + e.getMessage());
+            logger.warn("[FAILED] {}", e.getMessage());
             return false;
         } catch (Exception e) {
-            System.err.println("[ERROR] Lỗi không xác định khi đặt giá: " + e.getMessage());
+            logger.error("[ERROR] Lỗi không xác định khi đặt giá: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -103,7 +106,7 @@ public class AuctionService {
 
         auction.updateAuctionState(bidder, bidAmount, transaction);
 
-        System.out.println("[SUCCESS] " + bidder.getUsername() + " đã đặt giá thành công: " + bidAmount);
+        logger.info("[SUCCESS] {} đã đặt giá thành công: {}", bidder.getUsername(), bidAmount);
     }
 
     public boolean updateAuctionStatus(Auction auction, AuctionStatus nextStatus) {
@@ -113,16 +116,14 @@ public class AuctionService {
             auction.setStatus(nextStatus);
             auctionRepository.save(auction);
 
-            System.out.println("[INFO] Auction " + auction.getAuctionId()
-                    + ": " + oldStatus + " -> " + nextStatus);
+            logger.info("[INFO] Auction {}: {} -> {}", auction.getAuctionId(), oldStatus, nextStatus);
 
             // Broadcast cập nhật trạng thái tới tất cả các Client đang theo dõi
             AuctionManager.getInstance().notifyStatusUpdate(auction.getAuctionId(), nextStatus);
 
             return true;
         } else {
-            System.err.println("[FAILED] Không thể chuyển trạng thái từ "
-                    + auction.getStatus() + " sang " + nextStatus);
+            logger.warn("[FAILED] Không thể chuyển trạng thái từ {} sang {}", auction.getStatus(), nextStatus);
             return false;
         }
     }

@@ -1,6 +1,8 @@
 package com.auction.server.repository;
 
 import com.auction.server.config.DatabaseConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.auction.shared.models.Art;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
@@ -21,12 +23,13 @@ import java.util.List;
 
 public class AuctionRepository {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
+
     public AuctionRepository() {
         try {
             DatabaseConfig.initializeDatabase();
         } catch (SQLException e) {
-            System.err.println("[ERROR] Không thể khởi tạo database: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("[ERROR] Không thể khởi tạo database: {}", e.getMessage(), e);
         }
     }
 
@@ -41,7 +44,7 @@ public class AuctionRepository {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi tìm phiên đấu giá theo ID {}: {}", auctionId, e.getMessage(), e);
         }
         return null;
     }
@@ -85,9 +88,9 @@ public class AuctionRepository {
             pstmt.setString(14, auction.getStatus().name());
 
             pstmt.executeUpdate();
-            System.out.println("[DB] Đã lưu/cập nhật phiên đấu giá " + auction.getAuctionId());
+            logger.info("[DB] Đã lưu/cập nhật phiên đấu giá {}", auction.getAuctionId());
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi lưu/cập nhật phiên đấu giá {}: {}", auction.getAuctionId(), e.getMessage(), e);
         }
 
         return auction;
@@ -109,7 +112,7 @@ public class AuctionRepository {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi tìm phiên đấu giá theo trạng thái {} và thời gian bắt đầu trước {}: {}", status, time, e.getMessage(), e);
         }
         return result;
     }
@@ -130,7 +133,7 @@ public class AuctionRepository {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi tìm phiên đấu giá theo trạng thái {} và thời gian kết thúc trước {}: {}", status, time, e.getMessage(), e);
         }
         return result;
     }

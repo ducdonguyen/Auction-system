@@ -11,7 +11,15 @@ import java.sql.SQLException;
 
 public class ServerAuthService {
 
-    private final UserDao userDao = new UserDao();
+    private final UserDao userDao;
+
+    public ServerAuthService() {
+        this.userDao = new UserDao();
+    }
+
+    public ServerAuthService(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     // ==========================================
     // 1. XỬ LÝ ĐĂNG NHẬP VÀ TRẢ VỀ THÔNG BÁO LỖI
