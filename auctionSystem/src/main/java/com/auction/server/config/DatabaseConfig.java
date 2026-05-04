@@ -42,10 +42,30 @@ public final class DatabaseConfig {
                 )
                 """;
 
+        String sqlCreateAuctionsTable = """
+                CREATE TABLE IF NOT EXISTS auctions (
+                    id VARCHAR(50) PRIMARY KEY,
+                    item_id VARCHAR(50),
+                    item_name VARCHAR(100),
+                    item_description TEXT,
+                    item_starting_price DOUBLE,
+                    item_type VARCHAR(20),
+                    item_extra_info VARCHAR(100),
+                    seller_username VARCHAR(50),
+                    start_time DATETIME,
+                    end_time DATETIME,
+                    current_price DOUBLE,
+                    step_price DOUBLE,
+                    highest_bidder_username VARCHAR(50),
+                    status VARCHAR(20)
+                )
+                """;
+
         try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
                 Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
-            System.out.println("[DB] Đã đảm bảo bảng 'users' tồn tại.");
+            statement.execute(sqlCreateAuctionsTable);
+            System.out.println("[DB] Đã đảm bảo bảng 'users' và 'auctions' tồn tại.");
         }
     }
 }

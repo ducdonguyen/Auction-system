@@ -34,38 +34,50 @@ public class AuctionService {
         this.auctionRepository = auctionRepository;
     }
 
-    /**
-     * CHỨC NĂNG 1: TẠO PHIÊN ĐẤU GIÁ MỚI
-     * Công dụng: Khởi tạo một phiên đấu giá và đưa nó vào hệ thống.
-     */
-
     public Auction createAuction(Item item, Seller seller, double startingPrice, double stepPrice,
                                  LocalDateTime startTime, LocalDateTime endTime) {
-        // Tạo một ID duy nhất bằng UUID (tránh trùng lặp ID phiên)
         String auctionId = "AUC-" + UUID.randomUUID().toString().substring(0, 8);
 
-        // Khởi tạo đối tượng Auction
         Auction newAuction = new Auction(auctionId, item, seller, startingPrice, stepPrice, startTime, endTime);
 
-        // Mặc định phiên mới tạo sẽ ở trạng thái OPEN
         newAuction.setStatus(AuctionStatus.OPEN);
 
         System.out.println("[INFO] Đã tạo phiên đấu giá mới: " + auctionId + " cho mặt hàng " + item.getName());
         return auctionRepository.save(newAuction);
     }
 
-    /**
-     * CHỨC NĂNG 2: ĐẶT GIÁ (PLACE BID)
-     * Công dụng: Xử lý tranh chấp và cập nhật giá hiện tại.
-     * Sử dụng AuctionLockManager để lock từng phiên đấu giá, đảm bảo thread-safe.
-     */
+    public boolean placeBid(String auctionId, String bidderUsername, double bidAmount) {
+        try {
+            Auction auction = auctionRepository.findById(auctionId);
+            if (auction == null) {
+                System.err.println("[FAILED] Auction không tồn tại: " + auctionId);
+                return false;
+            }
+
+            Bidder bidder = new Bidder(bidderUsername, "", 0); // Simplified for now
+
+            // Ensure only one person can bid at a time for this auction
+            lockManager.lockAndRun(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, bidAmount));
+
+            auctionRepository.save(auction);
+
+            // Notify observers via AuctionManager
+            BidTransaction lastBid = auction.getBidHistory().get(auction.getBidHistory().size() - 1);
+            AuctionManager.getInstance().notifyObservers(auctionId, lastBid);
+            return true;
+        } catch (AuctionClosedException | InvalidBidException e) {
+            System.err.println("[FAILED] Bid rejected: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            System.err.println("[ERROR] Unknown error during bidding: " + e.getMessage());
+            throw new RuntimeException("Lỗi đặt giá: " + e.getMessage());
+        }
+    }
 
     public boolean placeBid(Auction auction, Bidder bidder, double bidAmount) {
         try {
             // Sử dụng lock manager để đảm bảo chỉ một người có thể đặt giá cho phiên này tại một thời điểm
-            lockManager.executeWithLock(auction.getAuctionId(), () -> {
-                performPlaceBid(auction, bidder, bidAmount);
-            });
+            lockManager.lockAndRun(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, bidAmount));
 
             auctionRepository.save(auction);
             return true;
@@ -78,11 +90,7 @@ public class AuctionService {
         }
     }
 
-    /**
-     * Xử lý logic đặt giá (chạy bên trong lock)
-     */
     private void performPlaceBid(Auction auction, Bidder bidder, double bidAmount) {
-        // Sử dụng logic ném exception đã được "cấy" vào Model Auction
         auction.validateBid(bidAmount);
 
         // Nếu vượt qua validateBid (không ném exception), tiến hành cập nhật trạng thái
@@ -93,16 +101,10 @@ public class AuctionService {
                 LocalDateTime.now()
         );
 
-        // Gọi hàm cập nhật dữ liệu nội bộ của đối tượng Auction
         auction.updateAuctionState(bidder, bidAmount, transaction);
 
         System.out.println("[SUCCESS] " + bidder.getUsername() + " đã đặt giá thành công: " + bidAmount);
     }
-
-    /**
-     * CHỨC NĂNG 3: CHUYỂN ĐỔI TRẠNG THÁI (STATUS TRANSITION)
-     * Công dụng: Đảm bảo phiên đấu giá tuân thủ đúng vòng đời (OPEN -> RUNNING -> FINISHED).
-     */
 
     public boolean updateAuctionStatus(Auction auction, AuctionStatus nextStatus) {
         // Kiểm tra xem việc chuyển từ trạng thái hiện tại sang trạng thái mới có hợp lệ không
@@ -114,8 +116,8 @@ public class AuctionService {
             System.out.println("[INFO] Auction " + auction.getAuctionId()
                     + ": " + oldStatus + " -> " + nextStatus);
 
-            // TODO: Nơi đây bạn có thể thêm logic Broadcast qua Socket sau này
-            // broadcastStatusUpdate(auction);
+            // Broadcast cập nhật trạng thái tới tất cả các Client đang theo dõi
+            AuctionManager.getInstance().notifyStatusUpdate(auction.getAuctionId(), nextStatus);
 
             return true;
         } else {

@@ -16,14 +16,16 @@ public class ItemFactory {
 
     // Khởi tạo các công thức mặc định một lần duy nhất
     static {
-        ITEM_REGISTRY.put("ELECTRONICS", (n, d, p, e) -> new Electronics(n, d, p, Integer.parseInt(e)));
-        ITEM_REGISTRY.put("ART", (n, d, p, e) -> new Art(n, d, p, e));
-        ITEM_REGISTRY.put("VEHICLE", (n, d, p, e) -> new Vehicle(n, d, p, e));
+        ITEM_REGISTRY.put("ELECTRONICS", (name, description, price, extraParam) ->
+                new Electronics(name, description, price, Integer.parseInt(extraParam)));
+        ITEM_REGISTRY.put("ART", (name, description, price, extraParam) ->
+                new Art(name, description, price, extraParam));
+        ITEM_REGISTRY.put("VEHICLE", (name, description, price, extraParam) ->
+                new Vehicle(name, description, price, extraParam));
     }
 
     /**
      * Cho phép các Module khác tự do thêm loại sản phẩm mới từ bên ngoài
-     * mà KHÔNG CẦN chạm vào mã nguồn của class này (Đúng chuẩn Open/Closed).
      */
     public static void registerNewItemType(String type, ItemCreator creator) {
         ITEM_REGISTRY.put(type.toUpperCase(), creator);

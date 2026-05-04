@@ -3,11 +3,9 @@ package com.auction.server;
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.repository.AuctionRepository;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.Bidder;
-import com.auction.shared.models.Item;
-import com.auction.shared.models.Seller;
+import com.auction.shared.models.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -15,105 +13,98 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AuctionServiceTest {
 
-    @Test
-    public void testConcurrency() throws InterruptedException {
-        // 1. Khởi tạo dịch vụ cùng với LockManager và Mock Repository
+    private AuctionService auctionService;
+    private Item laptop;
+    private Seller seller;
+
+    @BeforeEach
+    public void setUp() {
         AuctionLockManager lockManager = new AuctionLockManager();
         AuctionRepository fakeRepository = new AuctionRepository() {
             @Override
             public Auction save(Auction auction) {
-                // Giả lập hệ thống lưu Database thành công và trả về chính nó
                 return auction;
             }
-
         };
+        auctionService = new AuctionService(lockManager, fakeRepository);
 
-        AuctionService auctionService = new AuctionService(lockManager, fakeRepository);
-
-        // 2. Kiểm thử việc TẠO PHIÊN (Sử dụng auctionService thay vì service)
-        // Lưu ý: Item là abstract nên ta dùng class ẩn danh {}
-        Item laptop = new Item("IT01", "Macbook Air", 1000.0) {
+        laptop = new Item("IT01", "Macbook Air", 1000.0) {
+            @Override
+            public String getItemType() { return "Electronics"; }
+            @Override
+            public String getExtraInfo() { return "RAM 16GB, SSD 512GB"; }
         };
-        Seller seller = new Seller("S01", "Cửa hàng điện máy");
+        seller = new Seller("S01", "Cửa hàng điện máy");
+    }
 
-        // Gọi đúng tên biến auctionService
-        Auction myAuction =
-                auctionService.createAuction(laptop, seller, 1000.0, 50.0, LocalDateTime.parse("2026-04-13T10:30:00"),
-                        LocalDateTime.parse("2026-05-13T10:30:00"));
+    @Test
+    @DisplayName("Kiểm thử tạo phiên đấu giá")
+    public void testCreateAuction() {
+        Auction myAuction = createTestAuction(1000.0, 50.0);
+        assertNotNull(myAuction, "Phiên đấu giá không được null");
+        assertNotNull(myAuction.getAuctionId(), "ID phiên đấu giá không được null");
+    }
 
-        System.out.println("========== KIỂM THỬ TẠO PHIÊN ==========");
-        if (myAuction != null && myAuction.getAuctionId() != null) {
-            System.out.println("=> PASS: Tạo phiên thành công. ID: " + myAuction.getAuctionId());
-        }
-
-        // 3. Chuẩn bị dữ liệu cho kiểm thử đặt giá
-        // Không khai báo lại 'laptop' và 'seller', chỉ sử dụng lại hoặc gán giá trị mới
-        Bidder bidderA = new Bidder("User_A", "passA", 2.0); // Bỏ tham số 2.0 nếu constructor không có
-        Bidder bidderB = new Bidder("User_B", "passB", 2.0);
-
-        System.out.println("\n========== BẮT ĐẦU KIỂM THỬ NGHIỆP VỤ ==========");
-        // Đảm bảo phiên đấu giá đang chạy
+    @Test
+    @DisplayName("Kiểm thử nghiệp vụ đặt giá")
+    public void testBiddingLogic() {
+        Auction myAuction = createTestAuction(1000.0, 50.0);
         myAuction.setStatus(AuctionStatus.RUNNING);
-        System.out.println("Giá hiện tại: " + myAuction.getCurrentPrice() + ", Bước giá: " + myAuction.getStepPrice());
 
-        // --- TEST 1: Đặt giá thấp hơn mức tối thiểu (1000 + 50 = 1050) ---
-        System.out.println("\n[Test 1] Đặt giá 1020.0:");
+        Bidder bidderA = new Bidder("User_A", "passA", 2000.0);
+        Bidder bidderB = new Bidder("User_B", "passB", 2000.0);
+
+        // TEST 1: Đặt giá thấp hơn mức tối thiểu (1000 + 50 = 1050)
         boolean res1 = auctionService.placeBid(myAuction, bidderA, 1020.0);
-        checkResult(!res1, "Hệ thống đã chặn mức giá thấp (Thành công)");
+        assertFalse(res1, "Hệ thống phải chặn mức giá thấp hơn giá hiện tại + bước giá");
 
-        // --- TEST 2: Đặt giá hợp lệ ---
-        System.out.println("\n[Test 2] Đặt giá 1100.0:");
+        // TEST 2: Đặt giá hợp lệ
         boolean res2 = auctionService.placeBid(myAuction, bidderA, 1100.0);
-        checkResult(res2 && myAuction.getCurrentPrice() == 1100.0,
-                "Đặt giá thành công. Giá mới: " + myAuction.getCurrentPrice());
+        assertTrue(res2, "Đặt giá hợp lệ phải thành công");
+        assertEquals(1100.0, myAuction.getCurrentPrice(), "Giá hiện tại phải được cập nhật");
 
-        // --- TEST 3: Đặt giá khi phiên đã kết thúc ---
-        System.out.println("\n[Test 3] Đặt giá khi trạng thái là 'FINISHED':");
+        // TEST 3: Đặt giá khi phiên đã kết thúc
         myAuction.setStatus(AuctionStatus.FINISHED);
         boolean res3 = auctionService.placeBid(myAuction, bidderB, 1500.0);
-        checkResult(!res3, "Hệ thống đã chặn đặt giá thành công.");
+        assertFalse(res3, "Hệ thống phải chặn đặt giá khi phiên đã kết thúc");
+    }
 
-        // --- TEST 4: KIỂM THỬ ĐỒNG THỜI (CONCURRENCY) ---
-        System.out.println("\n========== BẮT ĐẦU KIỂM THỬ ĐA LUỒNG ==========");
-        // Tạo một phiên đấu giá mới hoàn toàn để test đa luồng
-        Auction syncAuction =
-                auctionService.createAuction(laptop, seller, 2000.0, 100.0, LocalDateTime.parse("2026-04-13T10:30:00"),
-                        LocalDateTime.parse("2026-05-13T10:30:00"));
+    @Test
+    @DisplayName("Kiểm thử đa luồng (Concurrency)")
+    public void testConcurrency() throws InterruptedException {
+        Auction syncAuction = createTestAuction(2000.0, 100.0);
         syncAuction.setStatus(AuctionStatus.RUNNING);
 
-        System.out.println("Giá khởi điểm: 2000.0. 5 người cùng đặt 2100.0...");
+        int numberOfBidders = 5;
+        double bidAmount = 2100.0;
+        ExecutorService executor = Executors.newFixedThreadPool(numberOfBidders);
 
-        ExecutorService executor = Executors.newFixedThreadPool(50);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < numberOfBidders; i++) {
             final int id = i;
             executor.submit(() -> {
-                Bidder competitor = new Bidder("Competitor_" + id, "pass", 2.0);
-                auctionService.placeBid(syncAuction, competitor, 2100.0);
+                Bidder competitor = new Bidder("Competitor_" + id, "pass", 5000.0);
+                auctionService.placeBid(syncAuction, competitor, bidAmount);
             });
         }
 
         executor.shutdown();
-        executor.awaitTermination(10, TimeUnit.SECONDS);
+        assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS), "Executor không kết thúc kịp thời");
 
-        System.out.println("\n--- KẾT QUẢ CUỐI CÙNG ---");
-        int historySize = syncAuction.getBidHistory().size();
-        System.out.println("Số giao dịch thành công: " + historySize);
-
-        if (historySize == 1) {
-            System.out.println("=> KẾT LUẬN: PASS (Synchronized hoạt động tốt)");
-        } else {
-            System.out.println("=> KẾT LUẬN: FAIL (Lỗi Race Condition - Có " + historySize + " người cùng thắng)");
-        }
+        // Chỉ có 1 người đặt giá thành công nếu tất cả đặt cùng một mức giá (2100.0)
+        // và giá khởi điểm là 2000, bước giá 100 => giá tiếp theo tối thiểu là 2100.
+        // Sau khi người đầu tiên đặt 2100, người tiếp theo phải đặt >= 2200.
+        assertEquals(1, syncAuction.getBidHistory().size(), "Chỉ một giao dịch thành công khi nhiều người đặt cùng mức giá tối thiểu");
     }
 
-    private void checkResult(boolean condition, String message) {
-        if (condition) {
-            System.out.println("   [PASS] " + message);
-        } else {
-            System.out.println("   [FAIL] " + message);
-        }
+    private Auction createTestAuction(double startingPrice, double stepPrice) {
+        return auctionService.createAuction(
+                laptop, seller, startingPrice, stepPrice,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2)
+        );
     }
 }

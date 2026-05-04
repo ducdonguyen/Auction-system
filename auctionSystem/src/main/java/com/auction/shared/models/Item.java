@@ -1,6 +1,7 @@
 package com.auction.shared.models;
 
 public abstract class Item extends Entity {
+    private static final long serialVersionUID = 1L;
     private String name;
     private String description;
     private double startingPrice;
@@ -34,4 +35,8 @@ public abstract class Item extends Entity {
     public void setStartingPrice(double startingPrice) {
         this.startingPrice = startingPrice;
     }
+
+    public abstract String getItemType();
+
+    public abstract String getExtraInfo();
 }
