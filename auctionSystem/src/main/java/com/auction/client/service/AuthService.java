@@ -5,50 +5,55 @@ import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
+/**
+ * Service xử lý các nghiệp vụ liên quan đến xác thực (đăng nhập, đăng ký).
+ */
 public class AuthService {
+  private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public ServiceResult<AuthUser> login(LoginRequest request) {
-        String username = (request.username() == null) ? "" : request.username().trim();
-        String password = (request.password() == null) ? "" : request.password().trim();
-
-        if (username.isEmpty() || password.isEmpty()) {
-            return new ServiceResult<>(false, "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.", null);
-        }
-
-        try {
-            // Gửi gói tin Login lên Server
-            SocketClient.getInstance().sendRequest(request);
-
-            // Đợi Server phản hồi
-            @SuppressWarnings("unchecked")
-            ServiceResult<AuthUser> result = (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
-
-            // Nếu đăng nhập thành công, lưu thông tin phiên làm việc
-            if (result.success() && result.data() != null) {
-                SessionContext.setCurrentUser(result.data());
-            }
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
-        }
+  /**
+   * Thực hiện yêu cầu đăng nhập.
+   *
+   * @param request Yêu cầu đăng nhập.
+   * @return Kết quả đăng nhập.
+   */
+  @SuppressWarnings("unchecked")
+  public ServiceResult<AuthUser> login(LoginRequest request) {
+    if (request.username() == null || request.username().isBlank()
+        || request.password() == null || request.password().isBlank()) {
+      return new ServiceResult<>(false, "Nhập đủ thông tin.", null);
     }
-
-    public ServiceResult<AuthUser> register(RegistrationRequest request) {
-        try {
-            // Gửi gói tin Register lên Server
-            SocketClient.getInstance().sendRequest(request);
-
-            // Đợi Server phản hồi
-            @SuppressWarnings("unchecked")
-            ServiceResult<AuthUser> result = (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
-
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ServiceResult<>(false, "Lỗi kết nối mạng: Không thể kết nối tới Server.", null);
-        }
+    try {
+      SocketClient.getInstance().sendRequest(request);
+      ServiceResult<AuthUser> result =
+          (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
+      if (result.success() && result.data() != null) {
+        SessionContext.setCurrentUser(result.data());
+      }
+      return result;
+    } catch (Exception e) {
+      logger.error("Login error: {}", e.getMessage());
+      return new ServiceResult<>(false, "Lỗi kết nối.", null);
     }
+  }
+
+  /**
+   * Thực hiện yêu cầu đăng ký.
+   *
+   * @param request Yêu cầu đăng ký.
+   * @return Kết quả đăng ký.
+   */
+  @SuppressWarnings("unchecked")
+  public ServiceResult<AuthUser> register(RegistrationRequest request) {
+    try {
+      SocketClient.getInstance().sendRequest(request);
+      return (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
+    } catch (Exception e) {
+      logger.error("Reg error: {}", e.getMessage());
+      return new ServiceResult<>(false, "Lỗi kết nối.", null);
+    }
+  }
 }

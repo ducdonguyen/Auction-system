@@ -4,80 +4,108 @@ import com.auction.shared.exceptions.AuthenticationException;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Quản lý các phiên đấu giá đang hoạt động và các người quan sát (Observer).
+ */
 public class AuctionManager {
-    private static volatile AuctionManager instance;
-    private final Map<String, Auction> activeAuctions;
-    private final Map<String, List<AuctionObserver>> observersMap;
+  private static final Logger logger = LoggerFactory.getLogger(AuctionManager.class);
+  private static volatile AuctionManager instance;
+  private final Map<String, Auction> activeAuctions = new ConcurrentHashMap<>();
+  private final Map<String, List<AuctionObserver>> observersMap = new ConcurrentHashMap<>();
 
-    private AuctionManager() {
-        activeAuctions = new ConcurrentHashMap<>();
-        observersMap = new ConcurrentHashMap<>();
-    }
+  private AuctionManager() {
+  }
 
-    public static AuctionManager getInstance() {
+  /**
+   * Lấy instance duy nhất của AuctionManager (Singleton).
+   *
+   * @return Instance của AuctionManager.
+   */
+  public static AuctionManager getInstance() {
+    if (instance == null) {
+      synchronized (AuctionManager.class) {
         if (instance == null) {
-            synchronized (AuctionManager.class) {
-                if (instance == null) {
-                    instance = new AuctionManager();
-                }
-            }
+          instance = new AuctionManager();
         }
-        return instance;
+      }
     }
+    return instance;
+  }
 
-    public void addAuction(Auction auction, String authToken) throws AuthenticationException {
-        if (authToken == null || !authToken.equals("ADMIN_SECRET_TOKEN")) {
-            throw new AuthenticationException("Phiên làm việc không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
-        }
-
-        if (auction == null) {
-            throw new IllegalArgumentException("Auction không thể null");
-        }
-
-        if (auction.getAuctionId() == null || auction.getAuctionId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Auction ID không thể null hoặc để trống");
-        }
-
-        Auction existingAuction = activeAuctions.putIfAbsent(auction.getAuctionId(), auction);
-        if (existingAuction != null) {
-            throw new IllegalArgumentException("Auction với ID " + auction.getAuctionId() + " đã tồn tại");
-        }
+  /**
+   * Thêm một phiên đấu giá mới vào hệ thống.
+   *
+   * @param a Phiên đấu giá.
+   * @param t Token xác thực quản trị viên.
+   * @throws AuthenticationException Nếu token không hợp lệ.
+   */
+  public void addAuction(Auction a, String t) throws AuthenticationException {
+    if (t == null || !t.equals("ADMIN_SECRET_TOKEN")) {
+      throw new AuthenticationException("Invalid token.");
     }
-
-    public void subscribe(String auctionId, AuctionObserver observer) {
-        observersMap.computeIfAbsent(auctionId, k -> new CopyOnWriteArrayList<>()).add(observer);
-        System.out.println("Có Client vừa đăng ký xem phiên đấu giá ID: " + auctionId);
+    if (a == null || a.getAuctionId() == null) {
+      throw new IllegalArgumentException("Invalid auction.");
     }
-
-    public void unsubscribe(String auctionId, AuctionObserver observer) {
-        List<AuctionObserver> observers = observersMap.get(auctionId);
-        if (observers != null) {
-            observers.remove(observer);
-            System.out.println("Một Client đã thoát khỏi phiên đấu giá ID: " + auctionId);
-        }
+    if (activeAuctions.putIfAbsent(a.getAuctionId(), a) != null) {
+      throw new IllegalArgumentException("Auction exists.");
     }
+  }
 
-    public void notifyObservers(String auctionId, BidTransaction newBid) {
-        List<AuctionObserver> observers = observersMap.get(auctionId);
-        if (observers != null) {
-            for (AuctionObserver observer : observers) {
-                observer.updateNewBid(auctionId, newBid);
-            }
-        }
-    }
+  /**
+   * Đăng ký theo dõi một phiên đấu giá.
+   *
+   * @param aid ID của phiên đấu giá.
+   * @param o   Người quan sát.
+   */
+  public void subscribe(String aid, AuctionObserver o) {
+    observersMap.computeIfAbsent(aid, k -> new CopyOnWriteArrayList<>()).add(o);
+    logger.info("Subscribed to: {}", aid);
+  }
 
-    public void notifyStatusUpdate(String auctionId, AuctionStatus newStatus) {
-        List<AuctionObserver> observers = observersMap.get(auctionId);
-        if (observers != null) {
-            for (AuctionObserver observer : observers) {
-                observer.updateStatus(auctionId, newStatus);
-            }
-        }
+  /**
+   * Hủy đăng ký theo dõi một phiên đấu giá.
+   *
+   * @param aid ID của phiên đấu giá.
+   * @param o   Người quan sát.
+   */
+  public void unsubscribe(String aid, AuctionObserver o) {
+    List<AuctionObserver> obs = observersMap.get(aid);
+    if (obs != null) {
+      obs.remove(o);
+      logger.info("Unsubscribed from: {}", aid);
     }
+  }
+
+  /**
+   * Thông báo cho các người quan sát khi có giá thầu mới.
+   *
+   * @param aid ID của phiên đấu giá.
+   * @param b   Giao dịch thầu mới.
+   */
+  public void notifyObservers(String aid, BidTransaction b) {
+    List<AuctionObserver> obs = observersMap.get(aid);
+    if (obs != null) {
+      obs.forEach(o -> o.updateNewBid(aid, b));
+    }
+  }
+
+  /**
+   * Thông báo cho các người quan sát khi trạng thái phiên đấu giá thay đổi.
+   *
+   * @param aid ID của phiên đấu giá.
+   * @param s   Trạng thái mới.
+   */
+  public void notifyStatusUpdate(String aid, AuctionStatus s) {
+    List<AuctionObserver> obs = observersMap.get(aid);
+    if (obs != null) {
+      obs.forEach(o -> o.updateStatus(aid, s));
+    }
+  }
 }

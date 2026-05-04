@@ -5,36 +5,50 @@ import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.Item;
 import com.auction.shared.models.ItemFactory;
 import com.auction.shared.models.Seller;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Kho lưu trữ dữ liệu giả lập cho các phiên đấu giá tại Client.
+ */
 public class AuctionDataStore {
-    private AuctionDataStore() {}
-    private static final List<Auction> auctions = new ArrayList<>();
+  private AuctionDataStore() {
+  }
 
-    static {
-        Seller s = new Seller("admin_seller", "123");
-        Item i1 = ItemFactory.createItem("ELECTRONICS", "Laptop Dell XPS 15", "Laptop cao cấp 2024", 25000000, "12");
-        Auction a1 = new Auction("AUC001", i1, s, 25000000, 500000, LocalDateTime.now().minusHours(1),
-                LocalDateTime.now().plusHours(5));
-        a1.setStatus(AuctionStatus.RUNNING);
-        Item i2 = ItemFactory.createItem("VEHICLE", "VinFast VF8", "Xe điện thông minh", 1000000000, "29A-123.45");
-        Auction a2 = new Auction("AUC002", i2, s, 1000000000, 10000000, LocalDateTime.now().plusDays(1),
-                LocalDateTime.now().plusDays(2));
-        auctions.add(a1);
-        auctions.add(a2);
-        a1.setStatus(AuctionStatus.FINISHED);
-        a2.setStatus(AuctionStatus.RUNNING);
-    }
+  private static final List<Auction> auctions = new ArrayList<>();
 
-    public static List<Auction> getAuctions() {
-        return auctions;
-    }
+  static {
+    Seller s = new Seller("admin_seller", "123");
+    Item i1 = ItemFactory.createItem("ELECTRONICS", "Laptop Dell XPS 15",
+        "Laptop cao cấp 2024", 25000000, "12");
+    Auction a1 = new Auction("AUC001", i1, s, 25000000, 500000,
+        LocalDateTime.now().minusHours(1),
+        LocalDateTime.now().plusHours(5));
+    a1.setStatus(AuctionStatus.RUNNING);
+    Item i2 = ItemFactory.createItem("VEHICLE", "VinFast VF8", "Xe điện thông minh",
+        1000000000, "29A-123.45");
+    Auction a2 = new Auction("AUC002", i2, s, 1000000000, 10000000,
+        LocalDateTime.now().plusDays(1),
+        LocalDateTime.now().plusDays(2));
+    auctions.add(a1);
+    auctions.add(a2);
+    a1.setStatus(AuctionStatus.FINISHED);
+    a2.setStatus(AuctionStatus.RUNNING);
+  }
 
-    public static Optional<Auction> findById(String id) {
-        return auctions.stream().filter(a -> a.getAuctionId().equals(id)).findFirst();
-    }
+  public static List<Auction> getAuctions() {
+    return auctions;
+  }
+
+  /**
+   * Tìm kiếm phiên đấu giá theo ID.
+   *
+   * @param id ID phiên đấu giá.
+   * @return Optional chứa phiên đấu giá nếu tìm thấy.
+   */
+  public static Optional<Auction> findById(String id) {
+    return auctions.stream().filter(a -> a.getAuctionId().equals(id)).findFirst();
+  }
 }
