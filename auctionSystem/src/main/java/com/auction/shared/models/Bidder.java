@@ -18,6 +18,8 @@ public class Bidder extends User {
     }
 
     public void deposit(double amount) {
-        if (amount > 0) balance += amount;
+        if (amount > 0) {
+            balance += amount;
+        };
     }
 }

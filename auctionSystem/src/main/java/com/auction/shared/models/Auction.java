@@ -17,14 +17,16 @@ public class Auction implements Serializable {
     private String auctionId;
     private Item item;
     private Seller seller;
-    private LocalDateTime startTime, endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private double currentPrice;
     private final double stepPrice;
     private Bidder highestBidder;
     private final List<BidTransaction> bidHistory = new ArrayList<>();
     private AuctionStatus status = AuctionStatus.OPEN;
 
-    public Auction(String auctionId, Item item, Seller seller, double startingPrice, double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
+    public Auction(String auctionId, Item item, Seller seller, double startingPrice,
+                   double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
         this.auctionId = auctionId;
         this.item = item;
         this.seller = seller;
@@ -35,17 +37,24 @@ public class Auction implements Serializable {
     }
 
     public boolean validateBid(double amount) throws AuctionClosedException, InvalidBidException {
-        if (status != AuctionStatus.RUNNING) throw new AuctionClosedException("Auction " + auctionId + " not running.");
-        if (amount <= 0) throw new InvalidBidException("Bid must be > 0.");
-        if (amount < (currentPrice + stepPrice))
+        if (status != AuctionStatus.RUNNING) {
+            throw new AuctionClosedException("Auction " + auctionId + " not running.");
+        }
+        if (amount <= 0) {
+            throw new InvalidBidException("Bid must be > 0.");
+        }
+        if (amount < (currentPrice + stepPrice)) {
             throw new InvalidBidException("Bid " + amount + " too low. Min: " + (currentPrice + stepPrice));
+        }
         return true;
     }
 
     public void updateAuctionState(Bidder bidder, double amount, BidTransaction transaction) {
         this.currentPrice = amount;
         this.highestBidder = bidder;
-        if (transaction != null) this.bidHistory.add(transaction);
+        if (transaction != null) {
+            this.bidHistory.add(transaction);
+        }
         logger.debug("[LOG] Auction {} updated: {} by {}", auctionId, amount, bidder.getUsername());
     }
 
