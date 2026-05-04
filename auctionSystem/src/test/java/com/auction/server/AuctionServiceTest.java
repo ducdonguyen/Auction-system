@@ -7,6 +7,9 @@ import com.auction.shared.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
@@ -14,31 +17,29 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AuctionServiceTest {
 
     private AuctionService auctionService;
     private Item laptop;
     private Seller seller;
 
+    @Mock
+    private AuctionRepository auctionRepository;
+
     @BeforeEach
     public void setUp() {
         AuctionLockManager lockManager = new AuctionLockManager();
-        AuctionRepository fakeRepository = new AuctionRepository() {
-            @Override
-            public Auction save(Auction auction) {
-                return auction;
-            }
-        };
-        auctionService = new AuctionService(lockManager, fakeRepository);
+        auctionService = new AuctionService(lockManager, auctionRepository);
 
-        laptop = new Item("IT01", "Macbook Air", 1000.0) {
-            @Override
-            public String getItemType() { return "Electronics"; }
-            @Override
-            public String getExtraInfo() { return "RAM 16GB, SSD 512GB"; }
-        };
+        laptop = new Electronics("Macbook Air", "M2 Chip", 1000.0, 12);
         seller = new Seller("S01", "Cửa hàng điện máy");
+
+        // Giả lập hành vi lưu trữ của repository
+        when(auctionRepository.save(any(Auction.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test

@@ -1,86 +1,40 @@
 package com.auction.server.core;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import com.auction.shared.exceptions.AuthenticationException;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
+import com.auction.shared.models.*;
+import java.util.*;
+import java.util.concurrent.*;
 public class AuctionManager {
     private static final Logger logger = LoggerFactory.getLogger(AuctionManager.class);
     private static volatile AuctionManager instance;
-    private final Map<String, Auction> activeAuctions;
-    private final Map<String, List<AuctionObserver>> observersMap;
-
-    private AuctionManager() {
-        activeAuctions = new ConcurrentHashMap<>();
-        observersMap = new ConcurrentHashMap<>();
-    }
-
+    private final Map<String, Auction> activeAuctions = new ConcurrentHashMap<>();
+    private final Map<String, List<AuctionObserver>> observersMap = new ConcurrentHashMap<>();
+    private AuctionManager() {}
     public static AuctionManager getInstance() {
         if (instance == null) {
             synchronized (AuctionManager.class) {
-                if (instance == null) {
-                    instance = new AuctionManager();
-                }
-            }
-        }
+                if (instance == null) instance = new AuctionManager(); } }
         return instance;
     }
-
-    public void addAuction(Auction auction, String authToken) throws AuthenticationException {
-        if (authToken == null || !authToken.equals("ADMIN_SECRET_TOKEN")) {
-            throw new AuthenticationException("Phiên làm việc không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
-        }
-
-        if (auction == null) {
-            throw new IllegalArgumentException("Auction không thể null");
-        }
-
-        if (auction.getAuctionId() == null || auction.getAuctionId().trim().isEmpty()) {
-            throw new IllegalArgumentException("Auction ID không thể null hoặc để trống");
-        }
-
-        Auction existingAuction = activeAuctions.putIfAbsent(auction.getAuctionId(), auction);
-        if (existingAuction != null) {
-            throw new IllegalArgumentException("Auction với ID " + auction.getAuctionId() + " đã tồn tại");
-        }
+    public void addAuction(Auction a, String t) throws AuthenticationException {
+        if (t == null || !t.equals("ADMIN_SECRET_TOKEN")) throw new AuthenticationException("Invalid token.");
+        if (a == null || a.getAuctionId() == null) throw new IllegalArgumentException("Invalid auction.");
+        if (activeAuctions.putIfAbsent(a.getAuctionId(), a) != null) throw new IllegalArgumentException("Auction exists.");
     }
-
-    public void subscribe(String auctionId, AuctionObserver observer) {
-        observersMap.computeIfAbsent(auctionId, k -> new CopyOnWriteArrayList<>()).add(observer);
-        logger.info("Có Client vừa đăng ký xem phiên đấu giá ID: {}", auctionId);
+    public void subscribe(String aid, AuctionObserver o) {
+        observersMap.computeIfAbsent(aid, k -> new CopyOnWriteArrayList<>()).add(o);
+        logger.info("Subscribed to: {}", aid);
     }
-
-    public void unsubscribe(String auctionId, AuctionObserver observer) {
-        List<AuctionObserver> observers = observersMap.get(auctionId);
-        if (observers != null) {
-            observers.remove(observer);
-            logger.info("Một Client đã thoát khỏi phiên đấu giá ID: {}", auctionId);
-        }
+    public void unsubscribe(String aid, AuctionObserver o) {
+        List<AuctionObserver> obs = observersMap.get(aid);
+        if (obs != null) { obs.remove(o); logger.info("Unsubscribed from: {}", aid); }
     }
-
-    public void notifyObservers(String auctionId, BidTransaction newBid) {
-        List<AuctionObserver> observers = observersMap.get(auctionId);
-        if (observers != null) {
-            for (AuctionObserver observer : observers) {
-                observer.updateNewBid(auctionId, newBid);
-            }
-        }
+    public void notifyObservers(String aid, BidTransaction b) {
+        List<AuctionObserver> obs = observersMap.get(aid);
+        if (obs != null) obs.forEach(o -> o.updateNewBid(aid, b));
     }
-
-    public void notifyStatusUpdate(String auctionId, AuctionStatus newStatus) {
-        List<AuctionObserver> observers = observersMap.get(auctionId);
-        if (observers != null) {
-            for (AuctionObserver observer : observers) {
-                observer.updateStatus(auctionId, newStatus);
-            }
-        }
+    public void notifyStatusUpdate(String aid, AuctionStatus s) {
+        List<AuctionObserver> obs = observersMap.get(aid);
+        if (obs != null) obs.forEach(o -> o.updateStatus(aid, s));
     }
 }
