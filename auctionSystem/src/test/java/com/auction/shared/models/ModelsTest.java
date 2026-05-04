@@ -15,7 +15,7 @@ class ModelsTest {
         assertEquals("Leonardo da Vinci", art.getExtraInfo());
         art.setAuthor("Leonardo");
         assertEquals("Leonardo", art.getExtraInfo());
-        
+
         art.setName("New Name");
         assertEquals("New Name", art.getName());
         art.setDescription("New Desc");

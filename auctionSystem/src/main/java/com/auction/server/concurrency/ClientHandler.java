@@ -1,12 +1,12 @@
 package com.auction.server.concurrency;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionObserver;
 import com.auction.server.core.AuctionService;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

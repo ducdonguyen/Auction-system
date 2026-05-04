@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class JoinRoomRequest implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String auctionId;
+    private final String auctionId;
 
     public JoinRoomRequest(String auctionId) {
         this.auctionId = auctionId;

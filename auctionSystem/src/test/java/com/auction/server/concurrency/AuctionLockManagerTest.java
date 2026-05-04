@@ -14,9 +14,9 @@ class AuctionLockManagerTest {
     void testLockAndRunExecutesAction() {
         AuctionLockManager manager = new AuctionLockManager();
         AtomicInteger counter = new AtomicInteger(0);
-        
+
         manager.lockAndRun("key1", counter::incrementAndGet);
-        
+
         assertEquals(1, counter.get());
     }
 
@@ -72,7 +72,8 @@ class AuctionLockManagerTest {
         Thread.sleep(100);
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            manager.lockAndRun(key, () -> {});
+            manager.lockAndRun(key, () -> {
+            });
         });
 
         assertTrue(ex.getMessage().contains("Hệ thống đang bận"));

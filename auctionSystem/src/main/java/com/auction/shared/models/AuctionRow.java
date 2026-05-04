@@ -12,5 +12,6 @@ public record AuctionRow(
         String status,
         String summary,
         String highestBidder
-) { }
+) {
+}
 

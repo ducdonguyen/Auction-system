@@ -1,7 +1,8 @@
 package com.auction.shared.models;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ItemTest {
 
@@ -13,7 +14,7 @@ class ItemTest {
         assertEquals(1000000.0, art.getStartingPrice());
         assertEquals("Da Vinci", art.getExtraInfo());
         assertEquals("ART", art.getItemType());
-        
+
         art.setAuthor("Someone else");
         assertEquals("Someone else", art.getExtraInfo());
     }
@@ -25,7 +26,7 @@ class ItemTest {
         assertEquals(1000.0, electronics.getStartingPrice());
         assertEquals("12", electronics.getExtraInfo());
         assertEquals("ELECTRONICS", electronics.getItemType());
-        
+
         electronics.setWarrantyMonths(24);
         assertEquals("24", electronics.getExtraInfo());
     }
@@ -37,7 +38,7 @@ class ItemTest {
         assertEquals(50000.0, vehicle.getStartingPrice());
         assertEquals("Tesla Brand", vehicle.getExtraInfo());
         assertEquals("VEHICLE", vehicle.getItemType());
-        
+
         vehicle.setBrand("New Brand");
         assertEquals("New Brand", vehicle.getExtraInfo());
     }

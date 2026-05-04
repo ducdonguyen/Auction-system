@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class ClientMain extends Application {
     private static final Logger logger = LoggerFactory.getLogger(ClientMain.class);
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {

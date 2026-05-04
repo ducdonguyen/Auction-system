@@ -2,9 +2,10 @@ package com.auction.shared.network;
 
 import com.auction.shared.models.Bidder;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ObjectSerializationTest {
 
@@ -39,7 +40,7 @@ public class ObjectSerializationTest {
         assertEquals(originalBidder.getUsername(), deserializedBidder.getUsername(), "Username must be the same");
         assertEquals(originalBidder.getPassword(), deserializedBidder.getPassword(), "Password must be the same");
         assertEquals(originalBidder.getBalance(), deserializedBidder.getBalance(), 0.001, "Balance must be the same");
-        
+
         System.out.println("[DEBUG_LOG] Serialization and Deserialization successful for Bidder: " + deserializedBidder.getUsername());
     }
 

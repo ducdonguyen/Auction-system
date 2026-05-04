@@ -2,6 +2,7 @@ package com.auction.server.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -31,7 +32,7 @@ public final class DatabaseConfig {
 
     public static void initializeDatabase() throws SQLException {
         try (Connection connection = DriverManager.getConnection(BASE_URL, USERNAME, PASSWORD);
-                Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
             statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
         }
         String sqlCreateTable = """
@@ -65,7 +66,7 @@ public final class DatabaseConfig {
                 """;
 
         try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
             statement.execute(sqlCreateTable);
             statement.execute(sqlCreateAuctionsTable);
             logger.info("[DB] Đã đảm bảo bảng 'users' và 'auctions' tồn tại.");

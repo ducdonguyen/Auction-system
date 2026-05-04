@@ -1,11 +1,7 @@
 package com.auction.server.core;
 
 import com.auction.shared.exceptions.AuthenticationException;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-import com.auction.shared.models.Art;
-import com.auction.shared.models.Seller;
+import com.auction.shared.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)

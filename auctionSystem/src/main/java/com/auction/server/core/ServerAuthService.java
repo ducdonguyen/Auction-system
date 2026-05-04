@@ -1,7 +1,7 @@
 package com.auction.server.core;
 
 import com.auction.server.dao.UserDao;
-import com.auction.server.util.PasswordUtil; // Giả sử em đã dời PasswordUtil sang Server
+import com.auction.server.util.PasswordUtil;
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;

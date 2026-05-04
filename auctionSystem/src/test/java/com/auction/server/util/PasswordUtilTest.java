@@ -12,7 +12,7 @@ class PasswordUtilTest {
     void testHashAndMatch() {
         String password = "mySecretPassword123";
         String hash = PasswordUtil.hashPassword(password);
-        
+
         assertNotNull(hash);
         assertNotEquals(password, hash);
         assertTrue(PasswordUtil.matches(password, hash));

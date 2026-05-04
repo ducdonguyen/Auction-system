@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Them logging" />
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Viết thêm các test" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,9 +55,15 @@
     "Application.ClientMain.executor": "Run",
     "Application.SerializationTest.executor": "Run",
     "JUnit.AuctionLockManagerTest.executor": "Run",
+    "JUnit.AuctionManagerTest.executor": "Run",
+    "JUnit.AuctionRepositoryTest.executor": "Run",
+    "JUnit.AuctionSchedulerTest.executor": "Run",
     "JUnit.AuctionServiceTest.executor": "Run",
     "JUnit.AuctionTest.executor": "Run",
     "JUnit.ItemTest.executor": "Run",
+    "JUnit.PasswordUtilTest.executor": "Run",
+    "JUnit.ServerAuthServiceTest.executor": "Run",
+    "JUnit.UserDaoTest.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -301,7 +307,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777872354973</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Viết thêm các test">
+      <option name="closed" value="true" />
+      <created>1777908554695</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1777908554696</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -328,7 +342,8 @@
     <MESSAGE value="Cho các Entity implement Serializable" />
     <MESSAGE value="Xóa code smell" />
     <MESSAGE value="Them logging" />
-    <option name="LAST_COMMIT_MESSAGE" value="Them logging" />
+    <MESSAGE value="Viết thêm các test" />
+    <option name="LAST_COMMIT_MESSAGE" value="Viết thêm các test" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

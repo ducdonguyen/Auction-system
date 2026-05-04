@@ -1,15 +1,11 @@
 package com.auction.server.concurrency;
 
-import com.auction.server.util.PasswordUtil;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.dao.UserDao;
+import com.auction.server.util.PasswordUtil;
 import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.BidRequest;
-import com.auction.shared.network.JoinRoomRequest;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.RegistrationRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.network.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +14,9 @@ import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 
 public class RequestRouter {
-    private RequestRouter() {}
+    private RequestRouter() {
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(RequestRouter.class);
     private static final UserDao userDao = new UserDao();
 
@@ -62,7 +60,7 @@ public class RequestRouter {
     }
 
     private static void handleJoinRoom(JoinRoomRequest request, ClientHandler handler, ObjectOutputStream out)
-            throws IOException{
+            throws IOException {
         String auctionId = request.getAuctionId();
         // Unsubscribe from old room if any
         String oldAuctionId = handler.getCurrentWatchingAuctionId();
@@ -75,7 +73,7 @@ public class RequestRouter {
     }
 
     private static void handleBid(BidRequest request, ObjectOutputStream out, AuctionService auctionService)
-            throws IOException{
+            throws IOException {
         ServiceResult<Void> result;
         try {
             auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());

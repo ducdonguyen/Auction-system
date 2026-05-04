@@ -1,10 +1,6 @@
 package com.auction.client.service;
 
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.Item;
-import com.auction.shared.models.ItemFactory;
-import com.auction.shared.models.Seller;
+import com.auction.shared.models.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,7 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class AuctionDataStore {
-    private AuctionDataStore() {}
+    private AuctionDataStore() {
+    }
+
     private static final List<Auction> auctions = new ArrayList<>();
 
     static {

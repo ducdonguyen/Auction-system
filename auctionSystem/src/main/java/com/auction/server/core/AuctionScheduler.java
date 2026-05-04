@@ -1,10 +1,10 @@
 package com.auction.server.core;
 
 import com.auction.server.repository.AuctionRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;

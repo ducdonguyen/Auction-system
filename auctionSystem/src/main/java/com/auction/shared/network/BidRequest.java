@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class BidRequest implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String auctionId;
-    private String bidderName;
-    private double amount;
+    private final String auctionId;
+    private final String bidderName;
+    private final double amount;
 
     public BidRequest(String auctionId, String bidderName, double amount) {
         this.auctionId = auctionId;
