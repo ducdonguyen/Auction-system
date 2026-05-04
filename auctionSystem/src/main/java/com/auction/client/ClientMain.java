@@ -1,6 +1,7 @@
 package com.auction.client;
 
 import com.auction.client.network.SocketClient;
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,37 +10,42 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
+/**
+ * Lớp chính của ứng dụng Client sử dụng JavaFX.
+ */
 public class ClientMain extends Application {
-    private static final Logger logger = LoggerFactory.getLogger(ClientMain.class);
+  private static final Logger logger = LoggerFactory.getLogger(ClientMain.class);
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        try {
-            SocketClient.getInstance().connect();
-        } catch (IOException e) {
-            logger.error("Không thể kết nối đến Server. Vui lòng bật Server trước!", e);
-        }
-
-        // Load Login.fxml
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
-        AnchorPane loginView = loader.load();
-
-        Scene scene = new Scene(loginView, 600, 400);
-
-        primaryStage.setTitle("Auction System - Client");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    try {
+      SocketClient.getInstance().connect();
+    } catch (IOException e) {
+      logger.error("Không thể kết nối đến Server. Vui lòng bật Server trước!", e);
     }
 
-    @Override
-    public void stop() {
-        SocketClient.getInstance().disconnect();
-    }
+    // Load Login.fxml
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Login.fxml"));
+    AnchorPane loginView = loader.load();
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    Scene scene = new Scene(loginView, 600, 400);
 
+    primaryStage.setTitle("Auction System - Client");
+    primaryStage.setScene(scene);
+    primaryStage.show();
+  }
+
+  @Override
+  public void stop() {
+    SocketClient.getInstance().disconnect();
+  }
+
+  /**
+   * Phương thức main để khởi chạy ứng dụng JavaFX.
+   *
+   * @param args Tham số dòng lệnh.
+   */
+  public static void main(String[] args) {
+    launch(args);
+  }
 }
