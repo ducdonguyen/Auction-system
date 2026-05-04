@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class AuctionDataStore {
+    private AuctionDataStore() {}
     private static final List<Auction> auctions = new ArrayList<>();
 
     static {

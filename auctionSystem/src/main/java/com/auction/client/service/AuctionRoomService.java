@@ -19,7 +19,7 @@ import java.util.Optional;
  * Service xử lý logic nghiệp vụ trong phòng đấu giá.
  */
 public class AuctionRoomService {
-    private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+    private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public Optional<ServiceResult<AuctionRoomViewModel>> getAuctionRoom(String id) {
@@ -30,9 +30,9 @@ public class AuctionRoomService {
         return AuctionDataStore.findById(auctionId).map(auction -> {
             try {
                 // Normalize amount (remove non-digits)
-                String cleanAmount = amountText.replaceAll("[^\\d]", "");
+                String cleanAmount = amountText.replaceAll("\\D", "");
                 if (cleanAmount.isEmpty()) {
-                    return new ServiceResult<AuctionRoomViewModel>(false, "Vui lòng nhập số tiền hợp lệ.",
+                    return new ServiceResult<>(false, "Vui lòng nhập số tiền hợp lệ.",
                             convertToViewModel(auction));
                 }
 
@@ -41,7 +41,7 @@ public class AuctionRoomService {
                 // Check bid logic from Auction class
                 if (!auction.validateBid(bidAmount)) {
                     String minBidStr = currencyFormatter.format(auction.getCurrentPrice() + auction.getStepPrice());
-                    return new ServiceResult<AuctionRoomViewModel>(false, "Giá đặt phải ít nhất bằng: " + minBidStr,
+                    return new ServiceResult<>(false, "Giá đặt phải ít nhất bằng: " + minBidStr,
                             convertToViewModel(auction));
                 }
 
@@ -63,10 +63,10 @@ public class AuctionRoomService {
                 return new ServiceResult<>(true, "Đặt giá thành công cho phiên " + auctionId + "!",
                         convertToViewModel(auction));
             } catch (InvalidBidException e) {
-                return new ServiceResult<AuctionRoomViewModel>(false, "Số tiền đấu giá không hợp lệ.",
+                return new ServiceResult<>(false, "Số tiền đấu giá không hợp lệ.",
                         convertToViewModel(auction));
             } catch (AuctionClosedException e) {
-                return new ServiceResult<AuctionRoomViewModel>(false, "Phiên đấu giá đã kết thúc.",
+                return new ServiceResult<>(false, "Phiên đấu giá đã kết thúc.",
                         convertToViewModel(auction));
             }
         }).orElse(new ServiceResult<>(false, "Không tìm thấy phiên đấu giá.", null));

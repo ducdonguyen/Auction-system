@@ -3,6 +3,7 @@ package com.auction.client.service;
 import com.auction.shared.models.AuthUser;
 
 public class SessionContext {
+    private SessionContext() {}
     private static AuthUser currentUser;
 
     public static AuthUser getCurrentUser() {

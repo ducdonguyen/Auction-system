@@ -5,6 +5,8 @@ import com.auction.server.concurrency.ClientHandler;
 import com.auction.server.core.AuctionScheduler;
 import com.auction.server.core.AuctionService;
 import com.auction.server.repository.AuctionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,17 +14,26 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class ServerApplication {
+    private static final Logger logger = LoggerFactory.getLogger(ServerApplication.class);
     // Định nghĩa cổng mạng để Client kết nối vào
     private static final int PORT = 8080;
 
+    // Thêm cờ điều kiện dừng vòng lặp
+    private static volatile boolean running = true;
+
     public static void main(String[] args) {
-        System.out.println("=== SERVER ĐẤU GIÁ ĐANG KHỞI ĐỘNG ===");
+        logger.info("=== SERVER ĐẤU GIÁ ĐANG KHỞI ĐỘNG ===");
+
+        // Đăng ký Shutdown Hook để dừng Server an toàn khi tắt ứng dụng
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Đang tắt Server...");
+            running = false;
+        }));
 
         try {
-
-            System.out.println("Đang kiểm tra cấu trúc cơ sở dữ liệu (MySQL)...");
+            logger.info("Đang kiểm tra cấu trúc cơ sở dữ liệu (MySQL)...");
             com.auction.server.config.DatabaseConfig.initializeDatabase();
-            System.out.println("Khởi tạo Database thành công!");
+            logger.info("Khởi tạo Database thành công!");
 
             // 1. KHỞI TẠO CÁC THÀNH PHẦN DÙNG CHUNG (Dựa trên SOLID)
             AuctionRepository auctionRepository = new AuctionRepository();
@@ -40,13 +51,13 @@ public class ServerApplication {
 
             // Bước 1: Mở cổng (Binding to Port)
             try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-                System.out.println("Server đang lắng nghe kết nối tại cổng: " + PORT);
+                logger.info("Server đang lắng nghe kết nối tại cổng: {}", PORT);
 
-                // Bước 2: Lắng nghe liên tục (Listening)
-                while (true) {
+                // Bước 2: Lắng nghe liên tục với điều kiện dừng
+                while (running) {
                     // Hàm accept() sẽ "đứng hình" (block) ở đây để chờ cho đến khi có 1 Client kết nối
                     Socket clientSocket = serverSocket.accept();
-                    System.out.println("--> CÓ KHÁCH! Client mới kết nối từ IP: " + clientSocket.getInetAddress());
+                    logger.info("--> CÓ KHÁCH! Client mới kết nối từ IP: {}", clientSocket.getInetAddress());
 
                     // Bước 3: Chấp nhận và Cử nhân viên phục vụ (Accepting & Serving)
                     // Tạo một ClientHandler (đã tích hợp AuctionObserver) để tiếp khách
@@ -59,7 +70,7 @@ public class ServerApplication {
             }
 
         } catch (Exception e) {
-            System.err.println("Lỗi khi khởi động Server: " + e.getMessage());
+            logger.error("Lỗi khi khởi động Server: ", e);
         }
     }
 }
