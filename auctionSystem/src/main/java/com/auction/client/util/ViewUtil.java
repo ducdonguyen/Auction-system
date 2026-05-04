@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class ViewUtil {
+    private ViewUtil() {
+        throw new UnsupportedOperationException("Khong the khoi tao ViewUtil");
+    }
     private static final String SUCCESS_STYLE = "-fx-text-fill: green;";
     private static final String ERROR_STYLE = "-fx-text-fill: red;";
 

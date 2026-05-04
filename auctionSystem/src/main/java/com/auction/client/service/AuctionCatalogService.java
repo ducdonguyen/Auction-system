@@ -12,7 +12,7 @@ import java.util.Locale;
  * Service xử lý danh mục đấu giá, hỗ trợ lọc và định dạng dữ liệu cho TableView.
  */
 public class AuctionCatalogService {
-    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
 
     public List<String> getAvailableStatuses() {
         return List.of("Tất cả", "OPEN", "RUNNING", "FINISHED", "PAID", "CANCELED");
@@ -24,10 +24,8 @@ public class AuctionCatalogService {
 
         List<AuctionRow> result = new ArrayList<>();
         for (Auction a : AuctionDataStore.getAuctions()) {
-            if (matchesKeyword(a, kw)) {
-                if (isFilterAll || a.getStatus().name().equalsIgnoreCase(status)) {
-                    result.add(toRow(a)); // map + collect
-                }
+            if (matchesKeyword(a, kw) && (isFilterAll || a.getStatus().name().equalsIgnoreCase(status))) {
+                result.add(toRow(a)); // map + collect
             }
         }
         return result;
