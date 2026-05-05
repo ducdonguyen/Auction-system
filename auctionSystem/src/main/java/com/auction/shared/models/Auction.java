@@ -2,136 +2,151 @@ package com.auction.shared.models;
 
 import com.auction.shared.exceptions.AuctionClosedException;
 import com.auction.shared.exceptions.InvalidBidException;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Lớp đại diện cho một phiên đấu giá.
+ */
 public class Auction implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private String auctionId;      // Mã định danh duy nhất cho mỗi phiên đấu giá
-    private Item item;             // Món hàng đang được đem ra đấu giá (Electronics, Art, hoặc Vehicle)
-    private Seller seller;         // Người tạo ra phiên đấu giá này
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private double currentPrice;
-    private double stepPrice;
-    private Bidder highestBidder;
-    private List<BidTransaction> bidHistory;
-    private AuctionStatus status;
+  private static final Logger logger = LoggerFactory.getLogger(Auction.class);
+  private static final long serialVersionUID = 1L;
+  private String auctionId;
+  private Item item;
+  private Seller seller;
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
+  private double currentPrice;
+  private final double stepPrice;
+  private Bidder highestBidder;
+  private final List<BidTransaction> bidHistory = new ArrayList<>();
+  private AuctionStatus status = AuctionStatus.OPEN;
 
-    public Auction(String auctionId, Item item, Seller seller, double startingPrice, double stepPrice,
-                   LocalDateTime startTime, LocalDateTime endTime) {
-        this.auctionId = auctionId;
-        this.item = item;
-        this.seller = seller;
-        this.currentPrice = startingPrice; // Gán giá khởi điểm vào giá hiện tại để bắt đầu đấu giá
-        this.stepPrice = stepPrice;
-        this.bidHistory = new ArrayList<>(); // Khởi tạo danh sách rỗng để tránh NullPointerException
-        this.status = AuctionStatus.OPEN;    // Mặc định phiên mới tạo sẽ ở trạng thái chờ mở
-        this.startTime = startTime;
-        this.endTime = endTime;
+  /**
+   * Khởi tạo một phiên đấu giá mới.
+   *
+   * @param auctionId     ID của phiên đấu giá.
+   * @param item          Sản phẩm được đấu giá.
+   * @param seller        Người bán.
+   * @param startingPrice Giá khởi điểm.
+   * @param stepPrice     Bước giá tối thiểu.
+   * @param startTime     Thời gian bắt đầu.
+   * @param endTime       Thời gian kết thúc.
+   */
+  public Auction(String auctionId, Item item, Seller seller, double startingPrice,
+                 double stepPrice, LocalDateTime startTime, LocalDateTime endTime) {
+    this.auctionId = auctionId;
+    this.item = item;
+    this.seller = seller;
+    this.currentPrice = startingPrice;
+    this.stepPrice = stepPrice;
+    this.startTime = startTime;
+    this.endTime = endTime;
+  }
+
+  /**
+   * Kiểm tra xem giá thầu có hợp lệ hay không.
+   *
+   * @param amount Số tiền thầu.
+   * @return true nếu giá thầu hợp lệ.
+   * @throws AuctionClosedException Nếu phiên đấu giá không còn chạy.
+   * @throws InvalidBidException    Nếu giá thầu không đáp ứng yêu cầu.
+   */
+  public boolean validateBid(double amount) throws AuctionClosedException, InvalidBidException {
+    if (status != AuctionStatus.RUNNING) {
+      throw new AuctionClosedException("Auction " + auctionId + " not running.");
     }
-
-    public boolean validateBid(double amount) throws AuctionClosedException, InvalidBidException {
-        if (this.status != AuctionStatus.RUNNING) {
-            throw new AuctionClosedException(
-                    "Phiên đấu giá " + auctionId + " hiện không trong trạng thái cho phép đặt giá.");
-        }
-        if (amount <= 0) {
-            throw new InvalidBidException("Giá đặt không thể nhỏ hơn hoặc bằng 0.");
-        }
-        if (amount < (this.currentPrice + this.stepPrice)) {
-            throw new InvalidBidException("Giá đặt " + amount + " không hợp lệ. Phải lớn hơn hoặc bằng " +
-                    (this.currentPrice + this.stepPrice));
-        } else {
-            return true;
-        }
+    if (amount <= 0) {
+      throw new InvalidBidException("Bid must be > 0.");
     }
-
-    public void updateAuctionState(Bidder bidder, double amount, BidTransaction transaction) {
-        // Cập nhật giá cao nhất hiện tại thành giá mới vừa đặt
-        this.currentPrice = amount;
-
-        // Ghi nhận người đang thắng thế hiện tại
-        this.highestBidder = bidder;
-
-        // Thêm giao dịch này vào lịch sử đấu giá của món hàng
-        this.bidHistory.add(transaction);
-
-        // In log nhẹ để kiểm tra trạng thái trên Console Server (tùy chọn)
-        System.out.println("[LOG] Auction " + auctionId + " updated: " + amount + " by " + bidder.getUsername());
+    if (amount < (currentPrice + stepPrice)) {
+      throw new InvalidBidException("Bid " + amount + " too low. Min: " + (currentPrice + stepPrice));
     }
+    return true;
+  }
 
-    public double getCurrentPrice() {
-        return currentPrice;
+  /**
+   * Cập nhật trạng thái của phiên đấu giá khi có giá thầu mới.
+   *
+   * @param bidder      Người đặt thầu mới.
+   * @param amount      Số tiền thầu mới.
+   * @param transaction Giao dịch thầu tương ứng.
+   */
+  public void updateAuctionState(Bidder bidder, double amount, BidTransaction transaction) {
+    this.currentPrice = amount;
+    this.highestBidder = bidder;
+    if (transaction != null) {
+      this.bidHistory.add(transaction);
     }
+    logger.debug("[LOG] Auction {} updated: {} by {}", auctionId, amount, bidder.getUsername());
+  }
 
-    public double getStepPrice() {
-        return stepPrice;
-    }
+  public double getCurrentPrice() {
+    return currentPrice;
+  }
 
-    public Bidder getHighestBidder() {
-        return highestBidder;
-    }
+  public double getStepPrice() {
+    return stepPrice;
+  }
 
-    /**
-     * Trả về danh sách lịch sử đặt giá.
-     * Sử dụng Collections.unmodifiableList để ngăn chặn việc các lớp bên ngoài
-     * tự ý thêm/xóa phần tử trong danh sách này mà không thông qua logic của lớp Auction.
-     * Đây là kỹ thuật bảo vệ dữ liệu (Data Integrity).
-     */
-    public List<BidTransaction> getBidHistory() {
-        return Collections.unmodifiableList(bidHistory);
-    }
+  public Bidder getHighestBidder() {
+    return highestBidder;
+  }
 
-    public String getAuctionId() {
-        return auctionId;
-    }
+  public List<BidTransaction> getBidHistory() {
+    return Collections.unmodifiableList(bidHistory);
+  }
 
-    public void setAuctionId(String auctionId) {
-        this.auctionId = auctionId;
-    }
+  public String getAuctionId() {
+    return auctionId;
+  }
 
-    public Item getItem() {
-        return item;
-    }
+  public void setAuctionId(String auctionId) {
+    this.auctionId = auctionId;
+  }
 
-    public void setItem(Item item) {
-        this.item = item;
-    }
+  public Item getItem() {
+    return item;
+  }
 
-    public Seller getSeller() {
-        return seller;
-    }
+  public void setItem(Item item) {
+    this.item = item;
+  }
 
-    public void setSeller(Seller seller) {
-        this.seller = seller;
-    }
+  public Seller getSeller() {
+    return seller;
+  }
 
-    public AuctionStatus getStatus() {
-        return status;
-    }
+  public void setSeller(Seller seller) {
+    this.seller = seller;
+  }
 
-    public void setStatus(AuctionStatus status) {
-        this.status = status;
-    }
+  public AuctionStatus getStatus() {
+    return status;
+  }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
+  public void setStatus(AuctionStatus status) {
+    this.status = status;
+  }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
+  public void setStartTime(LocalDateTime startTime) {
+    this.startTime = startTime;
+  }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
+  public LocalDateTime getStartTime() {
+    return startTime;
+  }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
+  public void setEndTime(LocalDateTime endTime) {
+    this.endTime = endTime;
+  }
+
+  public LocalDateTime getEndTime() {
+    return endTime;
+  }
 }

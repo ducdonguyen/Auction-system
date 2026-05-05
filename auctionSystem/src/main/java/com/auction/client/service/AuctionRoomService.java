@@ -1,14 +1,11 @@
 package com.auction.client.service;
 
 import com.auction.client.model.AuctionRoomViewModel;
-import com.auction.shared.exceptions.AuctionClosedException;
-import com.auction.shared.exceptions.InvalidBidException;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.models.BidTransaction;
 import com.auction.shared.models.Bidder;
 import com.auction.shared.network.ServiceResult;
-
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,84 +13,64 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Service xử lý logic nghiệp vụ trong phòng đấu giá.
+ * Service xử lý logic cho phòng đấu giá tại Client.
  */
 public class AuctionRoomService {
-    private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+  private final NumberFormat cf = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
+  private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public Optional<ServiceResult<AuctionRoomViewModel>> getAuctionRoom(String id) {
-        return AuctionDataStore.findById(id).map(auction -> new ServiceResult<>(true, "", convertToViewModel(auction)));
-    }
+  public Optional<ServiceResult<AuctionRoomViewModel>> getAuctionRoom(String auctionId) {
+    return AuctionDataStore.findById(auctionId).map(auction ->
+        new ServiceResult<>(true, "", convert(auction)));
+  }
 
-    public ServiceResult<AuctionRoomViewModel> placeBid(String auctionId, String amountText) {
-        return AuctionDataStore.findById(auctionId).map(auction -> {
-            try {
-                // Normalize amount (remove non-digits)
-                String cleanAmount = amountText.replaceAll("\\D", "");
-                if (cleanAmount.isEmpty()) {
-                    return new ServiceResult<>(false, "Vui lòng nhập số tiền hợp lệ.",
-                            convertToViewModel(auction));
-                }
+  /**
+   * Thực hiện đặt giá thầu từ Client.
+   *
+   * @param auctionId ID phiên đấu giá.
+   * @param amountStr Số tiền thầu dưới dạng chuỗi.
+   * @return Kết quả đặt thầu.
+   */
+  public ServiceResult<AuctionRoomViewModel> placeBid(String auctionId, String amountStr) {
+    return AuctionDataStore.findById(auctionId).map(auction -> {
+      try {
+        String cleanAmount = amountStr.replaceAll("\\D", "");
+        if (cleanAmount.isEmpty()) {
+          return new ServiceResult<>(false, "Nhập số tiền hợp lệ.", convert(auction));
+        }
+        double amount = Double.parseDouble(cleanAmount);
+        if (!auction.validateBid(amount)) {
+          return new ServiceResult<>(false, "Giá thấp. Min: "
+              + cf.format(auction.getCurrentPrice() + auction.getStepPrice()), convert(auction));
+        }
+        AuthUser currentUser = SessionContext.getCurrentUser();
+        Bidder bidder = new Bidder(currentUser != null ? currentUser.getUsername() : "khách",
+            "secret", amount * 2);
+        auction.updateAuctionState(bidder, amount,
+            new BidTransaction("TX-" + auctionId + "-" + (auction.getBidHistory().size() + 1),
+                bidder, amount, LocalDateTime.now()));
+        return new ServiceResult<>(true, "Thành công!", convert(auction));
+      } catch (Exception e) {
+        return new ServiceResult<>(false, "Lỗi: " + e.getMessage(), convert(auction));
+      }
+    }).orElse(new ServiceResult<>(false, "Không thấy phiên.", null));
+  }
 
-                double bidAmount = Double.parseDouble(cleanAmount);
-
-                // Check bid logic from Auction class
-                if (!auction.validateBid(bidAmount)) {
-                    String minBidStr = currencyFormatter.format(auction.getCurrentPrice() + auction.getStepPrice());
-                    return new ServiceResult<>(false, "Giá đặt phải ít nhất bằng: " + minBidStr,
-                            convertToViewModel(auction));
-                }
-
-                // Get current bidder info
-                AuthUser user = SessionContext.getCurrentUser();
-                String bidderName = (user != null) ? user.getUsername() : "khách_vãng_lai";
-
-                Bidder bidder = new Bidder(bidderName, "secret", bidAmount * 2);
-                BidTransaction transaction = new BidTransaction(
-                        "TX-" + auctionId + "-" + (auction.getBidHistory().size() + 1),
-                        bidder,
-                        bidAmount,
-                        LocalDateTime.now()
-                );
-
-                // Update auction state
-                auction.updateAuctionState(bidder, bidAmount, transaction);
-
-                return new ServiceResult<>(true, "Đặt giá thành công cho phiên " + auctionId + "!",
-                        convertToViewModel(auction));
-            } catch (InvalidBidException e) {
-                return new ServiceResult<>(false, "Số tiền đấu giá không hợp lệ.",
-                        convertToViewModel(auction));
-            } catch (AuctionClosedException e) {
-                return new ServiceResult<>(false, "Phiên đấu giá đã kết thúc.",
-                        convertToViewModel(auction));
-            }
-        }).orElse(new ServiceResult<>(false, "Không tìm thấy phiên đấu giá.", null));
-    }
-
-    private AuctionRoomViewModel convertToViewModel(Auction auction) {
-        String leadingBidder = (auction.getHighestBidder() == null) ? "Chưa có người dẫn đầu" :
-                auction.getHighestBidder().getUsername();
-        double nextMinBid = auction.getCurrentPrice() + auction.getStepPrice();
-
-        return new AuctionRoomViewModel(
-                auction.getAuctionId(),
-                auction.getItem().getName(),
-                auction.getSeller().getUsername(),
-                auction.getStatus().name(),
-                currencyFormatter.format(auction.getCurrentPrice()),
-                currencyFormatter.format(auction.getStepPrice()),
-                currencyFormatter.format(nextMinBid),
-                leadingBidder,
-                auction.getItem().getDescription(),
-                "Lịch phiên: " + dateTimeFormatter.format(auction.getStartTime()) + " - " +
-                        dateTimeFormatter.format(auction.getEndTime()),
-                auction.getBidHistory().stream()
-                        .map(t -> t.getBidder().getUsername() + " đã đặt " +
-                                currencyFormatter.format(t.getBidAmount()) + " lúc " +
-                                dateTimeFormatter.format(t.getTimestamp()))
-                        .toList()
-        );
-    }
+  private AuctionRoomViewModel convert(Auction auction) {
+    return new AuctionRoomViewModel(
+        auction.getAuctionId(),
+        auction.getItem().getName(),
+        auction.getSeller().getUsername(),
+        auction.getStatus().name(),
+        cf.format(auction.getCurrentPrice()),
+        cf.format(auction.getStepPrice()),
+        cf.format(auction.getCurrentPrice() + auction.getStepPrice()),
+        auction.getHighestBidder() == null ? "Chưa có" : auction.getHighestBidder().getUsername(),
+        auction.getItem().getDescription(),
+        "Lịch: " + df.format(auction.getStartTime()) + " - " + df.format(auction.getEndTime()),
+        auction.getBidHistory().stream()
+            .map(tx -> tx.bidder().getUsername() + " đặt " + cf.format(tx.bidAmount())
+                + " lúc " + df.format(tx.timestamp()))
+            .toList());
+  }
 }
