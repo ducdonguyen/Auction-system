@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuctionRepository {
+public class AuctionRepository implements IAuctionRepository {
     private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
 
     public AuctionRepository() {

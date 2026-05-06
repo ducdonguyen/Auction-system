@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDao {
+public class UserDao implements IUserDao {
     public boolean existsByUsernameOrEmail(String username, String email) throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
         try (Connection conn = DatabaseConfig.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
