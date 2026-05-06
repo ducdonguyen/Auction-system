@@ -2,7 +2,8 @@ package com.auction.shared.models;
 
 public abstract class User extends Entity {
     private static final long serialVersionUID = 1L;
-    private String username, password;
+  private String username;
+  private String password;
 
     public User(String username, String password) {
         this.username = username;

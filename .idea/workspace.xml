@@ -5,12 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Viết thêm các test">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/maven.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/maven.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/google_checks.xml" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/google_checks.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/AuctionListController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/AuctionListController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/dao/UserDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/dao/UserDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/shared/models/ModelsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/shared/models/ModelsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -211,7 +214,7 @@
       <workItem from="1777905202146" duration="1769000" />
       <workItem from="1777945268434" duration="930000" />
       <workItem from="1777958093763" duration="202000" />
-      <workItem from="1778066717095" duration="5139000" />
+      <workItem from="1778066717095" duration="6057000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -365,7 +368,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777910390478</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Viết thêm các test">
+      <option name="closed" value="true" />
+      <created>1778075009338</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1778075009340</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
