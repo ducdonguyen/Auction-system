@@ -59,13 +59,13 @@ public class Auction implements Serializable {
    */
   public boolean validateBid(double amount) throws AuctionClosedException, InvalidBidException {
     if (status != AuctionStatus.RUNNING) {
-      throw new AuctionClosedException("Auction " + auctionId + " not running.");
+      throw new AuctionClosedException("Phiên " + auctionId + " không hoạt động.");
     }
     if (amount <= 0) {
-      throw new InvalidBidException("Bid must be > 0.");
+      throw new InvalidBidException("Giá đặt phải cao hơn 0");
     }
     if (amount < (currentPrice + stepPrice)) {
-      throw new InvalidBidException("Bid " + amount + " too low. Min: " + (currentPrice + stepPrice));
+      throw new InvalidBidException("Giá thấp: " + amount + " . Tối thiểu: " + (currentPrice + stepPrice));
     }
     return true;
   }
@@ -83,7 +83,7 @@ public class Auction implements Serializable {
     if (transaction != null) {
       this.bidHistory.add(transaction);
     }
-    logger.debug("[LOG] Auction {} updated: {} by {}", auctionId, amount, bidder.getUsername());
+    logger.debug("[LOG] Phiên {} cập nhật: {} bởi {}", auctionId, amount, bidder.getUsername());
   }
 
   public double getCurrentPrice() {
