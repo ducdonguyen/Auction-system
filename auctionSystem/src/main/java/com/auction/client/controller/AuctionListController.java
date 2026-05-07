@@ -78,8 +78,9 @@ public class AuctionListController {
   private void handleOpenAuctionAction() throws IOException {
     AuctionRow sel = auctionTable.getSelectionModel().getSelectedItem();
     if (sel != null) {
-      SceneNavigator.<AuctionRoomController>switchScene(openAuctionButton, "/views/AuctionRoom.fxml",
-          "Phòng đấu giá", 1180, 780, c -> c.setAuctionId(sel.auctionId()));
+      SceneNavigator.<AuctionRoomController>switchScene(openAuctionButton,
+          "/views/AuctionRoom.fxml", "Phòng đấu giá", 1180, 780,
+          c -> c.setAuctionId(sel.auctionId()));
     }
   }
 
