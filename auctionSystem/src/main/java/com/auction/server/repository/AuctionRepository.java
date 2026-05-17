@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Repository xử lý lưu trữ dữ liệu phiên đấu giá vào cơ sở dữ liệu.
  */
-public class AuctionRepository implements IAuctionRepository {
+public class AuctionRepository {
   private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
 
   public AuctionRepository() {
