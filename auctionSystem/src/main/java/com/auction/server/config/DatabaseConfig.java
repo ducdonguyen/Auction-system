@@ -37,7 +37,7 @@ public final class DatabaseConfig {
          Statement statement = connection.createStatement()) {
       statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
     }
-    String sqlCreateTable = """
+    String sqlCreateUsersTable = """
         CREATE TABLE IF NOT EXISTS users (
             id BIGINT PRIMARY KEY AUTO_INCREMENT,
             full_name VARCHAR(100) NOT NULL,
@@ -69,7 +69,7 @@ public final class DatabaseConfig {
 
     try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
          Statement statement = connection.createStatement()) {
-      statement.execute(sqlCreateTable);
+      statement.execute(sqlCreateUsersTable);
       statement.execute(sqlCreateAuctionsTable);
       logger.info("[DB] Đã đảm bảo bảng 'users' và 'auctions' tồn tại.");
     }
