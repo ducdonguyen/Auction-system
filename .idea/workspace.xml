@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thay đổi class Database Config">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/dao/UserDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/dao/UserDao.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,22 +118,7 @@
       <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AuctionListControllerTest">
-    <configuration name="AuctionListControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="auction-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.auction.client.controller.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
-      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.AuctionListControllerTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.UserDaoTest">
     <configuration name="AuctionLockManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
@@ -194,13 +179,28 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="UserDaoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.server.dao.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.server.dao" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.server.dao.UserDaoTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserDaoTest" />
         <item itemvalue="JUnit.RegisterControllerTest" />
         <item itemvalue="JUnit.LoginControllerTest" />
         <item itemvalue="JUnit.AuctionRoomControllerTest" />
         <item itemvalue="JUnit.AuctionLockManagerTest" />
-        <item itemvalue="JUnit.AuctionListControllerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -423,7 +423,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779016864265</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Thay đổi class Database Config">
+      <option name="closed" value="true" />
+      <created>1779017602448</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1779017602448</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
