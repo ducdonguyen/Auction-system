@@ -4,8 +4,10 @@ import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.dao.UserDao;
 import com.auction.server.util.PasswordUtil;
+import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.BidRequest;
+import com.auction.shared.network.GetAllAuctionsRequest;
 import com.auction.shared.network.JoinRoomRequest;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
@@ -40,8 +42,9 @@ public class RequestRouter {
       switch (request) {
         case LoginRequest login -> handleLogin(login, out);
         case BidRequest bid -> handleBid(bid, out, auctionService);
-        case JoinRoomRequest join -> handleJoinRoom(join, handler, out);
+        case JoinRoomRequest join -> handleJoinRoom(join, handler, out, auctionService);
         case RegistrationRequest register -> handleRegister(register, out);
+        case GetAllAuctionsRequest getAll -> handleGetAllAuctions(out, auctionService);
         default -> logger.warn("Unknown request: {}", request.getClass().getName());
       }
     } catch (Exception e) {
@@ -76,7 +79,7 @@ public class RequestRouter {
   }
 
   private static void handleJoinRoom(JoinRoomRequest request, ClientHandler handler,
-                                     ObjectOutputStream out)
+                                     ObjectOutputStream out, AuctionService auctionService)
       throws IOException {
     String auctionId = request.getAuctionId();
     // Unsubscribe from old room if any
@@ -86,7 +89,8 @@ public class RequestRouter {
     }
     handler.setCurrentWatchingAuctionId(auctionId);
     AuctionManager.getInstance().subscribe(auctionId, handler);
-    sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, null));
+    Auction currentAuction = auctionService.getAuctionById(auctionId);
+    sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction));
   }
 
   private static void handleBid(BidRequest request, ObjectOutputStream out,
@@ -100,6 +104,11 @@ public class RequestRouter {
       result = new ServiceResult<>(false, e.getMessage(), null);
     }
     sendResponse(out, result);
+  }
+
+  private static void handleGetAllAuctions(ObjectOutputStream out, AuctionService auctionService) throws IOException {
+    java.util.List<Auction> allAuctions = auctionService.getAllAuctions();
+    sendResponse(out, new ServiceResult<>(true, "Lấy danh sách thành công", allAuctions));
   }
 
   private static void sendResponse(ObjectOutputStream out, Object response) throws IOException {
