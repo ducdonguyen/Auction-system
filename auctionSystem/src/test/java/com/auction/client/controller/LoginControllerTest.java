@@ -1,5 +1,6 @@
 package com.auction.client.controller;
 
+import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuthService;
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
@@ -48,6 +49,9 @@ public class LoginControllerTest {
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
+
+        SocketClient mockSocket = mock(SocketClient.class);
+        SocketClient.setInstance(mockSocket);
         
         // Inject mock AuthService into private final field using reflection
         Field authServiceField = LoginController.class.getDeclaredField("authService");
