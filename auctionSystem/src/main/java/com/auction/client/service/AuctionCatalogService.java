@@ -29,12 +29,34 @@ public class AuctionCatalogService {
     boolean isFilterAll = (status == null || "Tất cả".equals(status));
 
     List<AuctionRow> result = new ArrayList<>();
-    for (Auction a : AuctionDataStore.getAuctions()) {
+    //Gọi Server để lấy danh sách thời gian thực
+    List<Auction> onlineAuctions = fetchOnlineAuctions();
+
+    for (Auction a : onlineAuctions) {
       if (matchesKeyword(a, kw) && (isFilterAll || a.getStatus().name().equalsIgnoreCase(status))) {
-        result.add(toRow(a)); // map + collect
+        result.add(toRow(a));
       }
     }
     return result;
+  }
+
+  // Hàm nội bộ gọi mạng
+  @SuppressWarnings("unchecked")
+  private List<Auction> fetchOnlineAuctions() {
+    try {
+      com.auction.client.network.SocketClient.getInstance().sendRequest(new com.auction.shared.network.GetAllAuctionsRequest());
+      Object rawResponse = com.auction.client.network.SocketClient.getInstance().receiveResponse();
+
+      if (rawResponse instanceof com.auction.shared.network.ServiceResult<?> response) {
+        if (response.success() && response.data() instanceof List<?> list) {
+          return (List<Auction>) list;
+        }
+      }
+    } catch (Exception e) {
+      System.err.println("Lỗi tải danh sách Sảnh: " + e.getMessage());
+    }
+    // Fallback: Nếu rớt mạng thì mới dùng danh sách lưu tạm dưới máy
+    return com.auction.client.service.AuctionDataStore.getAuctions();
   }
 
   private boolean matchesKeyword(Auction a, String kw) {

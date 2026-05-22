@@ -9,6 +9,7 @@ import com.auction.shared.models.Bidder;
 import com.auction.shared.models.Item;
 import com.auction.shared.models.Seller;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,25 @@ public class AuctionService {
   public AuctionService(AuctionLockManager lm, AuctionRepository ar) {
     this.lockManager = lm;
     this.auctionRepository = ar;
+  }
+
+  /**
+   * Lấy thông tin phiên đấu giá theo ID.
+   *
+   * @param auctionId ID của phiên đấu giá.
+   * @return Đối tượng Auction tương ứng, hoặc null nếu không tìm thấy.
+   */
+  public Auction getAuctionById(String auctionId) {
+    return auctionRepository.findById(auctionId);
+  }
+
+  /**
+   * Lấy toàn bộ danh sách phiên đấu giá.
+   *
+   * @return Danh sách các phiên đấu giá.
+   */
+  public List<Auction> getAllAuctions() {
+    return auctionRepository.findAll();
   }
 
   /**

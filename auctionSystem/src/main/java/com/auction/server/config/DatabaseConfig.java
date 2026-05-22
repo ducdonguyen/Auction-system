@@ -37,7 +37,7 @@ public final class DatabaseConfig {
          Statement statement = connection.createStatement()) {
       statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
     }
-    String sqlCreateTable = """
+    String sqlCreateUsersTable = """
         CREATE TABLE IF NOT EXISTS users (
             id BIGINT PRIMARY KEY AUTO_INCREMENT,
             full_name VARCHAR(100) NOT NULL,
@@ -67,11 +67,23 @@ public final class DatabaseConfig {
         )
         """;
 
+    String sqlCreateBidTransactionsTable = """
+        CREATE TABLE IF NOT EXISTS bid_transactions (
+            id VARCHAR(50) PRIMARY KEY,
+            auction_id VARCHAR(50) NOT NULL,
+            bidder_username VARCHAR(50) NOT NULL,
+            bid_amount DOUBLE NOT NULL,
+            bid_time DATETIME NOT NULL,
+            FOREIGN KEY (auction_id) REFERENCES auctions(id) ON DELETE CASCADE
+        )
+        """;
+
     try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
          Statement statement = connection.createStatement()) {
-      statement.execute(sqlCreateTable);
+      statement.execute(sqlCreateUsersTable);
       statement.execute(sqlCreateAuctionsTable);
-      logger.info("[DB] Đã đảm bảo bảng 'users' và 'auctions' tồn tại.");
+      statement.execute(sqlCreateBidTransactionsTable);
+      logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
     }
   }
 }

@@ -4,6 +4,7 @@ import com.auction.server.config.DatabaseConfig;
 import com.auction.shared.models.Art;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
+import com.auction.shared.models.BidTransaction;
 import com.auction.shared.models.Bidder;
 import com.auction.shared.models.Electronics;
 import com.auction.shared.models.Item;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Repository xử lý lưu trữ dữ liệu phiên đấu giá vào cơ sở dữ liệu.
  */
-public class AuctionRepository implements IAuctionRepository {
+public class AuctionRepository {
   private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
 
   public AuctionRepository() {
@@ -37,34 +38,97 @@ public class AuctionRepository implements IAuctionRepository {
     }
   }
 
+  /**
+   * Lấy toàn bộ danh sách phòng đấu giá (Dành cho màn hình Sảnh - Lobby)
+   */
+  public List<Auction> findAll() {
+    List<Auction> results = new ArrayList<>();
+    String sql = "SELECT * FROM auctions";
+    try (Connection connection = DatabaseConfig.getConnection();
+         PreparedStatement ps = connection.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+      while (rs.next()) {
+        //Lấy vỏ phòng đấu giá
+        Auction auction = map(rs);
+
+        //PHỤC HỒI TÊN NGƯỜI DẪN ĐẦU CHO MÀN HÌNH SẢNH
+        String bidderUsername = rs.getString("highest_bidder_username");
+        if (bidderUsername != null) {
+          Bidder b = new Bidder(bidderUsername, "", 0);
+
+          // Tại sao dùng giao dịch Ảo ở đây lại AN TOÀN?
+          // Vì màn hình Sảnh (Lobby) CHỈ đọc Tên người thắng, KHÔNG BAO GIỜ in danh sách lịch sử ra.
+          // Do đó, ta truyền một giao dịch đại diện vào đây để làm mồi mà không sợ sập App!
+          BidTransaction txLobby = new BidTransaction("TX-LOBBY", b, auction.getCurrentPrice(), LocalDateTime.now());
+          auction.updateAuctionState(b, auction.getCurrentPrice(), txLobby);
+        }
+
+        results.add(auction);
+      }
+    } catch (SQLException e) {
+      logger.error("FindAll failed: {}", e.getMessage());
+    }
+    return results;
+  }
+
+  /**
+   * Lấy chi tiết phòng đấu giá và toàn bộ lịch sử đặt giá (Dành cho người vào phòng)
+   */
   public Auction findById(String auctionId) {
+    Auction auction = null;
     String sql = "SELECT * FROM auctions WHERE id = ?";
+
     try (Connection connection = DatabaseConfig.getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
       preparedStatement.setString(1, auctionId);
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         if (resultSet.next()) {
-          return map(resultSet);
+          auction = map(resultSet); // Lấy cái vỏ phòng đấu giá
+        }
+      }
+
+      // NẾU CÓ PHÒNG -> KÉO LỊCH SỬ THẬT TỪ BẢNG bid_transactions ĐẮP VÀO
+      if (auction != null) {
+        String sqlBids = "SELECT * FROM bid_transactions WHERE auction_id = ? ORDER BY bid_time ASC";
+        try (PreparedStatement psBids = connection.prepareStatement(sqlBids)) {
+          psBids.setString(1, auctionId);
+          try (ResultSet rsBids = psBids.executeQuery()) {
+            // Đọc từ cũ nhất đến mới nhất và phát lại giao dịch
+            while (rsBids.next()) {
+              Bidder b = new Bidder(rsBids.getString("bidder_username"), "", 0);
+              BidTransaction tx = new BidTransaction(
+                      rsBids.getString("id"),
+                      b,
+                      rsBids.getDouble("bid_amount"),
+                      rsBids.getTimestamp("bid_time").toLocalDateTime()
+              );
+              // Tính năng Replay: Phát lại từng giao dịch để cập nhật giá hiện tại cho phòng
+              auction.updateAuctionState(b, tx.bidAmount(), tx);
+            }
+          }
         }
       }
     } catch (SQLException e) {
       logger.error("Find failed {}: {}", auctionId, e.getMessage());
     }
-    return null;
+    return auction;
   }
 
   public Auction save(Auction auction) {
     String sql = "INSERT INTO auctions (id, item_id, item_name, item_description, item_starting_price, "
-        + "item_type, item_extra_info, seller_username, start_time, end_time, current_price, step_price, "
-        + "highest_bidder_username, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-        + "ON DUPLICATE KEY UPDATE item_name = VALUES(item_name), item_description = VALUES(item_description), "
-        + "item_starting_price = VALUES(item_starting_price), item_type = VALUES(item_type), "
-        + "item_extra_info = VALUES(item_extra_info), seller_username = VALUES(seller_username), "
-        + "start_time = VALUES(start_time), end_time = VALUES(end_time), "
-        + "current_price = VALUES(current_price), step_price = VALUES(step_price), "
-        + "highest_bidder_username = VALUES(highest_bidder_username), status = VALUES(status)";
+            + "item_type, item_extra_info, seller_username, start_time, end_time, current_price, step_price, "
+            + "highest_bidder_username, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            + "ON DUPLICATE KEY UPDATE item_name = VALUES(item_name), item_description = VALUES(item_description), "
+            + "item_starting_price = VALUES(item_starting_price), item_type = VALUES(item_type), "
+            + "item_extra_info = VALUES(item_extra_info), seller_username = VALUES(seller_username), "
+            + "start_time = VALUES(start_time), end_time = VALUES(end_time), "
+            + "current_price = VALUES(current_price), step_price = VALUES(step_price), "
+            + "highest_bidder_username = VALUES(highest_bidder_username), status = VALUES(status)";
+
     try (Connection connection = DatabaseConfig.getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
       preparedStatement.setString(1, auction.getAuctionId());
       Item item = auction.getItem();
       preparedStatement.setString(2, item != null ? item.getId() : null);
@@ -81,6 +145,23 @@ public class AuctionRepository implements IAuctionRepository {
       preparedStatement.setString(13, auction.getHighestBidder() != null ? auction.getHighestBidder().getUsername() : null);
       preparedStatement.setString(14, auction.getStatus().name());
       preparedStatement.executeUpdate();
+
+      // BƠM LỊCH SỬ ĐẶT GIÁ VÀO BẢNG bid_transactions (Sử dụng ExecuteBatch siêu tốc)
+      if (auction.getBidHistory() != null && !auction.getBidHistory().isEmpty()) {
+        String sqlBid = "INSERT IGNORE INTO bid_transactions (id, auction_id, bidder_username, bid_amount, bid_time) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement psBid = connection.prepareStatement(sqlBid)) {
+          for (BidTransaction tx : auction.getBidHistory()) {
+            psBid.setString(1, tx.transactionId());
+            psBid.setString(2, auction.getAuctionId());
+            psBid.setString(3, tx.bidder().getUsername());
+            psBid.setDouble(4, tx.bidAmount());
+            psBid.setTimestamp(5, Timestamp.valueOf(tx.timestamp()));
+            psBid.addBatch(); // Cho vào giỏ hàng
+          }
+          psBid.executeBatch(); // Chạy lệnh lưu toàn bộ lô
+        }
+      }
+
     } catch (SQLException e) {
       logger.error("Save failed {}: {}", auction.getAuctionId(), e.getMessage());
     }
@@ -112,6 +193,9 @@ public class AuctionRepository implements IAuctionRepository {
     return results;
   }
 
+  /**
+   * Ánh xạ ResultSet thành đối tượng Auction (Chỉ lấy vỏ, không có lịch sử)
+   */
   private Auction map(ResultSet resultSet) throws SQLException {
     String id = resultSet.getString("id");
     String name = resultSet.getString("item_name");
@@ -119,20 +203,20 @@ public class AuctionRepository implements IAuctionRepository {
     String type = resultSet.getString("item_type");
     String extra = resultSet.getString("item_extra_info");
     double startingPrice = resultSet.getDouble("item_starting_price");
+
     Item item = switch (type) {
       case "ART" -> new Art(name, desc, startingPrice, extra);
       case "ELECTRONICS" -> new Electronics(name, desc, startingPrice, Integer.parseInt(extra));
       case "VEHICLE" -> new Vehicle(name, desc, startingPrice, extra);
       default -> throw new IllegalArgumentException("Invalid type: " + type);
     };
+
     Auction auction = new Auction(id, item, new Seller(resultSet.getString("seller_username"), ""),
-        resultSet.getDouble("current_price"), resultSet.getDouble("step_price"),
-        resultSet.getTimestamp("start_time").toLocalDateTime(), resultSet.getTimestamp("end_time").toLocalDateTime());
+            resultSet.getDouble("current_price"), resultSet.getDouble("step_price"),
+            resultSet.getTimestamp("start_time").toLocalDateTime(), resultSet.getTimestamp("end_time").toLocalDateTime());
+
     auction.setStatus(AuctionStatus.valueOf(resultSet.getString("status")));
-    String bidderUsername = resultSet.getString("highest_bidder_username");
-    if (bidderUsername != null) {
-      auction.updateAuctionState(new Bidder(bidderUsername, "", 0), auction.getCurrentPrice(), null);
-    }
+
     return auction;
   }
 }

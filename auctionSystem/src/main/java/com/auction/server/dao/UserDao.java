@@ -10,9 +10,8 @@ import java.sql.SQLException;
 /**
  * DAO xử lý các thao tác liên quan đến người dùng trong cơ sở dữ liệu.
  */
-public class UserDao implements IUserDao {
+public class UserDao {
 
-  @Override
   public boolean existsByUsernameOrEmail(String username, String email) throws SQLException {
     String sql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
     try (Connection conn = DatabaseConfig.getConnection();
@@ -25,7 +24,6 @@ public class UserDao implements IUserDao {
     }
   }
 
-  @Override
   public void register(AuthUser user) throws SQLException {
     String sql = "INSERT INTO users (full_name, username, email, password_hash) VALUES (?, ?, ?, ?)";
     try (Connection conn = DatabaseConfig.getConnection();
@@ -38,7 +36,6 @@ public class UserDao implements IUserDao {
     }
   }
 
-  @Override
   public AuthUser findByUsername(String username) throws SQLException {
     String sql = "SELECT * FROM users WHERE username = ?";
     try (Connection conn = DatabaseConfig.getConnection();

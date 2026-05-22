@@ -53,6 +53,15 @@ public class SocketClient {
     return instance;
   }
 
+  /**
+   * Ghi đè instance bằng Mock Object (Dành riêng cho Unit Test).
+   *
+   * @param mockInstance Đối tượng SocketClient giả.
+   */
+  public static void setInstance(SocketClient mockInstance) {
+    instance = mockInstance;
+  }
+
   public void setRealtimeListener(RealtimeListener l) {
     this.realtimeListener.set(l);
   }

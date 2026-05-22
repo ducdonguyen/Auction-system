@@ -65,19 +65,25 @@ public class AuctionRoomController {
     SocketClient.getInstance().setRealtimeListener(new SocketClient.RealtimeListener() {
       @Override
       public void onNewBid(BidTransaction bidTransaction) {
-        currentPriceLabel.setText(String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
-        highestBidderLabel.setText(bidTransaction.bidder().getUsername());
-        bidHistoryList.getItems().add(0, bidTransaction.bidder().getUsername()
-            + " vừa đặt: " + bidTransaction.bidAmount());
+        // BẮT BUỘC: Nhờ luồng giao diện cập nhật để không bị sập app
+        javafx.application.Platform.runLater(() -> {
+          currentPriceLabel.setText(String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
+          highestBidderLabel.setText(bidTransaction.bidder().getUsername());
+          bidHistoryList.getItems().add(0, bidTransaction.bidder().getUsername()
+                  + " vừa đặt: " + bidTransaction.bidAmount());
+        });
       }
 
       @Override
       public void onStatusUpdate(AuctionStatus status) {
-        statusLabel.setText(status.name());
-        if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
-          bidAmountField.setDisable(true);
-          messageLabel.setText("Phiên đã kết thúc!");
-        }
+        // BẮT BUỘC: Nhờ luồng giao diện cập nhật
+        javafx.application.Platform.runLater(() -> {
+          statusLabel.setText(status.name());
+          if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
+            bidAmountField.setDisable(true);
+            messageLabel.setText("Phiên đã kết thúc!");
+          }
+        });
       }
     });
   }
