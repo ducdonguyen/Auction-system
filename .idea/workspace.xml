@@ -4,19 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Merge remote-tracking branch 'origin/dev' into dev&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;auctionSystem/src/main/java/com/auction/client/controller/LoginController.java&#10;#&#9;auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" />
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Viết test cho package server.concurrency">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/util/SceneNavigator.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/util/SceneNavigator.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="CopilotPersistence">
-    <persistenceIdMap>
-      <entry key="_/Users/hungdomanh/Desktop/Auction-system/auctionSystem" value="3CCuFtvrX6uiYZbmNtBeG50Mtan" />
-    </persistenceIdMap>
-  </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="109" />
+    <option name="cachedIndexableFilesCount" value="98" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -27,11 +26,6 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="main" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -40,15 +34,31 @@
     &quot;assignee&quot;: &quot;ducdonguyen&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ducdonguyen/Auction-system.git&quot;,
-    &quot;accountId&quot;: &quot;572a6d18-1e6d-41e3-b884-8baeb227d69d&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ducdonguyen/Auction-system.git",
+    "accountId": "7dae0bae-ce59-46f7-9535-e39d0cc90aab"
   }
-}</component>
+}]]></component>
   <component name="McpProjectServerCommands">
-    <commands />
-    <urls />
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
@@ -64,7 +74,6 @@
     &quot;Application.ClientLauncher.executor&quot;: &quot;Run&quot;,
     &quot;Application.ClientMain.executor&quot;: &quot;Run&quot;,
     &quot;Application.SerializationTest.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ServerApplication.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.AuctionListControllerTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.AuctionLockManagerTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.AuctionManagerTest.executor&quot;: &quot;Run&quot;,
@@ -111,7 +120,6 @@
   },
   &quot;keyToStringList&quot;: {
     &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;,
       &quot;mysql_aurora&quot;
     ]
   }
@@ -121,7 +129,22 @@
       <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AuctionLockManagerTest">
+  <component name="RunManager" selected="JUnit.RegisterControllerTest">
+    <configuration name="AuctionListControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.client.controller.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.AuctionListControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="AuctionLockManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
@@ -182,44 +205,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserDaoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="auction-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.auction.server.dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.auction.server.dao" />
-      <option name="MAIN_CLASS_NAME" value="com.auction.server.dao.UserDaoTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="JUnit.AuctionLockManagerTest" />
-      <item itemvalue="JUnit.UserDaoTest" />
-      <item itemvalue="JUnit.AuctionRoomControllerTest" />
-      <item itemvalue="JUnit.LoginControllerTest" />
-      <item itemvalue="JUnit.RegisterControllerTest" />
-    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.UserDaoTest" />
         <item itemvalue="JUnit.RegisterControllerTest" />
         <item itemvalue="JUnit.LoginControllerTest" />
         <item itemvalue="JUnit.AuctionRoomControllerTest" />
+        <item itemvalue="JUnit.AuctionListControllerTest" />
         <item itemvalue="JUnit.AuctionLockManagerTest" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -246,8 +240,6 @@
       <workItem from="1777945268434" duration="930000" />
       <workItem from="1777958093763" duration="202000" />
       <workItem from="1778066717095" duration="7475000" />
-      <workItem from="1778418484562" duration="260000" />
-      <workItem from="1778504252920" duration="32000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -425,23 +417,7 @@
       <option name="project" value="LOCAL" />
       <updated>1778122422359</updated>
     </task>
-    <task id="LOCAL-00023" summary="Thay đổi class Database Config">
-      <option name="closed" value="true" />
-      <created>1779016864265</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1779016864265</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Thay đổi class Database Config">
-      <option name="closed" value="true" />
-      <created>1779017602448</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1779017602448</updated>
-    </task>
-    <option name="localTasksCounter" value="25" />
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,8 +446,7 @@
     <MESSAGE value="Them logging" />
     <MESSAGE value="Viết thêm các test" />
     <MESSAGE value="Viết test cho package server.concurrency" />
-    <MESSAGE value="Thay đổi class Database Config" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thay đổi class Database Config" />
+    <option name="LAST_COMMIT_MESSAGE" value="Viết test cho package server.concurrency" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

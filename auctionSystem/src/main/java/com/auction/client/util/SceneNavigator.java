@@ -31,14 +31,21 @@ public final class SceneNavigator {
   public static <T> void switchScene(Node sourceNode, String fxmlPath, String title,
                                      double w, double h,
                                      Consumer<T> init) throws IOException {
-    FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(fxmlPath));
-    AnchorPane view = loader.load();
-    if (init != null) {
-      init.accept(loader.getController());
-    }
-    Stage stage = (Stage) sourceNode.getScene().getWindow();
-    stage.setScene(new Scene(view, w, h));
-    stage.setTitle(title);
+
+      String normalizedPath = "/" + fxmlPath.replaceAll("^/+", "");
+
+      java.net.URL fxmlResource = SceneNavigator.class.getResource(normalizedPath);
+
+      FXMLLoader loader = new FXMLLoader(fxmlResource);
+      AnchorPane view = loader.load();
+
+      if (init != null) {
+          init.accept(loader.getController());
+      }
+
+      Stage stage = (Stage) sourceNode.getScene().getWindow();
+      stage.setScene(new Scene(view, w, h));
+      stage.setTitle(title);
   }
 
   /**
