@@ -4,67 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thay đổi class Database Config">
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Viết test cho package server.concurrency">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/network/SocketClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/network/SocketClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/controller/LoginControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/controller/LoginControllerTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="CopilotChats">
-    <option name="panelChat">
-      <chat>
-        <option name="activeSessionId" value="a1ce74c2-97ed-40a7-94e1-0fc4578aaf44" />
-        <option name="sessions">
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="a1ce74c2-97ed-40a7-94e1-0fc4578aaf44" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="status" value="Completed" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="ae04e2e3-e51f-449c-959d-73223372988d" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-        </option>
-        <option name="type" value="PANEL" />
-      </chat>
-    </option>
-  </component>
-  <component name="CopilotPersistence">
-    <persistenceIdMap>
-      <entry key="_D:/Auction System/auctionSystem" value="3CCuFtvrX6uiYZbmNtBeG50Mtan" />
-    </persistenceIdMap>
-  </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="87" />
+    <option name="cachedIndexableFilesCount" value="98" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Exception" />
         <option value="Class" />
+        <option value="Exception" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="main" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -75,7 +35,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ducdonguyen/Auction-system.git&quot;,
-    &quot;accountId&quot;: &quot;5fb56dd2-3bb3-4773-a64c-d661c1697f77&quot;
+    &quot;accountId&quot;: &quot;572a6d18-1e6d-41e3-b884-8baeb227d69d&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -96,7 +56,6 @@
     "Application.ClientLauncher.executor": "Run",
     "Application.ClientMain.executor": "Run",
     "Application.SerializationTest.executor": "Run",
-    "Application.ServerApplication.executor": "Run",
     "JUnit.AuctionListControllerTest.executor": "Run",
     "JUnit.AuctionLockManagerTest.executor": "Run",
     "JUnit.AuctionManagerTest.executor": "Run",
@@ -114,7 +73,6 @@
     "JUnit.RequestRouterTest.executor": "Run",
     "JUnit.ServerAuthServiceTest.executor": "Run",
     "JUnit.UserDaoTest.executor": "Run",
-    "Maven.auction-system [clean,test].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -144,7 +102,6 @@
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
-      "mysql",
       "mysql_aurora"
     ]
   }
@@ -154,14 +111,22 @@
       <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
     </key>
   </component>
-  <component name="RunAnythingCache">
-    <option name="myCommands">
-      <command value="tmvn clean test" />
-      <command value="xvfb-run mvn -f auctionSystem/pom.xml clean test checkstyle:checkstyle" />
-      <command value="mvn clean test " />
-    </option>
-  </component>
-  <component name="RunManager" selected="JUnit.UserDaoTest">
+  <component name="RunManager" selected="JUnit.RegisterControllerTest">
+    <configuration name="AuctionListControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.client.controller.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.AuctionListControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="AuctionLockManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
@@ -222,34 +187,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserDaoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="auction-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.auction.server.dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.auction.server.dao" />
-      <option name="MAIN_CLASS_NAME" value="com.auction.server.dao.UserDaoTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="JUnit.AuctionLockManagerTest" />
-      <item itemvalue="JUnit.UserDaoTest" />
-      <item itemvalue="JUnit.AuctionRoomControllerTest" />
-      <item itemvalue="JUnit.LoginControllerTest" />
-      <item itemvalue="JUnit.RegisterControllerTest" />
-    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.UserDaoTest" />
         <item itemvalue="JUnit.RegisterControllerTest" />
         <item itemvalue="JUnit.LoginControllerTest" />
         <item itemvalue="JUnit.AuctionRoomControllerTest" />
+        <item itemvalue="JUnit.AuctionListControllerTest" />
         <item itemvalue="JUnit.AuctionLockManagerTest" />
       </list>
     </recent_temporary>
@@ -257,7 +200,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.33514.17" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
       </set>
     </attachedChunks>
   </component>
@@ -286,8 +230,6 @@
       <workItem from="1777945268434" duration="930000" />
       <workItem from="1777958093763" duration="202000" />
       <workItem from="1778066717095" duration="7475000" />
-      <workItem from="1778418484562" duration="260000" />
-      <workItem from="1778504252920" duration="32000" />
     </task>
     <task id="LOCAL-00001" summary="Thêm @Transactional">
       <option name="closed" value="true" />
@@ -465,23 +407,7 @@
       <option name="project" value="LOCAL" />
       <updated>1778122422359</updated>
     </task>
-    <task id="LOCAL-00023" summary="Thay đổi class Database Config">
-      <option name="closed" value="true" />
-      <created>1779016864265</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1779016864265</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Thay đổi class Database Config">
-      <option name="closed" value="true" />
-      <created>1779017602448</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1779017602448</updated>
-    </task>
-    <option name="localTasksCounter" value="25" />
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -510,19 +436,10 @@
     <MESSAGE value="Them logging" />
     <MESSAGE value="Viết thêm các test" />
     <MESSAGE value="Viết test cho package server.concurrency" />
-    <MESSAGE value="Thay đổi class Database Config" />
-    <option name="LAST_COMMIT_MESSAGE" value="Thay đổi class Database Config" />
+    <option name="LAST_COMMIT_MESSAGE" value="Viết test cho package server.concurrency" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
-  </component>
-  <component name="github-copilot-workspace">
-    <instructionFileLocations>
-      <option value=".github/instructions" />
-    </instructionFileLocations>
-    <promptFileLocations>
-      <option value=".github/prompts" />
-    </promptFileLocations>
   </component>
 </project>
