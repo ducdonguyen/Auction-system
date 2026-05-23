@@ -28,34 +28,23 @@ public class LoginController {
 
   @FXML
   private void handleLoginAction() {
-      ServiceResult<AuthUser> result = authService.login(
-              new LoginRequest(usernameField.getText(), passwordField.getText()));
+    ServiceResult<AuthUser> result = authService.login(
+            new LoginRequest(usernameField.getText(), passwordField.getText()));
 
-      errorLabel.setText(result.message());
-      errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+    errorLabel.setText(result.message());
+    errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
 
-      if (result.success()) {
-          AuthUser user = result.data(); // Hoặc result.getData() tùy code của bạn
+    if (result.success()) {
+      AuthUser user = result.data();
 
-          if (user != null) {
-              // BẮT BUỘC: Bọc khối try-catch ở đây để giải quyết lỗi "unreported exception"
-              try {
-                  if ("ADMIN".equalsIgnoreCase(user.getRole())) {
-                      // Gọi sang màn hình Admin (nhớ thêm tham số null ở cuối nếu hàm yêu cầu 6 tham số)
-                      SceneNavigator.switchScene(usernameField, "/views/AdminDashboard.fxml", "Bảng điều khiển Admin", 1200, 760, null);
-                  } else {
-                      // Gọi sang màn hình User
-                      SceneNavigator.switchScene(usernameField, "/views/AuctionList.fxml", "Sảnh đấu giá", 1200, 760, null);
-                  }
-              } catch (IOException e) {
-                  // Nếu quá trình load file fxml lỗi, nó sẽ chạy vào đây chứ không làm sập app
-                  System.err.println("Lỗi nghiêm trọng khi chuyển màn hình!");
-                  e.printStackTrace();
-                  errorLabel.setText("Lỗi hệ thống: Không thể mở giao diện màn hình tiếp theo.");
-                  errorLabel.setStyle("-fx-text-fill: red;");
-              }
-          }
+      if (user != null) {
+        if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+          navigate("/views/AdminDashboard.fxml", "Bảng điều khiển Admin", 1200, 760);
+        } else {
+          navigate("/views/AuctionList.fxml", "Sảnh đấu giá", 1200, 760);
+        }
       }
+    }
   }
 
   @FXML
@@ -67,7 +56,10 @@ public class LoginController {
     try {
       SceneNavigator.switchScene(loginButton, fxmlPath, title, width, height);
     } catch (IOException e) {
-      errorLabel.setText("Lỗi điều hướng.");
+      System.err.println("Lỗi nghiêm trọng khi chuyển màn hình!");
+      e.printStackTrace();
+      errorLabel.setText("Lỗi hệ thống: Không thể tải giao diện.");
+      errorLabel.setStyle("-fx-text-fill: red;");
     }
   }
 }

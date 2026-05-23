@@ -76,6 +76,31 @@ public class AuctionService {
   }
 
   /**
+   * Hủy một phiên đấu giá từ yêu cầu của Admin.
+   *
+   * @param auctionId ID của phiên đấu giá cần hủy.
+   * @throws IllegalArgumentException nếu không tìm thấy ID.
+   * @throws IllegalStateException nếu không thể chuyển trạng thái.
+   */
+  public void cancelAuction(String auctionId) {
+    // Tìm phiên đấu giá
+    Auction auction = getAuctionById(auctionId);
+    if (auction == null) {
+      throw new IllegalArgumentException("Không tìm thấy phiên đấu giá với ID: " + auctionId);
+    }
+
+    // Chuyển trạng thái sang CANCELED
+    boolean success = updateAuctionStatus(auction, AuctionStatus.CANCELED);
+
+    // Xử lý kết quả
+    if (!success) {
+      throw new IllegalStateException("Trạng thái hiện tại (" + auction.getStatus() + ") không cho phép hủy.");
+    }
+
+    logger.info("[ADMIN ACTION] Phiên đấu giá {} đã bị hủy thành công.", auctionId);
+  }
+
+  /**
    * Thực hiện đặt giá thầu cho một phiên đấu giá.
    *
    * @param auctionId      ID của phiên đấu giá.

@@ -4,50 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Merge remote-tracking branch 'origin/dev' into dev&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;auctionSystem/src/main/java/com/auction/client/controller/LoginController.java&#10;#&#9;auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/repository/AuctionRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuctionStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuctionStatus.java" afterDir="false" />
-    </list>
+    <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Merge remote-tracking branch 'origin/dev' into dev&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;auctionSystem/src/main/java/com/auction/client/controller/LoginController.java&#10;#&#9;auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="CopilotChats">
-    <option name="panelChat">
-      <chat>
-        <option name="activeSessionId" value="a1ce74c2-97ed-40a7-94e1-0fc4578aaf44" />
-        <option name="sessions">
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="a1ce74c2-97ed-40a7-94e1-0fc4578aaf44" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="status" value="Completed" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="ae04e2e3-e51f-449c-959d-73223372988d" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-        </option>
-        <option name="type" value="PANEL" />
-      </chat>
-    </option>
-  </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
-      <entry key="_D:/Auction System/auctionSystem" value="3CCuFtvrX6uiYZbmNtBeG50Mtan" />
+      <entry key="_/Users/hungdomanh/Desktop/Auction-system/auctionSystem" value="3CCuFtvrX6uiYZbmNtBeG50Mtan" />
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="122" />
+    <option name="cachedIndexableFilesCount" value="109" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -64,7 +33,6 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -90,69 +58,65 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ClientLauncher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ClientMain.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SerializationTest.executor&quot;: &quot;Run&quot;,
-    &quot;Application.ServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionListControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionLockManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionManagerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionRoomControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionSchedulerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.AuctionTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ClientHandlerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ClientServicesTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ClientServicesTest.testPlaceBid.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ItemTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.LoginControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.PasswordUtilTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.RegisterControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.RequestRouterTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ServerAuthServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.UserDaoTest.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.auction-system [clean,test].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/BTL&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.AuctionServiceTest.executor": "Run",
+    "Application.ClientLauncher.executor": "Run",
+    "Application.ClientMain.executor": "Run",
+    "Application.SerializationTest.executor": "Run",
+    "Application.ServerApplication.executor": "Run",
+    "JUnit.AuctionListControllerTest.executor": "Run",
+    "JUnit.AuctionLockManagerTest.executor": "Run",
+    "JUnit.AuctionManagerTest.executor": "Run",
+    "JUnit.AuctionRepositoryTest.executor": "Run",
+    "JUnit.AuctionRoomControllerTest.executor": "Run",
+    "JUnit.AuctionSchedulerTest.executor": "Run",
+    "JUnit.AuctionServiceTest.executor": "Run",
+    "JUnit.AuctionTest.executor": "Run",
+    "JUnit.ClientHandlerTest.executor": "Run",
+    "JUnit.ClientServicesTest.testPlaceBid.executor": "Run",
+    "JUnit.ItemTest.executor": "Run",
+    "JUnit.LoginControllerTest.executor": "Run",
+    "JUnit.PasswordUtilTest.executor": "Run",
+    "JUnit.RegisterControllerTest.executor": "Run",
+    "JUnit.RequestRouterTest.executor": "Run",
+    "JUnit.ServerAuthServiceTest.executor": "Run",
+    "JUnit.UserDaoTest.executor": "Run",
+    "Maven.auction-system [clean,test].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "Spring Boot.ServerApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "dev",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/BTL",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;,
-      &quot;mysql_aurora&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql",
+      "mysql_aurora"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
@@ -160,63 +124,66 @@
   </component>
   <component name="RunAnythingCache">
     <option name="myCommands">
-      <command value="tmvn clean test" />
-      <command value="xvfb-run mvn -f auctionSystem/pom.xml clean test checkstyle:checkstyle" />
-      <command value="mvn clean test " />
+      <command value="temvn clean test" />
+      <command value="mvn clean test" />
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.AuctionServiceTest">
-    <configuration name="ClientLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.auction.client.ClientLauncher" />
+  <component name="RunManager" selected="JUnit.AuctionLockManagerTest">
+    <configuration name="AuctionLockManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.auction.client.*" />
+          <option name="PATTERN" value="com.auction.server.concurrency.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ServerApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.auction.server.ServerApplication" />
-      <module name="auction-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.auction.server.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AuctionServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="auction-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.auction.server.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.auction.server" />
-      <option name="MAIN_CLASS_NAME" value="com.auction.server.AuctionServiceTest" />
+      <option name="PACKAGE_NAME" value="com.auction.server.concurrency" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.server.concurrency.AuctionLockManagerTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ClientServicesTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AuctionRoomControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.auction.client.service.*" />
+          <option name="PATTERN" value="com.auction.client.controller.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.auction.client.service" />
-      <option name="MAIN_CLASS_NAME" value="com.auction.client.service.ClientServicesTest" />
+      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.AuctionRoomControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LoginControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.client.controller.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.LoginControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RegisterControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.client.controller.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.RegisterControllerTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -238,19 +205,19 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.ClientLauncher" />
-      <item itemvalue="Application.ServerApplication" />
-      <item itemvalue="JUnit.AuctionServiceTest" />
-      <item itemvalue="JUnit.ClientServicesTest" />
+      <item itemvalue="JUnit.AuctionLockManagerTest" />
       <item itemvalue="JUnit.UserDaoTest" />
+      <item itemvalue="JUnit.AuctionRoomControllerTest" />
+      <item itemvalue="JUnit.LoginControllerTest" />
+      <item itemvalue="JUnit.RegisterControllerTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.AuctionServiceTest" />
         <item itemvalue="JUnit.UserDaoTest" />
-        <item itemvalue="Application.ClientLauncher" />
-        <item itemvalue="Application.ServerApplication" />
-        <item itemvalue="JUnit.ClientServicesTest" />
+        <item itemvalue="JUnit.RegisterControllerTest" />
+        <item itemvalue="JUnit.LoginControllerTest" />
+        <item itemvalue="JUnit.AuctionRoomControllerTest" />
+        <item itemvalue="JUnit.AuctionLockManagerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -481,23 +448,7 @@
       <option name="project" value="LOCAL" />
       <updated>1779017602448</updated>
     </task>
-    <task id="LOCAL-00025" summary="Them vai tro Admin">
-      <option name="closed" value="true" />
-      <created>1779517359662</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1779517359663</updated>
-    </task>
-    <task id="LOCAL-00026" summary="Them vai tro Admin">
-      <option name="closed" value="true" />
-      <created>1779517734270</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1779517734271</updated>
-    </task>
-    <option name="localTasksCounter" value="27" />
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -527,8 +478,7 @@
     <MESSAGE value="Viết thêm các test" />
     <MESSAGE value="Viết test cho package server.concurrency" />
     <MESSAGE value="Thay đổi class Database Config" />
-    <MESSAGE value="Them vai tro Admin" />
-    <option name="LAST_COMMIT_MESSAGE" value="Them vai tro Admin" />
+    <option name="LAST_COMMIT_MESSAGE" value="Thay đổi class Database Config" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
