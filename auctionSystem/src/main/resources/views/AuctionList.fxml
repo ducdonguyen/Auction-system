@@ -40,6 +40,7 @@
                         </Button>
                     </children>
                 </HBox>
+
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <children>
                         <TextField fx:id="searchField" prefHeight="40.0" prefWidth="300.0"
@@ -65,6 +66,7 @@
                         <Label fx:id="resultLabel" text="Hiển thị 0 phiên." textFill="#64748b"/>
                     </children>
                 </HBox>
+
                 <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS"
                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-overflow-x: hidden;">
                     <columns>
@@ -80,8 +82,18 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                     </columnResizePolicy>
                 </TableView>
-                <HBox alignment="CENTER_RIGHT">
+
+                <HBox alignment="CENTER_RIGHT" spacing="16.0">
                     <children>
+                        <Button fx:id="createAuctionButton" mnemonicParsing="false" onAction="#handleCreateAuctionAction"
+                                prefHeight="48.0" prefWidth="200.0"
+                                style="-fx-background-color: #ea580c; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"
+                                text="TẠO PHIÊN ĐẤU GIÁ">
+                            <font>
+                                <Font size="14.0"/>
+                            </font>
+                        </Button>
+
                         <Button fx:id="openAuctionButton" mnemonicParsing="false" onAction="#handleOpenAuctionAction"
                                 prefHeight="48.0" prefWidth="200.0"
                                 style="-fx-background-color: #0f766e; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"

@@ -1,6 +1,7 @@
 package com.auction.shared.models;
 
 public enum AuctionStatus {
+    PENDING,    // Chờ duyệt
     OPEN,       // Vừa tạo, chờ bắt đầu
     RUNNING,    // Đang trong thời gian đấu giá
     FINISHED,   // Đã hết giờ, chờ thanh toán

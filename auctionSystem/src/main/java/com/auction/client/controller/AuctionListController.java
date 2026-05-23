@@ -1,96 +1,229 @@
 package com.auction.client.controller;
 
+import com.auction.shared.network.CreateAuctionRequest;
+import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionCatalogService;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionRow;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 /**
  * Controller cho màn hình danh sách các phiên đấu giá.
  */
 public class AuctionListController {
-  private final AuctionCatalogService service = new AuctionCatalogService();
-  private final ObservableList<AuctionRow> data = FXCollections.observableArrayList();
-  @FXML
-  private TextField searchField;
-  @FXML
-  private ComboBox<String> statusFilter;
-  @FXML
-  private TableView<AuctionRow> auctionTable;
-  @FXML
-  private Label resultLabel;
-  @FXML
-  private Button openAuctionButton;
-  @FXML
-  private TableColumn<AuctionRow, String> idColumn;
-  @FXML
-  private TableColumn<AuctionRow, String> itemColumn;
-  @FXML
-  private TableColumn<AuctionRow, String> sellerColumn;
-  @FXML
-  private TableColumn<AuctionRow, String> priceColumn;
-  @FXML
-  private TableColumn<AuctionRow, String> stepColumn;
-  @FXML
-  private TableColumn<AuctionRow, String> summaryColumn;
-  @FXML
-  private TableColumn<AuctionRow, String> statusColumn;
+    private final AuctionCatalogService service = new AuctionCatalogService();
+    private final ObservableList<AuctionRow> data = FXCollections.observableArrayList();
 
-  /**
-   * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
-   */
-  @FXML
-  public void initialize() {
-    statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
-    statusFilter.setValue("Tất cả");
-    idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
-    itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
-    sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
-    priceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().currentPrice()));
-    stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
-    statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
-    summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
-    auctionTable.setItems(data);
-    reload();
-  }
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<String> statusFilter;
+    @FXML
+    private TableView<AuctionRow> auctionTable;
+    @FXML
+    private Label resultLabel;
+    @FXML
+    private Button openAuctionButton;
 
-  @FXML
-  private void handleSearchAction() {
-    reload();
-  }
+    // Ánh xạ nút "Tạo phiên đấu giá" từ file FXML
+    @FXML
+    private Button createAuctionButton;
 
-  @FXML
-  private void handleRefreshAction() {
-    reload();
-  }
+    @FXML
+    private TableColumn<AuctionRow, String> idColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> itemColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> sellerColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> priceColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> stepColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> summaryColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> statusColumn;
 
-  @FXML
-  private void handleOpenAuctionAction() throws IOException {
-    AuctionRow sel = auctionTable.getSelectionModel().getSelectedItem();
-    if (sel != null) {
-      SceneNavigator.<AuctionRoomController>switchScene(openAuctionButton,
-          "/views/AuctionRoom.fxml", "Phòng đấu giá", 1180, 780,
-          c -> c.setAuctionId(sel.auctionId()));
+    /**
+     * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
+     */
+    @FXML
+    public void initialize() {
+        statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
+        statusFilter.setValue("Tất cả");
+        idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
+        itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
+        sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
+        priceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().currentPrice()));
+        stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
+        statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
+        summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
+        auctionTable.setItems(data);
+        reload();
     }
-  }
 
-  @FXML
-  private void handleLogoutAction() throws IOException {
-    SceneNavigator.switchScene(openAuctionButton, "/views/Login.fxml", "Đăng nhập", 980, 640);
-  }
+    @FXML
+    private void handleSearchAction() {
+        reload();
+    }
 
-  private void reload() {
-    data.setAll(service.filterAuctions(searchField.getText(), statusFilter.getValue()));
-    resultLabel.setText("Hiển thị " + data.size() + " phiên.");
-  }
+    @FXML
+    private void handleRefreshAction() {
+        reload();
+    }
+
+    @FXML
+    private void handleOpenAuctionAction() throws IOException {
+        AuctionRow sel = auctionTable.getSelectionModel().getSelectedItem();
+        if (sel != null) {
+            SceneNavigator.<AuctionRoomController>switchScene(openAuctionButton,
+                    "/views/AuctionRoom.fxml", "Phòng đấu giá", 1180, 780,
+                    c -> c.setAuctionId(sel.auctionId()));
+        }
+    }
+
+    @FXML
+    private void handleLogoutAction() throws IOException {
+        SceneNavigator.switchScene(openAuctionButton, "/views/Login.fxml", "Đăng nhập", 980, 640);
+    }
+
+    /**
+     * Bắt sự kiện khi click vào nút "Tạo phiên đấu giá".
+     * Bung Dialog form nhập liệu, validate dữ liệu và ném request qua SocketClient.
+     */
+    @FXML
+    private void handleCreateAuctionAction(ActionEvent event) {
+        // 1. Tạo Khung Dialog
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Tạo phiên đấu giá mới");
+        dialog.setHeaderText("Nhập thông tin sản phẩm đấu giá");
+
+        // Tạo tổ hợp nút bấm Xác nhận và Hủy
+        ButtonType confirmButtonType = new ButtonType("Xác nhận", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        // 2. Dựng Layout Form nhập liệu bằng GridPane
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setPadding(new Insets(20, 30, 10, 30));
+
+        TextField txtName = new TextField();
+        txtName.setPromptText("Tên sản phẩm");
+        txtName.setPrefWidth(260);
+
+        TextArea txtDescription = new TextArea();
+        txtDescription.setPromptText("Mô tả chi tiết về sản phẩm...");
+        txtDescription.setPrefRowCount(3);
+        txtDescription.setWrapText(true);
+
+        TextField txtStartingPrice = new TextField();
+        txtStartingPrice.setPromptText("Ví dụ: 200000");
+
+        TextField txtPriceStep = new TextField();
+        txtPriceStep.setPromptText("Ví dụ: 20000");
+
+        ComboBox<String> cbProductType = new ComboBox<>();
+        cbProductType.getItems().addAll("Điện tử", "Thời trang", "Đồ cổ", "Xe cộ", "Khác");
+        cbProductType.setValue("Điện tử"); // Giá trị mặc định
+        cbProductType.setMaxWidth(Double.MAX_VALUE);
+
+        // Sắp xếp các thành phần vào lưới tọa độ (Cột, Hàng)
+        grid.add(new Label("Tên sản phẩm:"), 0, 0);
+        grid.add(txtName, 1, 0);
+        grid.add(new Label("Mô tả:"), 0, 1);
+        grid.add(txtDescription, 1, 1);
+        grid.add(new Label("Giá khởi điểm:"), 0, 2);
+        grid.add(txtStartingPrice, 1, 2);
+        grid.add(new Label("Bước giá:"), 0, 3);
+        grid.add(txtPriceStep, 1, 3);
+        grid.add(new Label("Loại sản phẩm:"), 0, 4);
+        grid.add(cbProductType, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // 3. Can thiệp sự kiện nút "Xác nhận" để kiểm tra tính hợp lệ dữ liệu (Validation)
+        final Button btnConfirm = (Button) dialog.getDialogPane().lookupButton(confirmButtonType);
+        btnConfirm.addEventFilter(ActionEvent.ACTION, ae -> {
+            String name = txtName.getText().trim();
+            String desc = txtDescription.getText().trim();
+            String startPriceStr = txtStartingPrice.getText().trim();
+            String priceStepStr = txtPriceStep.getText().trim();
+            String type = cbProductType.getValue();
+
+            // KIỂM TRA RỖNG
+            if (name.isEmpty() || desc.isEmpty() || startPriceStr.isEmpty() || priceStepStr.isEmpty() || type == null) {
+                showAlertDialog(Alert.AlertType.ERROR, "Lỗi nhập liệu", "Vui lòng nhập đầy đủ tất cả các trường dữ liệu!");
+                ae.consume(); // Ngăn chặn không cho đóng Dialog
+                return;
+            }
+
+            // KIỂM TRA ĐỊNH DẠNG SỐ VÀ GIÁ TRỊ HỢP LỆ
+            try {
+                double startingPrice = Double.parseDouble(startPriceStr);
+                double priceStep = Double.parseDouble(priceStepStr);
+
+                if (startingPrice <= 0 || priceStep <= 0) {
+                    showAlertDialog(Alert.AlertType.ERROR, "Lỗi giá trị", "Giá khởi điểm và Bước giá phải là số lớn hơn 0!");
+                    ae.consume(); // Giữ nguyên Dialog
+                    return;
+                }
+
+                // 4. ĐÓNG GÓI THÀNH REQUEST DTO
+                CreateAuctionRequest request = new CreateAuctionRequest(name, desc, startingPrice, priceStep, type);
+
+                // 5. GỬI LÊN SERVER QUA SOCKETCLIENT
+                SocketClient.getInstance().sendRequest(request);
+
+                // Hiện thông báo thành công đúng yêu cầu bài toán
+                showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", "Đã gửi yêu cầu tạo phòng, vui lòng chờ Admin kiểm duyệt!");
+
+            } catch (NumberFormatException e) {
+                showAlertDialog(Alert.AlertType.ERROR, "Lỗi định dạng", "Giá khởi điểm và Bước giá bắt buộc phải nhập ký tự số!");
+                ae.consume(); // Chặn đóng Dialog
+            } catch (IOException e) {
+                showAlertDialog(Alert.AlertType.ERROR, "Lỗi kết nối mạng", "Không thể gửi yêu cầu lên Server: " + e.getMessage());
+                ae.consume(); // Giữ lại Dialog để người dùng thử lại khi mạng ổn định
+            }
+        });
+
+        // Hiển thị Dialog lên màn hình
+        dialog.showAndWait();
+    }
+
+    /**
+     * Hàm tiện ích hiển thị nhanh một hộp thoại Alert thông báo.
+     */
+    private void showAlertDialog(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void reload() {
+        data.setAll(service.filterAuctions(searchField.getText(), statusFilter.getValue()));
+        resultLabel.setText("Hiển thị " + data.size() + " phiên.");
+    }
 }
