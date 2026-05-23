@@ -32,7 +32,7 @@ public class UserDao {
       ps.setString(2, user.getUsername());
       ps.setString(3, user.getEmail());
       ps.setString(4, user.getPasswordHash());
-      ps.setString(5, "BIDDER");
+      ps.setString(5, "USER");
       ps.executeUpdate();
     }
   }
@@ -46,8 +46,14 @@ public class UserDao {
         if (!rs.next()) {
           return null;
         }
-        AuthUser user = new AuthUser(rs.getString("full_name"), rs.getString("username"),
-            rs.getString("email"), rs.getString("password_hash"), rs.getString("account_role"));
+        // Gọi constructor 5 tham số của AuthUser, lấy cột account_role
+        AuthUser user = new AuthUser(
+                rs.getString("full_name"),
+                rs.getString("username"),
+                rs.getString("email"),
+                rs.getString("password_hash"),
+                rs.getString("account_role") // Lấy role ("USER" hoặc "ADMIN") từ CSDL
+        );
         user.setId(rs.getLong("id"));
         return user;
       }

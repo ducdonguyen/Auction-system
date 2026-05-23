@@ -5,23 +5,36 @@ import java.io.Serializable;
 public class AuthUser implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long id;
-  private String fullName;
-  private String username;
-  private String email;
-  private String passwordHash;
-  private String role;
+    private String fullName;
+    private String username;
+    private String email;
+    private String passwordHash;
+    private String role;
 
     public AuthUser() {
     }
 
+    // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL)
     public AuthUser(String fullName, String username, String email, String passwordHash) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
+        this.role = "USER";
     }
 
+    // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role)
     public AuthUser(String fullName, String username, String email, String passwordHash, String role) {
+        this.fullName = fullName;
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
+    // Constructor ĐẦY ĐỦ NHẤT (Dùng khi lôi từ CSDL lên, có cả ID)
+    public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role) {
+        this.id = id;
         this.fullName = fullName;
         this.username = username;
         this.email = email;
@@ -75,5 +88,14 @@ public class AuthUser implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "AuthUser{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", role='" + role + '\'' +
+                '}';
     }
 }

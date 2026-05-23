@@ -43,7 +43,7 @@ public class AuctionRepository {
    */
   public List<Auction> findAll() {
     List<Auction> results = new ArrayList<>();
-    String sql = "SELECT * FROM auctions";
+    String sql = "SELECT * FROM auctions WHERE status != 'PENDING'";
     try (Connection connection = DatabaseConfig.getConnection();
          PreparedStatement ps = connection.prepareStatement(sql);
          ResultSet rs = ps.executeQuery()) {
@@ -71,6 +71,31 @@ public class AuctionRepository {
     return results;
   }
 
+  /**
+   * Lấy các phòng đang đợi duyệt
+   */
+  public List<Auction> findPendingAuctions(){
+    List <Auction> pending = new ArrayList<>();
+    String sql = "SELECT * FROM auctions WHERE status = 'PENDING'";
+    // Sử dụng try-with-resources để tự động đóng Connection, PreparedStatement và ResultSet
+    try (Connection conn = DatabaseConfig.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+      // Duyệt qua từng dòng kết quả trả về từ Database
+      while (rs.next()) {
+        // Khởi tạo đối tượng Auction từ dữ liệu trong từng hàng
+        Auction auction = map(rs);
+        // Thêm vào danh sách trả về
+        pending.add(auction);
+      }
+    } catch (SQLException e) {
+      // Ghi log lỗi nếu có vấn đề xảy ra với Database (Có thể dùng SLF4J log giống trong pom.xml của bạn)
+      System.err.println("Lỗi khi lấy danh sách phiên đấu giá đang chờ duyệt: " + e.getMessage());
+      e.printStackTrace();
+    }
+    return pending;
+  }
   /**
    * Lấy chi tiết phòng đấu giá và toàn bộ lịch sử đặt giá (Dành cho người vào phòng)
    */
