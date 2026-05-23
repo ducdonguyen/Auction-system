@@ -28,7 +28,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 /**
- * Controller cho màn hình danh sách các phiên đấu giá.
+ * Controller cho màn hình danh sách các phiên đấu giá
  */
 public class AuctionListController {
     private final AuctionCatalogService service = new AuctionCatalogService();
