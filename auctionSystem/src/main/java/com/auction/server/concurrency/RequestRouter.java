@@ -71,7 +71,7 @@ public class RequestRouter {
       result = new ServiceResult<>(false, "Username or email already exists", null);
     } else {
       AuthUser newUser = new AuthUser(request.fullName(), request.username(), request.email(),
-          PasswordUtil.hashPassword(request.password()));
+          PasswordUtil.hashPassword(request.password()), "BIDDER");
       USER_DAO.register(newUser);
       result = new ServiceResult<>(true, "Registration successful", newUser);
     }

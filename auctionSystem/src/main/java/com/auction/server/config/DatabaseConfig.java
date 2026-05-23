@@ -1,9 +1,8 @@
 package com.auction.server.config;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +43,7 @@ public final class DatabaseConfig {
             username VARCHAR(50) NOT NULL UNIQUE,
             email VARCHAR(100) NOT NULL UNIQUE,
             password_hash VARCHAR(255) NOT NULL,
+            account_role VARCHAR(20) DEFAULT 'USER',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """;
@@ -78,12 +78,24 @@ public final class DatabaseConfig {
         )
         """;
 
-    try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-         Statement statement = connection.createStatement()) {
-      statement.execute(sqlCreateUsersTable);
-      statement.execute(sqlCreateAuctionsTable);
-      statement.execute(sqlCreateBidTransactionsTable);
-      logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
+    String insertAdminSQL = """
+            INSERT IGNORE INTO users (full_name, username, password_hash, email, account_role) 
+                   VALUES ('nguyen_admin', 'admin', ?, 'admin@gmail.com', 'ADMIN')
+            """;
+
+    try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+      try (Statement statement = connection.createStatement()) {
+        statement.execute(sqlCreateUsersTable);
+        statement.execute(sqlCreateAuctionsTable);
+        statement.execute(sqlCreateBidTransactionsTable);
+      }
+
+      // Dùng PreparedStatement riêng cho việc chèn Admin để truyền mật khẩu đã hash an toàn
+      try (PreparedStatement ps = connection.prepareStatement(insertAdminSQL)) {
+        ps.setString(1, BCrypt.hashpw("admin123", BCrypt.gensalt())); // Đẩy chuỗi đã băm vào dấu ?
+        ps.executeUpdate();
+      }
     }
+    logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
   }
 }
