@@ -29,11 +29,21 @@ public class LoginController {
   @FXML
   private void handleLoginAction() {
     ServiceResult<AuthUser> result = authService.login(
-        new LoginRequest(usernameField.getText(), passwordField.getText()));
+            new LoginRequest(usernameField.getText(), passwordField.getText()));
+
     errorLabel.setText(result.message());
     errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+
     if (result.success()) {
-      navigate("/views/AuctionList.fxml", "Hệ thống đấu giá", 1200, 760);
+      AuthUser user = result.data();
+
+      if (user != null) {
+        if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+          navigate("/views/AdminDashboard.fxml", "Bảng điều khiển Admin", 1200, 760);
+        } else {
+          navigate("/views/AuctionList.fxml", "Sảnh đấu giá", 1200, 760);
+        }
+      }
     }
   }
 
@@ -46,7 +56,10 @@ public class LoginController {
     try {
       SceneNavigator.switchScene(loginButton, fxmlPath, title, width, height);
     } catch (IOException e) {
-      errorLabel.setText("Lỗi điều hướng.");
+      System.err.println("Lỗi nghiêm trọng khi chuyển màn hình!");
+      e.printStackTrace();
+      errorLabel.setText("Lỗi hệ thống: Không thể tải giao diện.");
+      errorLabel.setStyle("-fx-text-fill: red;");
     }
   }
 }
