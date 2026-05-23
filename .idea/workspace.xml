@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Them vai tro Admin">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/controller/LoginControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/controller/LoginControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/service/SessionContextTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/service/SessionContextTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/server/config/DatabaseConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,6 +105,7 @@
     &quot;JUnit.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.AuctionTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ClientHandlerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ClientServicesTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ClientServicesTest.testPlaceBid.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.ItemTest.executor&quot;: &quot;Run&quot;,
     &quot;JUnit.LoginControllerTest.executor&quot;: &quot;Run&quot;,
@@ -164,7 +164,20 @@
       <command value="mvn clean test " />
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.ClientServicesTest">
+  <component name="RunManager" selected="Application.ClientLauncher">
+    <configuration name="ClientLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.auction.client.ClientLauncher" />
+      <module name="auction-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.auction.client.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ServerApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.auction.server.ServerApplication" />
       <module name="auction-system" />
@@ -208,21 +221,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="RegisterControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="auction-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.auction.client.controller.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.auction.client.controller" />
-      <option name="MAIN_CLASS_NAME" value="com.auction.client.controller.RegisterControllerTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="UserDaoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
@@ -239,19 +237,19 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.ClientLauncher" />
       <item itemvalue="Application.ServerApplication" />
       <item itemvalue="JUnit.ClientServicesTest" />
       <item itemvalue="JUnit.UserDaoTest" />
       <item itemvalue="JUnit.LoginControllerTest" />
-      <item itemvalue="JUnit.RegisterControllerTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.ClientLauncher" />
+        <item itemvalue="Application.ServerApplication" />
         <item itemvalue="JUnit.ClientServicesTest" />
         <item itemvalue="JUnit.LoginControllerTest" />
-        <item itemvalue="Application.ServerApplication" />
         <item itemvalue="JUnit.UserDaoTest" />
-        <item itemvalue="JUnit.RegisterControllerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -490,7 +488,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779517359663</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Them vai tro Admin">
+      <option name="closed" value="true" />
+      <created>1779517734270</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1779517734271</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
