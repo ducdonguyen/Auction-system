@@ -25,13 +25,14 @@ public class UserDao {
   }
 
   public void register(AuthUser user) throws SQLException {
-    String sql = "INSERT INTO users (full_name, username, email, password_hash) VALUES (?, ?, ?, ?)";
+    String sql = "INSERT INTO users (full_name, username, email, password_hash, account_role) VALUES (?, ?, ?, ?, ?)";
     try (Connection conn = DatabaseConfig.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setString(1, user.getFullName());
       ps.setString(2, user.getUsername());
       ps.setString(3, user.getEmail());
       ps.setString(4, user.getPasswordHash());
+      ps.setString(5, "BIDDER");
       ps.executeUpdate();
     }
   }
@@ -46,7 +47,7 @@ public class UserDao {
           return null;
         }
         AuthUser user = new AuthUser(rs.getString("full_name"), rs.getString("username"),
-            rs.getString("email"), rs.getString("password_hash"));
+            rs.getString("email"), rs.getString("password_hash"), rs.getString("account_role"));
         user.setId(rs.getLong("id"));
         return user;
       }
