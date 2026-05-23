@@ -42,7 +42,6 @@ public class LoginController {
 
           if (user != null) {
               // Lưu thông tin phiên đăng nhập vào hệ thống (nếu bạn có dùng Class Session)
-              // UserSession.createSession(user.getUsername(), user.getRole());
 
               // Rẽ nhánh điều hướng dựa trên Role của User
               if ("ADMIN".equalsIgnoreCase(user.getRole())) {
