@@ -19,6 +19,7 @@ public class AuctionManager {
   private static volatile AuctionManager instance;
   private final Map<String, Auction> activeAuctions = new ConcurrentHashMap<>();
   private final Map<String, List<AuctionObserver>> observersMap = new ConcurrentHashMap<>();
+  private final List<AuctionObserver> globalObservers = new CopyOnWriteArrayList<>();
 
   private AuctionManager() {
   }
@@ -37,6 +38,33 @@ public class AuctionManager {
       }
     }
     return instance;
+  }
+
+  /**
+   * Thêm Client vào danh sách nhận thông báo toàn Server.
+   */
+  public void addGlobalObserver(AuctionObserver o) {
+    if (!globalObservers.contains(o)) {
+      globalObservers.add(o);
+    }
+  }
+
+  /**
+   * Xóa Client khỏi danh sách toàn Server khi họ ngắt kết nối.
+   */
+  public void removeGlobalObserver(AuctionObserver o) {
+    globalObservers.remove(o);
+  }
+
+  /**
+   * Bắn thông báo cho TẤT CẢ mọi người đang online.
+   * @param message Nội dung thông báo
+   */
+  public void broadcastToAll(String message) {
+    for (AuctionObserver o : globalObservers) {
+      o.receiveSystemMessage(message);
+    }
+    logger.info("[BROADCAST] Đã gửi thông báo toàn Server: {}", message);
   }
 
   /**

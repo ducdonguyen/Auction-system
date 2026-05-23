@@ -9,4 +9,6 @@ public interface AuctionObserver {
 
     // Hàm này sẽ được gọi mỗi khi trạng thái của phiên đấu giá thay đổi (MỞ, ĐÓNG, KẾT THÚC...)
     void updateStatus(String auctionId, AuctionStatus newStatus);
+
+    void receiveSystemMessage(String message);
 }

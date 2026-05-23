@@ -7,6 +7,8 @@ import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionRow;
 import java.io.IOException;
 import java.time.LocalDateTime;
+
+import com.auction.shared.network.ServiceResult;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -143,10 +145,39 @@ public class AuctionListController {
         TextField txtPriceStep = new TextField();
         txtPriceStep.setPromptText("Ví dụ: 20000");
 
+        Label lblExtraInfo = new Label("Bảo hành (tháng):");
+        lblExtraInfo.setWrapText(true);
+        lblExtraInfo.setPrefWidth(120);
+        lblExtraInfo.setMinHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
+
+        TextField txtExtraInfo = new TextField();
+        txtExtraInfo.setPromptText("Ví dụ: 12, 24");
+
         ComboBox<String> cbProductType = new ComboBox<>();
-        cbProductType.getItems().addAll("Điện tử", "Thời trang", "Đồ cổ", "Xe cộ", "Khác");
+        cbProductType.getItems().addAll("Điện tử", "Tác phẩm nghệ thuật", "Xe cộ", "Thời trang", "Khác");
         cbProductType.setValue("Điện tử"); // Giá trị mặc định
         cbProductType.setMaxWidth(Double.MAX_VALUE);
+
+        cbProductType.valueProperty().addListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case "Tác phẩm nghệ thuật", "Thời trang" -> {
+                    lblExtraInfo.setText("Tên tác giả (hoặc nhà sản xuất):");
+                    txtExtraInfo.setPromptText("Ví dụ: Picasso, Chanel...");
+                }
+                case "Xe cộ" -> {
+                    lblExtraInfo.setText("Hãng xe:");
+                    txtExtraInfo.setPromptText("Ví dụ: Toyota, Honda...");
+                }
+                case "Khác" -> {
+                    lblExtraInfo.setText("Chi tiết loại sản phẩm:");
+                    txtExtraInfo.setPromptText("Ví dụ: Bất động sản, Thú cưng...");
+                }
+                default -> { // Điện tử
+                    lblExtraInfo.setText("Bảo hành (tháng):");
+                    txtExtraInfo.setPromptText("Ví dụ: 12, 24");
+                }
+            }
+        });
 
         // Sắp xếp các thành phần vào lưới tọa độ (Cột, Hàng)
         grid.add(new Label("Tên sản phẩm:"), 0, 0);
@@ -159,6 +190,8 @@ public class AuctionListController {
         grid.add(txtPriceStep, 1, 3);
         grid.add(new Label("Loại sản phẩm:"), 0, 4);
         grid.add(cbProductType, 1, 4);
+        grid.add(lblExtraInfo, 0, 5);
+        grid.add(txtExtraInfo, 1, 5);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -190,20 +223,69 @@ public class AuctionListController {
                 }
 
                 // 4. ĐÓNG GÓI THÀNH REQUEST DTO
-                CreateAuctionRequest request = new CreateAuctionRequest(name, desc, startingPrice, priceStep, type);
+                // 4.1. Lấy tên người dùng đang đăng nhập
+                String sellerUsername = com.auction.client.service.SessionContext.getCurrentUser().getFullName();
 
-                // 5. GỬI LÊN SERVER QUA SOCKETCLIENT
-                SocketClient.getInstance().sendRequest(request);
+                // 4.2. Thời gian mặc định (Ví dụ: Bắt đầu ngay lúc này, kết thúc sau 3 ngày)
+                java.time.LocalDateTime startTime = java.time.LocalDateTime.now();
+                java.time.LocalDateTime endTime = startTime.plusDays(3);
 
-                // Hiện thông báo thành công đúng yêu cầu bài toán
-                showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", "Đã gửi yêu cầu tạo phòng, vui lòng chờ Admin kiểm duyệt!");
+                // 4.3. Chuyển đổi Loại sản phẩm (Tiếng Việt) sang Mã Server (Tiếng Anh)
+                String serverType = switch (type) {
+                    case "Điện tử" -> "ELECTRONICS";
+                    case "Xe cộ" -> "VEHICLE";
+                    case "Tác phẩm nghệ thuật", "Thời trang" -> "ART";
+                    case "Khác" -> "OTHER";
+                    default -> "OTHER";
+                };
+
+                // 4.4. Lấy giá trị extraInfo do người dùng tự nhập
+                String extraInfo = txtExtraInfo.getText().trim();
+
+                // KIỂM TRA RỖNG CHO THÔNG TIN PHỤ
+                if (extraInfo.isEmpty()) {
+                    showAlertDialog(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập thông tin Tác giả / Hãng xe / Số tháng bảo hành!");
+                    ae.consume();
+                    return;
+                }
+
+                // KIỂM TRA LOGIC ĐIỆN TỬ (Phải là số nguyên)
+                if (serverType.equals("ELECTRONICS")) {
+                    try {
+                        Integer.parseInt(extraInfo); // Thử ép kiểu xem có phải là số không
+                    } catch (NumberFormatException e) {
+                        showAlertDialog(Alert.AlertType.ERROR, "Lỗi định dạng", "Số tháng bảo hành bắt buộc phải nhập con số!");
+                        ae.consume();
+                        return;
+                    }
+                }
+
+                // 5. ĐÓNG GÓI THÀNH REQUEST DTO (Bản đầy đủ 9 tham số)
+                CreateAuctionRequest request = new CreateAuctionRequest(
+                        name, desc, startingPrice, priceStep, serverType, extraInfo, sellerUsername, startTime, endTime
+                );
+
+                // 6. GỬI LÊN SERVER VÀ ĐỢI KẾT QUẢ
+                com.auction.client.network.SocketClient.getInstance().sendRequest(request);
+
+                // Bắt buộc phải đọc gói tin Server trả về để thông luồng mạng
+                ServiceResult<?> result = (ServiceResult<?>) com.auction.client.network.SocketClient.getInstance().receiveResponse();
+
+                if (result.success()) {
+                    // Hiện thông báo thành công lấy từ Server ("Đã gửi yêu cầu tạo phòng...")
+                    showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", result.message());
+                } else {
+                    showAlertDialog(Alert.AlertType.ERROR, "Lỗi từ Server", result.message());
+                    ae.consume(); // Chặn đóng Dialog để người dùng sửa lại
+                }
 
             } catch (NumberFormatException e) {
                 showAlertDialog(Alert.AlertType.ERROR, "Lỗi định dạng", "Giá khởi điểm và Bước giá bắt buộc phải nhập ký tự số!");
-                ae.consume(); // Chặn đóng Dialog
-            } catch (IOException e) {
-                showAlertDialog(Alert.AlertType.ERROR, "Lỗi kết nối mạng", "Không thể gửi yêu cầu lên Server: " + e.getMessage());
-                ae.consume(); // Giữ lại Dialog để người dùng thử lại khi mạng ổn định
+                ae.consume();
+            } catch (Exception e) {
+                // Đã đổi thành Exception chung để bắt cả lỗi ép kiểu Socket
+                showAlertDialog(Alert.AlertType.ERROR, "Lỗi kết nối mạng", "Không thể giao tiếp với Server: " + e.getMessage());
+                ae.consume();
             }
         });
 

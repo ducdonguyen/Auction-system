@@ -2,6 +2,7 @@ package com.auction.client.util;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -44,8 +45,25 @@ public final class SceneNavigator {
     }
 
     Stage stage = (Stage) sourceNode.getScene().getWindow();
+    stage.setMaximized(false);
     stage.setScene(new Scene(view, w, h));
     stage.setTitle(title);
+    if (fxmlPath.contains("AuctionList") || fxmlPath.contains("AuctionRoom") ||
+            fxmlPath.contains("Admin") || fxmlPath.contains("Register")) {
+
+      stage.setMaximized(true);
+    } else {
+      // Các màn hình còn lại (như Login) thì giữ nguyên kích thước nhỏ gọn và căn giữa
+      stage.setWidth(w);
+      stage.setHeight(h);
+      Platform.runLater(() -> {
+        stage.centerOnScreen();
+      });
+    }
+
+    Platform.runLater(() -> {
+      stage.centerOnScreen();
+    });
   }
 
   /**

@@ -66,59 +66,9 @@ public class AuctionService {
                                  LocalDateTime startTime, LocalDateTime endTime) {
         String id = "AUC-" + UUID.randomUUID().toString().substring(0, 8);
         Auction auction = new Auction(id, item, seller, startingPrice, stepPrice, startTime, endTime);
-        auction.setStatus(AuctionStatus.OPEN);
+        auction.setStatus(AuctionStatus.PENDING);
         logger.info("[INFO] Created auction: {} for {}", id, item.getName());
         return auctionRepository.save(auction);
-    }
-
-    /**
-     * Tiếp nhận và xử lý yêu cầu tạo phiên đấu giá từ Client dưới dạng PENDING (Chờ duyệt).
-     *
-     * @param request        Gói dữ liệu yêu cầu gửi từ Client.
-     * @param sellerUsername Tên tài khoản của người gửi yêu cầu.
-     * @return true nếu tiếp nhận và lưu thành công.
-     */
-    public boolean handleCreateAuctionRequest(CreateAuctionRequest request, String sellerUsername) {
-        try {
-            Item item;
-            String type = request.getProductType();
-            String name = request.getProductName();
-            String desc = request.getDescription();
-            double price = request.getStartingPrice();
-
-            // Phân loại và khởi tạo đúng lớp con cụ thể của Item
-            switch (type) {
-                case "Điện tử":
-                    item = new Electronics(name, desc, price, 12); // 12 tháng bảo hành mặc định
-                    break;
-                case "Xe cộ":
-                    item = new Vehicle(name, desc, price, "Chưa xác định"); // Thương hiệu mặc định
-                    break;
-                case "Đồ cổ":
-                    item = new Art(name, desc, price, "Ẩn danh"); // Tác giả mặc định
-                    break;
-                default:
-                    throw new IllegalArgumentException("Loại sản phẩm không hợp lệ: " + type);
-            }
-
-            Seller seller = new Seller(sellerUsername, "");
-
-            LocalDateTime startTime = LocalDateTime.now();
-            LocalDateTime endTime = startTime.plusDays(1);
-
-            String id = "AUC-" + UUID.randomUUID().toString().substring(0, 8);
-
-            Auction auction = new Auction(id, item, seller, request.getStartingPrice(), request.getPriceStep(), startTime, endTime);
-            auction.setStatus(AuctionStatus.PENDING);
-
-            logger.info("[INFO] Nhận yêu cầu tạo phòng từ {}. Mã phiên: {} -> Trạng thái: PENDING", sellerUsername, id);
-
-            auctionRepository.save(auction);
-            return true;
-        } catch (Exception e) {
-            logger.error("[ERROR] Tạo phiên đấu giá thất bại: {}", e.getMessage(), e);
-            return false;
-        }
     }
 
     /**
@@ -141,6 +91,13 @@ public class AuctionService {
         }
 
         logger.info("[ADMIN ACTION] Phiên đấu giá {} đã bị hủy thành công.", auctionId);
+    }
+
+    /**
+     * Lấy danh sách các phiên đấu giá đang chờ Admin duyệt.
+     */
+    public List<Auction> getPendingAuctions() {
+        return auctionRepository.findPendingAuctions();
     }
 
     /**

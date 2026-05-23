@@ -107,4 +107,15 @@ public class ClientHandler implements Runnable, AuctionObserver {
       logger.error("[ClientHandler] Lỗi khi gửi thông báo trạng thái: {}", e.getMessage());
     }
   }
+
+  @Override
+  public void receiveSystemMessage(String message) {
+    try {
+      // Đóng gói thành ServiceResult báo thành công và mang theo message
+      out.writeObject(new com.auction.shared.network.ServiceResult<>(true, message, null));
+      out.flush();
+    } catch (java.io.IOException e) {
+      e.printStackTrace();
+    }
+  }
 }

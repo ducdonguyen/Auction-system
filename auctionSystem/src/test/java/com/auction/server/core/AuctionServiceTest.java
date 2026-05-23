@@ -42,7 +42,7 @@ class AuctionServiceTest {
         assertNotNull(created);
         assertEquals(item, created.getItem());
         assertEquals(seller, created.getSeller());
-        assertEquals(AuctionStatus.OPEN, created.getStatus());
+        assertEquals(AuctionStatus.PENDING, created.getStatus());
         verify(auctionRepository).save(created);
     }
 

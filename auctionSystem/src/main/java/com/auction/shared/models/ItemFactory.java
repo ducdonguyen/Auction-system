@@ -22,6 +22,8 @@ public class ItemFactory {
                 new Art(name, description, price, extraParam));
         ITEM_REGISTRY.put("VEHICLE", (name, description, price, extraParam) ->
                 new Vehicle(name, description, price, extraParam));
+        ITEM_REGISTRY.put("OTHER", (name, description, price, extraParam) ->
+                new GenericItem(name, description, price, extraParam));
     }
 
     /**

@@ -10,6 +10,7 @@ import com.auction.shared.models.Electronics;
 import com.auction.shared.models.Item;
 import com.auction.shared.models.Seller;
 import com.auction.shared.models.Vehicle;
+import com.auction.shared.models.ItemFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -229,12 +230,8 @@ public class AuctionRepository {
     String extra = resultSet.getString("item_extra_info");
     double startingPrice = resultSet.getDouble("item_starting_price");
 
-    Item item = switch (type) {
-      case "ART" -> new Art(name, desc, startingPrice, extra);
-      case "ELECTRONICS" -> new Electronics(name, desc, startingPrice, Integer.parseInt(extra));
-      case "VEHICLE" -> new Vehicle(name, desc, startingPrice, extra);
-      default -> throw new IllegalArgumentException("Invalid type: " + type);
-    };
+    // ĐÃ SỬA: Chuyển toàn bộ logic tạo đối tượng cho ItemFactory xử lý
+    Item item = ItemFactory.createItem(type, name, desc, startingPrice, extra);
 
     Auction auction = new Auction(id, item, new Seller(resultSet.getString("seller_username"), ""),
             resultSet.getDouble("current_price"), resultSet.getDouble("step_price"),

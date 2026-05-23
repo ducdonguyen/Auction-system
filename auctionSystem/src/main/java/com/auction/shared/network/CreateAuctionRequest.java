@@ -1,6 +1,7 @@
 package com.auction.shared.network;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Lớp Đóng gói dữ liệu (DTO) gửi yêu cầu tạo phiên đấu giá mới từ Client lên Server.
@@ -15,6 +16,10 @@ public class CreateAuctionRequest implements Serializable {
     private double startingPrice;
     private double priceStep;
     private String productType;
+    private String extraInfo;     // VD: Nếu là Electronics thì là thời gian bảo hành, Art thì là tên tác giả, v.v
+    private String sellerUsername;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     /**
      * Constructor mặc định (Không đối số) - Cần thiết cho một số thư viện sê-ri hóa
@@ -25,12 +30,18 @@ public class CreateAuctionRequest implements Serializable {
     /**
      * Constructor đầy đủ tham số để khởi tạo nhanh từ Form nhập liệu.
      */
-    public CreateAuctionRequest(String productName, String description, double startingPrice, double priceStep, String productType) {
+    public CreateAuctionRequest(String productName, String description, double startingPrice, double priceStep,
+                                String productType, String extraInfo, String sellerUsername,
+                                LocalDateTime startTime, LocalDateTime endTime) {
         this.productName = productName;
         this.description = description;
         this.startingPrice = startingPrice;
         this.priceStep = priceStep;
         this.productType = productType;
+        this.extraInfo = extraInfo;
+        this.sellerUsername = sellerUsername;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     // ==========================================
@@ -75,6 +86,36 @@ public class CreateAuctionRequest implements Serializable {
 
     public void setProductType(String productType) {
         this.productType = productType;
+    }
+
+    public String getExtraInfo() {
+        return extraInfo;
+    }
+
+    public void setExtraInfo(String extraInfo) {
+        this.extraInfo = extraInfo;
+    }
+
+    public String getSellerUsername() {
+        return sellerUsername;
+    }
+
+    public void setSellerUsername(String sellerUsername) {
+        this.sellerUsername = sellerUsername;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     /**
