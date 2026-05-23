@@ -9,15 +9,21 @@ public class AuthUser implements Serializable {
   private String username;
   private String email;
   private String passwordHash;
+  private String role; // "USER" or "ADMIN"
 
     public AuthUser() {
     }
 
-    public AuthUser(String fullName, String username, String email, String passwordHash) {
+    public AuthUser(String fullName, String username, String email, String passwordHash, String role) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
+    public AuthUser(String fullName, String username, String email, String passwordHash) {
+        this(fullName, username, email, passwordHash, "USER");
     }
 
     public Long getId() {
@@ -58,5 +64,13 @@ public class AuthUser implements Serializable {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

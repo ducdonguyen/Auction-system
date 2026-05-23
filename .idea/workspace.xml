@@ -5,55 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c1855c0-909e-4549-a3b2-b92ffbeae911" name="Changes" comment="Thay đổi class Database Config">
+      <change afterPath="$PROJECT_DIR$/SETUP_IDE.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/setup_sdk.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/network/SocketClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/network/SocketClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/controller/LoginControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/test/java/com/auction/client/controller/LoginControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionCatalogService.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/client/service/AuctionCatalogService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/auctionSystem/src/main/java/com/auction/shared/models/AuthUser.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="CopilotChats">
-    <option name="panelChat">
-      <chat>
-        <option name="activeSessionId" value="a1ce74c2-97ed-40a7-94e1-0fc4578aaf44" />
-        <option name="sessions">
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="a1ce74c2-97ed-40a7-94e1-0fc4578aaf44" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="status" value="Completed" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-          <session>
-            <option name="chatType" value="PANEL" />
-            <option name="id" value="ae04e2e3-e51f-449c-959d-73223372988d" />
-            <option name="modeId" value="Ask" />
-            <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
-            <option name="targetType" value="LOCAL" />
-          </session>
-        </option>
-        <option name="type" value="PANEL" />
-      </chat>
-    </option>
-  </component>
-  <component name="CopilotPersistence">
-    <persistenceIdMap>
-      <entry key="_D:/Auction System/auctionSystem" value="3CCuFtvrX6uiYZbmNtBeG50Mtan" />
-    </persistenceIdMap>
-  </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="87" />
+    <option name="cachedIndexableFilesCount" value="109" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Exception" />
         <option value="Class" />
+        <option value="Exception" />
       </list>
     </option>
   </component>
@@ -64,7 +36,6 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -75,7 +46,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ducdonguyen/Auction-system.git&quot;,
-    &quot;accountId&quot;: &quot;5fb56dd2-3bb3-4773-a64c-d661c1697f77&quot;
+    &quot;accountId&quot;: &quot;572a6d18-1e6d-41e3-b884-8baeb227d69d&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -90,78 +61,70 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.AuctionServiceTest.executor": "Run",
-    "Application.ClientLauncher.executor": "Run",
-    "Application.ClientMain.executor": "Run",
-    "Application.SerializationTest.executor": "Run",
-    "Application.ServerApplication.executor": "Run",
-    "JUnit.AuctionListControllerTest.executor": "Run",
-    "JUnit.AuctionLockManagerTest.executor": "Run",
-    "JUnit.AuctionManagerTest.executor": "Run",
-    "JUnit.AuctionRepositoryTest.executor": "Run",
-    "JUnit.AuctionRoomControllerTest.executor": "Run",
-    "JUnit.AuctionSchedulerTest.executor": "Run",
-    "JUnit.AuctionServiceTest.executor": "Run",
-    "JUnit.AuctionTest.executor": "Run",
-    "JUnit.ClientHandlerTest.executor": "Run",
-    "JUnit.ClientServicesTest.testPlaceBid.executor": "Run",
-    "JUnit.ItemTest.executor": "Run",
-    "JUnit.LoginControllerTest.executor": "Run",
-    "JUnit.PasswordUtilTest.executor": "Run",
-    "JUnit.RegisterControllerTest.executor": "Run",
-    "JUnit.RequestRouterTest.executor": "Run",
-    "JUnit.ServerAuthServiceTest.executor": "Run",
-    "JUnit.UserDaoTest.executor": "Run",
-    "Maven.auction-system [clean,test].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "Spring Boot.ServerApplication.executor": "Run",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "dev",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/BTL",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ClientLauncher.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ClientMain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SerializationTest.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionListControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionLockManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionRoomControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionSchedulerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AuctionTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ClientHandlerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ClientServicesTest.testPlaceBid.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ItemTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.LoginControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.PasswordUtilTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.RegisterControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.RequestRouterTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ServerAuthServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserDaoTest.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/BTL&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql",
-      "mysql_aurora"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;,
+      &quot;mysql_aurora&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\BTL\auctionSystem\src\main\resources\sql" />
     </key>
   </component>
-  <component name="RunAnythingCache">
-    <option name="myCommands">
-      <command value="tmvn clean test" />
-      <command value="xvfb-run mvn -f auctionSystem/pom.xml clean test checkstyle:checkstyle" />
-      <command value="mvn clean test " />
-    </option>
-  </component>
-  <component name="RunManager" selected="JUnit.UserDaoTest">
+  <component name="RunManager">
     <configuration name="AuctionLockManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="auction-system" />
       <extension name="coverage">
@@ -257,7 +220,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.33514.17" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
       </set>
     </attachedChunks>
   </component>
@@ -516,13 +479,5 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
-  </component>
-  <component name="github-copilot-workspace">
-    <instructionFileLocations>
-      <option value=".github/instructions" />
-    </instructionFileLocations>
-    <promptFileLocations>
-      <option value=".github/prompts" />
-    </promptFileLocations>
   </component>
 </project>

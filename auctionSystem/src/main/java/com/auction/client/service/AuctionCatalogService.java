@@ -59,6 +59,21 @@ public class AuctionCatalogService {
     return com.auction.client.service.AuctionDataStore.getAuctions();
   }
 
+  /**
+   * Gửi yêu cầu hủy phiên đấu giá lên server.
+   *
+   * @param auctionId ID của phiên đấu giá cần hủy.
+   * @return Kết quả từ server.
+   */
+  public com.auction.shared.network.ServiceResult<Void> cancelAuction(String auctionId) {
+    try {
+      com.auction.client.network.SocketClient.getInstance().sendRequest(new com.auction.shared.network.CancelAuctionRequest(auctionId));
+      return (com.auction.shared.network.ServiceResult<Void>) com.auction.client.network.SocketClient.getInstance().receiveResponse();
+    } catch (Exception e) {
+      return new com.auction.shared.network.ServiceResult<>(false, "Lỗi kết nối khi hủy: " + e.getMessage(), null);
+    }
+  }
+
   private boolean matchesKeyword(Auction a, String kw) {
     if (kw.isEmpty()) {
       return true;

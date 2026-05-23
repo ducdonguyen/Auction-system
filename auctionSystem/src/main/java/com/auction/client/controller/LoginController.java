@@ -33,7 +33,12 @@ public class LoginController {
     errorLabel.setText(result.message());
     errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
     if (result.success()) {
-      navigate("/views/AuctionList.fxml", "Hệ thống đấu giá", 1200, 760);
+      AuthUser user = result.data();
+      if ("ADMIN".equalsIgnoreCase(user.getRole())) {
+        navigate("/views/AdminDashboard.fxml", "Bảng điều khiển Admin", 1200, 760);
+      } else {
+        navigate("/views/AuctionList.fxml", "Hệ thống đấu giá", 1200, 760);
+      }
     }
   }
 
