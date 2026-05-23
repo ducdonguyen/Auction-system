@@ -44,6 +44,7 @@ public final class DatabaseConfig {
             username VARCHAR(50) NOT NULL UNIQUE,
             email VARCHAR(100) NOT NULL UNIQUE,
             password_hash VARCHAR(255) NOT NULL,
+            account_role VARCHAR(20) DEFAULT 'USER',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """;
@@ -78,11 +79,16 @@ public final class DatabaseConfig {
         )
         """;
 
+    String insertAdminSQL = """
+            INSERT IGNORE INTO users (username, password_hash, account_role) VALUES ('admin', 'admin123', 'ADMIN')
+            """;
+
     try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
          Statement statement = connection.createStatement()) {
       statement.execute(sqlCreateUsersTable);
       statement.execute(sqlCreateAuctionsTable);
       statement.execute(sqlCreateBidTransactionsTable);
+      statement.execute(insertAdminSQL);
       logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
     }
   }
