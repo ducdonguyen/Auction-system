@@ -60,6 +60,38 @@ public class AuctionCatalogService {
   }
 
   /**
+   * Lấy danh sách các phiên đấu giá đang chờ duyệt.
+   */
+  @SuppressWarnings("unchecked")
+  public List<AuctionRow> getPendingAuctions() {
+    try {
+      com.auction.client.network.SocketClient.getInstance().sendRequest(new com.auction.shared.network.GetPendingAuctionsRequest());
+      Object rawResponse = com.auction.client.network.SocketClient.getInstance().receiveResponse();
+
+      if (rawResponse instanceof com.auction.shared.network.ServiceResult<?> response) {
+        if (response.success() && response.data() instanceof List<?> list) {
+          return ((List<Auction>) list).stream().map(this::toRow).toList();
+        }
+      }
+    } catch (Exception e) {
+      System.err.println("Lỗi tải danh sách chờ duyệt: " + e.getMessage());
+    }
+    return new ArrayList<>();
+  }
+
+  /**
+   * Gửi yêu cầu phê duyệt phiên đấu giá lên server.
+   */
+  public com.auction.shared.network.ServiceResult<Void> approveAuction(String auctionId) {
+    try {
+      com.auction.client.network.SocketClient.getInstance().sendRequest(new com.auction.shared.network.ApproveAuctionRequest(auctionId));
+      return (com.auction.shared.network.ServiceResult<Void>) com.auction.client.network.SocketClient.getInstance().receiveResponse();
+    } catch (Exception e) {
+      return new com.auction.shared.network.ServiceResult<>(false, "Lỗi kết nối khi duyệt: " + e.getMessage(), null);
+    }
+  }
+
+  /**
    * Gửi yêu cầu hủy phiên đấu giá lên server.
    *
    * @param auctionId ID của phiên đấu giá cần hủy.

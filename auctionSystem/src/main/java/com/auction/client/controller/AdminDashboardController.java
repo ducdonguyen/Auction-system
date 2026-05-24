@@ -12,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -23,6 +25,7 @@ import javafx.scene.paint.Color;
 public class AdminDashboardController {
   private final AuctionCatalogService service = new AuctionCatalogService();
   private final ObservableList<AuctionRow> data = FXCollections.observableArrayList();
+  private final ObservableList<AuctionRow> pendingData = FXCollections.observableArrayList();
 
   @FXML
   private TextField searchField;
@@ -31,11 +34,19 @@ public class AdminDashboardController {
   @FXML
   private TableView<AuctionRow> auctionTable;
   @FXML
+  private TableView<AuctionRow> pendingTable;
+  @FXML
+  private TabPane mainTabPane;
+  @FXML
   private Label resultLabel;
   @FXML
   private Label actionMessageLabel;
   @FXML
   private Button cancelAuctionButton;
+  @FXML
+  private Button approveButton;
+  @FXML
+  private Button rejectButton;
   @FXML
   private Button logoutButton;
 
@@ -55,10 +66,26 @@ public class AdminDashboardController {
   private TableColumn<AuctionRow, String> statusColumn;
 
   @FXML
+  private TableColumn<AuctionRow, String> pIdColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> pItemColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> pSellerColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> pPriceColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> pStepColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> pSummaryColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> pStatusColumn;
+
+  @FXML
   public void initialize() {
     statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
     statusFilter.setValue("Tất cả");
 
+    // Table "Tất cả"
     idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
     itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
     sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
@@ -67,7 +94,18 @@ public class AdminDashboardController {
     statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
     summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
 
+    // Table "Chờ duyệt"
+    pIdColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
+    pItemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
+    pSellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
+    pPriceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().currentPrice()));
+    pStepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
+    pStatusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
+    pSummaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
+
     auctionTable.setItems(data);
+    pendingTable.setItems(pendingData);
+
     reload();
   }
 
@@ -82,10 +120,45 @@ public class AdminDashboardController {
   }
 
   @FXML
+  private void handleApproveAction() {
+    AuctionRow selected = pendingTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      showMessage("Vui lòng chọn một phiên từ danh sách chờ duyệt.", false);
+      return;
+    }
+
+    ServiceResult<Void> result = service.approveAuction(selected.auctionId());
+    if (result.success()) {
+      showMessage("Đã phê duyệt phiên: " + selected.auctionId(), true);
+      reload();
+    } else {
+      showMessage(result.message(), false);
+    }
+  }
+
+  @FXML
+  private void handleRejectAction() {
+    AuctionRow selected = pendingTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      showMessage("Vui lòng chọn một phiên từ danh sách chờ duyệt để từ chối.", false);
+      return;
+    }
+
+    // Rejection can use the same cancelAuction call if defined on server for PENDING state
+    ServiceResult<Void> result = service.cancelAuction(selected.auctionId());
+    if (result.success()) {
+      showMessage("Đã từ chối phiên: " + selected.auctionId(), true);
+      reload();
+    } else {
+      showMessage(result.message(), false);
+    }
+  }
+
+  @FXML
   private void handleCancelAuctionAction() {
     AuctionRow selected = auctionTable.getSelectionModel().getSelectedItem();
     if (selected == null) {
-      showMessage("Vui lòng chọn một phiên đấu giá để hủy.", false);
+      showMessage("Vui lòng chọn một phiên đang hoạt động để hủy.", false);
       return;
     }
 
@@ -105,7 +178,8 @@ public class AdminDashboardController {
 
   private void reload() {
     data.setAll(service.filterAuctions(searchField.getText(), statusFilter.getValue()));
-    resultLabel.setText("Hiển thị " + data.size() + " phiên.");
+    pendingData.setAll(service.getPendingAuctions());
+    resultLabel.setText("Hiển thị " + data.size() + " phiên hoạt động, " + pendingData.size() + " phiên chờ duyệt.");
   }
 
   private void showMessage(String message, boolean success) {
