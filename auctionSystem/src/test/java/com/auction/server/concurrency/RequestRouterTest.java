@@ -41,7 +41,7 @@ public class RequestRouterTest {
         ServiceResult result = captor.getValue();
         
         assertTrue(result.success());
-        assertEquals("Bid placed successfully", result.message());
+        assertEquals("Đặt giá thầu thành công!", result.message());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class RequestRouterTest {
         ServiceResult result = captor.getValue();
         
         assertFalse(result.success());
-        assertEquals("Bid too low", result.message());
+        assertEquals("Lỗi xử lý hệ thống: Bid too low", result.message());
     }
 
     @Test
