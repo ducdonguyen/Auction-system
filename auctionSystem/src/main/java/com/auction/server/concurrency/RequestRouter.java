@@ -105,10 +105,16 @@ public class RequestRouter {
             throws IOException {
         ServiceResult<Void> result;
         try {
-            auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
-            result = new ServiceResult<>(true, "Bid placed successfully", null);
+            //Hứng giá trị boolean để biết đặt giá thành công hay thất bại thực tế
+            boolean isSuccess = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
+
+            if (isSuccess) {
+                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null);
+            } else {
+                result = new ServiceResult<>(false, "Đặt giá thất bại! Vui lòng kiểm tra lại số tiền đặt (phải lớn hơn Giá hiện tại + Bước giá) hoặc trạng thái của phiên đấu giá.", null);
+            }
         } catch (Exception e) {
-            result = new ServiceResult<>(false, e.getMessage(), null);
+            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null);
         }
         sendResponse(out, result);
     }

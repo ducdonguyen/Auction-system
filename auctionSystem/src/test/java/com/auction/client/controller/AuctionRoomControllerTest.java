@@ -105,7 +105,12 @@ public class AuctionRoomControllerTest {
 
     @Test
     public void testSetAuctionIdAndRender() {
-        AuctionRoomViewModel vm = new AuctionRoomViewModel("AUC001", "Item", "Seller", "OPEN", "100", "10", "110", "None", "Desc", "Schedule", Collections.emptyList());
+        AuctionRoomViewModel vm = new AuctionRoomViewModel(
+                "AUC001", "Item", "Seller", "OPEN", "100", "10", "110", "None", "Desc", "Schedule",
+                java.util.Collections.<String>emptyList(), // 1. Chỉ định rõ kiểu String cho danh sách rỗng
+                "Khác",                                    // 2. Thêm tham số cho itemType
+                "Không có thông tin"                       // 3. Thêm tham số cho extraInfo
+        );
         when(service.getAuctionRoom("AUC001")).thenReturn(Optional.of(new ServiceResult<>(true, "", vm)));
 
         controller.setAuctionId("AUC001");
@@ -119,7 +124,12 @@ public class AuctionRoomControllerTest {
     public void testHandlePlaceBidAction() throws Exception {
         injectField("aid", "AUC001");
         bidAmountField.setText("1000");
-        AuctionRoomViewModel vm = new AuctionRoomViewModel("AUC001", "Item", "Seller", "OPEN", "1000", "10", "1010", "user1", "Desc", "Schedule", Collections.singletonList("user1 đặt 1000"));
+        AuctionRoomViewModel vm = new AuctionRoomViewModel(
+                "AUC001", "Item", "Seller", "OPEN", "1000", "10", "1010", "user1", "Desc", "Schedule",
+                java.util.Collections.singletonList("user1 đặt 1000"), // Danh sách lịch sử đặt giá
+                "Khác",
+                "Không có thông tin"
+        );
         when(service.placeBid(eq("AUC001"), eq("1000"))).thenReturn(new ServiceResult<>(true, "Bid placed", vm));
 
         java.lang.reflect.Method method = AuctionRoomController.class.getDeclaredMethod("handlePlaceBidAction");

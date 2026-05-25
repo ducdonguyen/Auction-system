@@ -53,33 +53,33 @@ public class AuctionRoomService {
    */
   public ServiceResult<AuctionRoomViewModel> placeBid(String auctionId, String amountStr) {
     try {
+      // 1. Làm sạch chuỗi và kiểm tra định dạng số ngay tại Client
       String cleanAmount = amountStr.replaceAll("\\D", "");
       if (cleanAmount.isEmpty()) {
-        return new ServiceResult<>(false, "Vui lòng nhập số tiền hợp lệ.", null);
+        return new ServiceResult<>(false, "Vui lòng nhập số tiền hợp lệ!", null);
       }
       double amount = Double.parseDouble(cleanAmount);
+      if (amount <= 0) {
+        return new ServiceResult<>(false, "Số tiền đặt giá phải lớn hơn 0!", null);
+      }
 
       AuthUser currentUser = SessionContext.getCurrentUser();
       if (currentUser == null) {
         return new ServiceResult<>(false, "Bạn cần đăng nhập để đặt giá.", null);
       }
 
-      // 1. Tạo gói tin đặt giá
+      // 2. Tạo gói tin đặt giá
       BidRequest bidRequest = new BidRequest(auctionId, currentUser.getUsername(), amount);
 
-      // 2. Gửi lệnh lên Server
+      // 3. Gửi lệnh lên Server
       SocketClient.getInstance().sendRequest(bidRequest);
 
-      // 3. Chờ và lấy kết quả từ BlockingQueue
+      // 4. Chờ và lấy kết quả từ Server
       Object rawResponse = SocketClient.getInstance().receiveResponse();
 
-      // 4. Ép kiểu và đọc thông báo từ Server
+      // 5. Trả về đúng trạng thái và thông điệp thực tế của Server (Không gán cứng chữ thành công nữa)
       if (rawResponse instanceof ServiceResult<?> response) {
-        if (response.success()) {
-          return new ServiceResult<>(true, "Đã gửi lệnh đặt giá!", null);
-        } else {
-          return new ServiceResult<>(false, response.message(), null);
-        }
+        return new ServiceResult<>(response.success(), response.message(), null);
       }
 
       return new ServiceResult<>(false, "Phản hồi từ Server không hợp lệ", null);
@@ -90,6 +90,37 @@ public class AuctionRoomService {
   }
 
   private AuctionRoomViewModel convert(Auction auction) {
+    // Chuyển đổi và định dạng danh sách lịch sử đặt giá từ DB
+    java.util.List<String> history = new java.util.ArrayList<>(auction.getBidHistory().stream()
+            .map(tx -> tx.bidder().getUsername() + " đặt " + cf.format(tx.bidAmount())
+                    + " lúc " + df.format(tx.timestamp()))
+            .toList());
+
+    // ĐẢO NGƯỢC DANH SÁCH: Đưa các giao dịch mới nhất lên vị trí đầu tiên (Index 0)
+    java.util.Collections.reverse(history);
+
+    // ========================================================
+    // XỬ LÝ LOẠI SẢN PHẨM VÀ THÔNG TIN BỔ SUNG ĐỒNG BỘ VỚI FORM TẠO PHÒNG
+    // ========================================================
+    String rawType = auction.getItem().getItemType();
+    String rawExtra = auction.getItem().getExtraInfo();
+
+    // Dịch mã loại sản phẩm sang Tiếng Việt
+    String vietnameseType = switch (rawType) {
+      case "ELECTRONICS" -> "Điện tử";
+      case "ART" -> "Tác phẩm nghệ thuật";
+      case "VEHICLE" -> "Xe cộ";
+      default -> "Khác";
+    };
+
+    // Định dạng thông tin chi tiết BÁM SÁT câu chữ trong AuctionListController
+    String formattedExtra = switch (rawType) {
+      case "ELECTRONICS" -> "Bảo hành (tháng): " + rawExtra;
+      case "ART" -> "Tên tác giả (hoặc nhà sản xuất): " + rawExtra;
+      case "VEHICLE" -> "Hãng xe: " + rawExtra;
+      default -> "Chi tiết loại sản phẩm: " + rawExtra;
+    };
+
     return new AuctionRoomViewModel(
             auction.getAuctionId(),
             auction.getItem().getName(),
@@ -101,9 +132,9 @@ public class AuctionRoomService {
             auction.getHighestBidder() == null ? "Chưa có" : auction.getHighestBidder().getUsername(),
             auction.getItem().getDescription(),
             "Lịch: " + df.format(auction.getStartTime()) + " - " + df.format(auction.getEndTime()),
-            auction.getBidHistory().stream()
-                    .map(tx -> tx.bidder().getUsername() + " đặt " + cf.format(tx.bidAmount())
-                            + " lúc " + df.format(tx.timestamp()))
-                    .toList());
+            history,
+            vietnameseType,
+            formattedExtra
+    );
   }
 }

@@ -69,10 +69,19 @@ public class AuctionListController {
     /**
      * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
      */
+    /**
+     * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
+     */
     @FXML
     public void initialize() {
         statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
         statusFilter.setValue("Tất cả");
+
+        // Lắng nghe sự kiện: Mỗi khi người dùng đổi trạng thái trong ComboBox, tự động reload bảng
+        statusFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
+            reload();
+        });
+
         idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
         itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
         sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
@@ -80,6 +89,7 @@ public class AuctionListController {
         stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
         statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
         summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
+
         auctionTable.setItems(data);
         reload();
     }
@@ -138,6 +148,12 @@ public class AuctionListController {
         txtDescription.setPromptText("Mô tả chi tiết về sản phẩm...");
         txtDescription.setPrefRowCount(3);
         txtDescription.setWrapText(true);
+        txtDescription.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, line -> {
+            if (line.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                txtDescription.appendText("\n"); // Thêm ký tự xuống dòng
+                line.consume(); // Chặn sự kiện này lại, không cho Dialog nhận lệnh đóng Form
+            }
+        });
 
         TextField txtStartingPrice = new TextField();
         txtStartingPrice.setPromptText("Ví dụ: 200000");
