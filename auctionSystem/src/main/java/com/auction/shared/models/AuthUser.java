@@ -10,40 +10,36 @@ public class AuthUser implements Serializable {
     private String email;
     private String passwordHash;
     private String role;
-    private double balance; // THÊM MỚI: Thuộc tính quản lý số dư ví tiền tài khoản
 
     public AuthUser() {
     }
 
-    // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL, số dư mặc định = 0.0)
+    // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL)
     public AuthUser(String fullName, String username, String email, String passwordHash) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = "USER";
-        this.balance = 0.0;
     }
 
-    // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role, số dư mặc định = 0.0)
+    // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role)
     public AuthUser(String fullName, String username, String email, String passwordHash, String role) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        this.balance = 0.0;
     }
 
-    // Constructor ĐẦY ĐỦ NHẤT (Dùng khi lôi từ CSDL lên, có cả ID và số dư tài khoản)
-    public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role, double balance) {
+    // Constructor ĐẦY ĐỦ NHẤT (Dùng khi lôi từ CSDL lên, có cả ID)
+    public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role) {
         this.id = id;
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        this.balance = balance;
     }
 
     public Long getId() {
@@ -94,23 +90,12 @@ public class AuthUser implements Serializable {
         this.role = role;
     }
 
-    // THÊM MỚI: Getter cho balance
-    public double getBalance() {
-        return balance;
-    }
-
-    // THÊM MỚI: Setter cho balance
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-
     @Override
     public String toString() {
         return "AuthUser{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
-                ", balance=" + balance + // Cập nhật toString hiển thị kèm số dư tiện cho việc log debug
                 '}';
     }
 }
