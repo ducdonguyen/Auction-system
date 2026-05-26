@@ -11,7 +11,6 @@ import com.auction.shared.models.Item;
 import com.auction.shared.models.Seller;
 import com.auction.shared.network.BidRequest;
 import com.auction.shared.network.CancelAuctionRequest;
-import com.auction.shared.network.CreateAuctionRequest;
 import com.auction.shared.network.GetPendingAuctionsRequest;
 import com.auction.shared.network.ApproveAuctionRequest;
 import com.auction.shared.network.GetAllAuctionsRequest;
@@ -19,6 +18,8 @@ import com.auction.shared.network.JoinRoomRequest;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
+import com.auction.shared.network.TopUpRequest;   // IMPORT MỚI
+import com.auction.shared.network.TopUpResponse;  // IMPORT MỚI
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import org.slf4j.Logger;
@@ -57,6 +58,9 @@ public class RequestRouter {
                 case GetPendingAuctionsRequest getPending -> handleGetPendingAuctions(out, auctionService);
                 case ApproveAuctionRequest approve -> handleApproveAuction(approve, out, auctionService);
 
+                // NHÁNH MỚI: Bắt gói tin yêu cầu nạp tiền real-time
+                case TopUpRequest topUpReq -> handleTopUp(topUpReq, out);
+
                 default -> logger.warn("Unknown request: {}", request.getClass().getName());
             }
         } catch (Exception e) {
@@ -66,10 +70,8 @@ public class RequestRouter {
 
     private static void handleLogin(LoginRequest request, ClientHandler handler, ObjectOutputStream out)
             throws IOException {
-        // Gọi thẳng sang AuthService để xử lý
         ServiceResult<AuthUser> result = AUTH_SERVICE.login(request);
 
-        // Nếu đăng nhập thành công, đưa User này vào Sảnh (Global)
         if (result.success()) {
             AuctionManager.getInstance().addGlobalObserver(handler);
             logger.info("[RequestRouter] User {} đã đăng nhập và được thêm vào Global Observers", request.username());
@@ -80,7 +82,6 @@ public class RequestRouter {
 
     private static void handleRegister(RegistrationRequest request, ObjectOutputStream out)
             throws IOException {
-        // Gọi thẳng sang AuthService để xử lý
         ServiceResult<AuthUser> result = AUTH_SERVICE.register(request);
         sendResponse(out, result);
     }
@@ -89,7 +90,6 @@ public class RequestRouter {
                                        ObjectOutputStream out, AuctionService auctionService)
             throws IOException {
         String auctionId = request.getAuctionId();
-        // Unsubscribe from old room if any
         String oldAuctionId = handler.getCurrentWatchingAuctionId();
         if (oldAuctionId != null) {
             AuctionManager.getInstance().unsubscribe(oldAuctionId, handler);
@@ -105,16 +105,10 @@ public class RequestRouter {
             throws IOException {
         ServiceResult<Void> result;
         try {
-            //Hứng giá trị boolean để biết đặt giá thành công hay thất bại thực tế
-            boolean isSuccess = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
-
-            if (isSuccess) {
-                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null);
-            } else {
-                result = new ServiceResult<>(false, "Đặt giá thất bại! Vui lòng kiểm tra lại số tiền đặt (phải lớn hơn Giá hiện tại + Bước giá) hoặc trạng thái của phiên đấu giá.", null);
-            }
+            auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
+            result = new ServiceResult<>(true, "Bid placed successfully", null);
         } catch (Exception e) {
-            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null);
+            result = new ServiceResult<>(false, e.getMessage(), null);
         }
         sendResponse(out, result);
     }
@@ -128,7 +122,6 @@ public class RequestRouter {
                                             AuctionService auctionService) throws IOException {
         ServiceResult<Void> result;
         try {
-            // Gọi xuống AuctionService để thực hiện logic hủy (Đổi status CANCELED trong DB)
             auctionService.cancelAuction(request.auctionId());
             result = new ServiceResult<>(true, "Đã hủy phiên đấu giá thành công", null);
         } catch (Exception e) {
@@ -144,13 +137,11 @@ public class RequestRouter {
                                             ObjectOutputStream out, AuctionService auctionService) throws IOException {
         ServiceResult<Void> result;
         try {
-            // 1. Lấy đúng tên người bán từ gói tin Client gửi lên
             String sellerUsername = request.getSellerUsername();
             if (sellerUsername == null || sellerUsername.isBlank()) {
                 sellerUsername = "Người bán ẩn danh";
             }
 
-            // 2. Dùng ItemFactory để đúc ra sản phẩm tương ứng (kể cả loại OTHER)
             Item item = ItemFactory.createItem(
                     request.getProductType(),
                     request.getProductName(),
@@ -161,7 +152,6 @@ public class RequestRouter {
 
             Seller seller = new Seller(sellerUsername, "");
 
-            // 3. Gọi hàm tạo phòng gốc của AuctionService
             Auction newAuction = auctionService.createAuction(
                     item, seller, request.getStartingPrice(), request.getPriceStep(),
                     request.getStartTime(), request.getEndTime()
@@ -178,7 +168,6 @@ public class RequestRouter {
             logger.error("[RequestRouter] Lỗi khi xử lý CreateAuctionRequest", e);
         }
 
-        // Gửi phản hồi trạng thái kỹ thuật về lại cho Client
         sendResponse(out, result);
     }
 
@@ -206,7 +195,6 @@ public class RequestRouter {
                 return;
             }
 
-            // Gọi Core đổi trạng thái từ PENDING sang OPEN
             boolean success = auctionService.updateAuctionStatus(auction, com.auction.shared.models.AuctionStatus.OPEN);
 
             if (success) {
@@ -217,6 +205,25 @@ public class RequestRouter {
         } catch (Exception e) {
             sendResponse(out, new ServiceResult<>(false, "Lỗi duyệt phiên: " + e.getMessage(), null));
         }
+    }
+
+    /**
+     * HÀM MỚI THÊM VÀO: Tiếp nhận và điều hướng xử lý cộng tiền từ TopUpRequest
+     */
+    private static void handleTopUp(TopUpRequest request, ObjectOutputStream out) throws IOException {
+        TopUpResponse response;
+        try {
+            // Thực hiện nghiệp vụ nạp tiền thông qua AuthService của bạn
+            double newBalance = AUTH_SERVICE.topUpBalance(request.getUserId(), request.getAmount());
+
+            // Khởi tạo gói tin phản hồi thành công gửi lại Client
+            response = new TopUpResponse(true, String.format("Đã cộng %,.0f đ vào tài khoản.", request.getAmount()), newBalance);
+            logger.info("[SERVER] Nạp tiền thành công cho User {}: +{}", request.getUserId(), request.getAmount());
+        } catch (Exception e) {
+            response = new TopUpResponse(false, "Lỗi hệ thống khi nạp tiền: " + e.getMessage(), 0);
+            logger.error("[SERVER] Thất bại khi nạp tiền cho User {}", request.getUserId(), e);
+        }
+        sendResponse(out, response);
     }
 
     private static void sendResponse(ObjectOutputStream out, Object response) throws IOException {

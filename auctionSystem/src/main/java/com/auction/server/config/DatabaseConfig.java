@@ -11,44 +11,45 @@ import org.slf4j.LoggerFactory;
  */
 public final class DatabaseConfig {
 
-  private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
-  private static final String BASE_URL = "jdbc:mysql://localhost:3306"
-      + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-  private static final String DB_URL = "jdbc:mysql://localhost:3306/auction_system"
-      + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-  private static final String USERNAME = "root";
-  private static final String PASSWORD = "123456";
-  private static boolean initialized = false;
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
+    private static final String BASE_URL = "jdbc:mysql://localhost:3306"
+            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/auction_system"
+            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "123456";
+    private static boolean initialized = false;
 
-  private DatabaseConfig() {
-  }
-
-  public static Connection getConnection() throws SQLException {
-    if (!initialized) {
-      initializeDatabase();
-      initialized = true;
+    private DatabaseConfig() {
     }
-    return DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-  }
 
-  public static void initializeDatabase() throws SQLException {
-    try (Connection connection = DriverManager.getConnection(BASE_URL, USERNAME, PASSWORD);
-         Statement statement = connection.createStatement()) {
-      statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
+    public static Connection getConnection() throws SQLException {
+        if (!initialized) {
+            initializeDatabase();
+            initialized = true;
+        }
+        return DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
     }
-    String sqlCreateUsersTable = """
-        CREATE TABLE IF NOT EXISTS users (
-            id BIGINT PRIMARY KEY AUTO_INCREMENT,
-            full_name VARCHAR(100) NOT NULL,
-            username VARCHAR(50) NOT NULL UNIQUE,
-            email VARCHAR(100) NOT NULL UNIQUE,
-            password_hash VARCHAR(255) NOT NULL,
-            account_role VARCHAR(20) DEFAULT 'USER',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        """;
 
-    String sqlCreateAuctionsTable = """
+    public static void initializeDatabase() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(BASE_URL, USERNAME, PASSWORD);
+             Statement statement = connection.createStatement()) {
+            statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
+        }
+        String sqlCreateUsersTable = """
+    CREATE TABLE IF NOT EXISTS users (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        full_name VARCHAR(100) NOT NULL,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        account_role VARCHAR(20) DEFAULT 'USER',
+        balance DOUBLE DEFAULT 0.0, -- Cột mới thêm để quản lý số dư nạp tiền
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """;
+
+        String sqlCreateAuctionsTable = """
         CREATE TABLE IF NOT EXISTS auctions (
             id VARCHAR(50) PRIMARY KEY,
             item_id VARCHAR(50),
@@ -67,7 +68,7 @@ public final class DatabaseConfig {
         )
         """;
 
-    String sqlCreateBidTransactionsTable = """
+        String sqlCreateBidTransactionsTable = """
         CREATE TABLE IF NOT EXISTS bid_transactions (
             id VARCHAR(50) PRIMARY KEY,
             auction_id VARCHAR(50) NOT NULL,
@@ -78,24 +79,24 @@ public final class DatabaseConfig {
         )
         """;
 
-    String insertAdminSQL = """
+        String insertAdminSQL = """
             INSERT IGNORE INTO users (full_name, username, password_hash, email, account_role) 
                    VALUES ('nguyen_admin', 'admin', ?, 'admin@gmail.com', 'ADMIN')
             """;
 
-    try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
-      try (Statement statement = connection.createStatement()) {
-        statement.execute(sqlCreateUsersTable);
-        statement.execute(sqlCreateAuctionsTable);
-        statement.execute(sqlCreateBidTransactionsTable);
-      }
+        try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(sqlCreateUsersTable);
+                statement.execute(sqlCreateAuctionsTable);
+                statement.execute(sqlCreateBidTransactionsTable);
+            }
 
-      // Dùng PreparedStatement riêng cho việc chèn Admin để truyền mật khẩu đã hash an toàn
-      try (PreparedStatement ps = connection.prepareStatement(insertAdminSQL)) {
-        ps.setString(1, BCrypt.hashpw("admin123", BCrypt.gensalt())); // Đẩy chuỗi đã băm vào dấu ?
-        ps.executeUpdate();
-      }
+            // Dùng PreparedStatement riêng cho việc chèn Admin để truyền mật khẩu đã hash an toàn
+            try (PreparedStatement ps = connection.prepareStatement(insertAdminSQL)) {
+                ps.setString(1, BCrypt.hashpw("admin123", BCrypt.gensalt())); // Đẩy chuỗi đã băm vào dấu ?
+                ps.executeUpdate();
+            }
+        }
+        logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
     }
-    logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
-  }
 }

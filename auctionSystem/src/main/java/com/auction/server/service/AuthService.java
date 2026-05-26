@@ -73,4 +73,39 @@ public class AuthService {
             return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu khi đăng ký.", null);
         }
     }
+
+    /**
+     * HÀM MỚI THÊM VÀO: Xử lý cộng dồn số tiền nạp vào tài khoản người dùng trong DB.
+     * * @param username Định danh tài khoản cần nạp tiền.
+     * @param amount   Số tiền yêu cầu nạp thêm.
+     * @return Số dư mới sau khi đã nạp tiền thành công.
+     * @throws Exception Các ngoại lệ xảy ra trong quá trình kiểm tra hoặc kết nối dữ liệu.
+     */
+    public double topUpBalance(String username, double amount) throws Exception {
+        // 1. Kiểm tra tính hợp lệ của tham số đầu vào
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Định danh tài khoản không hợp lệ.");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Số tiền nạp vào phải lớn hơn 0 đ.");
+        }
+
+        try {
+            // 2. Xác thực tài khoản người dùng có tồn tại hay không
+            AuthUser user = userDao.findByUsername(username);
+            if (user == null) {
+                throw new IllegalArgumentException("Tài khoản người dùng không tồn tại trên hệ thống.");
+            }
+
+            // 3. Thực hiện cập nhật số dư tăng thêm trực tiếp vào Database thông qua UserDao.
+            // Phương thức updateBalance này sẽ trả về con số tổng (Số dư cũ + Số tiền mới nạp).
+            double newBalance = userDao.updateBalance(username, amount);
+
+            return newBalance;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Lỗi hệ thống khi tương tác với Cơ sở dữ liệu: " + e.getMessage());
+        }
+    }
 }

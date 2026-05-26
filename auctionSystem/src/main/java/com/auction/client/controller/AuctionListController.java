@@ -5,10 +5,13 @@ import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionCatalogService;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionRow;
+import com.auction.shared.network.ServiceResult;
+import com.auction.client.view.TopUpDialog;
+import com.auction.shared.network.TopUpRequest;
+import com.auction.shared.network.TopUpResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-
-import com.auction.shared.network.ServiceResult;
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -36,6 +39,9 @@ public class AuctionListController {
     private final AuctionCatalogService service = new AuctionCatalogService();
     private final ObservableList<AuctionRow> data = FXCollections.observableArrayList();
 
+    // BIẾN LƯU TRỮ TRẠNG THÁI SỐ DƯ MỚI THÊM
+    private double currentBalance = 0.0;
+
     @FXML
     private TextField searchField;
     @FXML
@@ -47,9 +53,12 @@ public class AuctionListController {
     @FXML
     private Button openAuctionButton;
 
-    // Ánh xạ nút "Tạo phiên đấu giá" từ file FXML
     @FXML
     private Button createAuctionButton;
+
+    // Ánh xạ ô Số dư màu xanh biển từ file FXML mới gộp
+    @FXML
+    private Button balanceButton;
 
     @FXML
     private TableColumn<AuctionRow, String> idColumn;
@@ -69,19 +78,10 @@ public class AuctionListController {
     /**
      * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
      */
-    /**
-     * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
-     */
     @FXML
     public void initialize() {
         statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
         statusFilter.setValue("Tất cả");
-
-        // Lắng nghe sự kiện: Mỗi khi người dùng đổi trạng thái trong ComboBox, tự động reload bảng
-        statusFilter.valueProperty().addListener((observable, oldValue, newValue) -> {
-            reload();
-        });
-
         idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
         itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
         sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
@@ -89,8 +89,29 @@ public class AuctionListController {
         stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
         statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
         summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
-
         auctionTable.setItems(data);
+
+        // 1. Cập nhật số dư hiển thị ban đầu lên nút xanh
+        updateBalanceUI(currentBalance);
+
+        // 2. ĐĂNG KÝ BỘ LẮNG NGHE MẠNG REAL-TIME: Đón gói tin phản hồi nạp tiền từ Server
+        SocketClient.getInstance().registerResponseHandler(TopUpResponse.class, (Object response) -> {
+            // Ép kiểu an toàn sau khi đã chỉ định tham số là Object
+            if (response instanceof TopUpResponse res) {
+
+                // Đẩy xử lý về UI Thread của JavaFX để cập nhật giao diện an toàn
+                Platform.runLater(() -> {
+                    if (res.isSuccess()) {
+                        this.currentBalance = res.getNewBalance();
+                        updateBalanceUI(this.currentBalance); // Thay đổi con số trên màn hình ngay lập tức
+                        showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", "Nạp tiền thành công: " + res.getMessage());
+                    } else {
+                        showAlertDialog(Alert.AlertType.ERROR, "Thất bại", "Nạp tiền thất bại: " + res.getMessage());
+                    }
+                });
+            }
+        });
+
         reload();
     }
 
@@ -117,6 +138,47 @@ public class AuctionListController {
     @FXML
     private void handleLogoutAction() throws IOException {
         SceneNavigator.switchScene(openAuctionButton, "/views/Login.fxml", "Đăng nhập", 980, 640);
+    }
+
+    /**
+     * HÀM MỚI THÊM VÀO: Xử lý sự kiện khi bấm ô Số dư màu xanh biển.
+     * Hiển thị popup mốc tiền nạp nhanh và gửi yêu cầu Socket.
+     */
+    @FXML
+    private void handleOpenTopUpDialog() {
+        TopUpDialog dialog = new TopUpDialog(amount -> {});
+        Optional<Double> result = dialog.showAndWait();
+
+        result.ifPresent(amount -> {
+            if (amount <= 0) {
+                showAlertDialog(Alert.AlertType.WARNING, "Cảnh báo", "Số tiền nạp phải lớn hơn 0 đ!");
+                return;
+            }
+
+            try {
+                // Lấy thông tin định danh người dùng hiện tại từ Session hệ thống
+                String userId = "Chưa xác định";
+                if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
+                    userId = com.auction.client.service.SessionContext.getCurrentUser().getFullName();
+                }
+
+                // Đóng gói request gửi bất đồng bộ lên Server qua đường truyền mạng Socket
+                TopUpRequest request = new TopUpRequest(userId, amount);
+                SocketClient.getInstance().sendRequest(request);
+
+            } catch (Exception e) {
+                showAlertDialog(Alert.AlertType.ERROR, "Lỗi kết nối", "Không thể gửi yêu cầu nạp tiền: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * HÀM PHỤ TRỢ MỚI: Định dạng tiền tệ hiển thị sắc nét trên ô màu xanh (Ví dụ: Số dư: 500,000 đ)
+     */
+    private void updateBalanceUI(double balance) {
+        if (balanceButton != null) {
+            balanceButton.setText(String.format("Số dư: %,.0f đ", balance));
+        }
     }
 
     /**
@@ -148,12 +210,6 @@ public class AuctionListController {
         txtDescription.setPromptText("Mô tả chi tiết về sản phẩm...");
         txtDescription.setPrefRowCount(3);
         txtDescription.setWrapText(true);
-        txtDescription.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, line -> {
-            if (line.getCode() == javafx.scene.input.KeyCode.ENTER) {
-                txtDescription.appendText("\n"); // Thêm ký tự xuống dòng
-                line.consume(); // Chặn sự kiện này lại, không cho Dialog nhận lệnh đóng Form
-            }
-        });
 
         TextField txtStartingPrice = new TextField();
         txtStartingPrice.setPromptText("Ví dụ: 200000");
