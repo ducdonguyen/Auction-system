@@ -3,15 +3,14 @@ package com.auction.server.core;
 import com.auction.shared.network.CreateAuctionRequest;
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.repository.AuctionRepository;
+import com.auction.server.service.AuthService;
 import com.auction.shared.models.Auction;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
 import com.auction.shared.models.Bidder;
 import com.auction.shared.models.Item;
 import com.auction.shared.models.Seller;
-import com.auction.shared.models.Art;
-import com.auction.shared.models.Electronics;
-import com.auction.shared.models.Vehicle;
+import com.auction.shared.network.BalanceUpdatedEvent;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +24,7 @@ public class AuctionService {
     private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
     private AuctionLockManager lockManager;
     private AuctionRepository auctionRepository;
+    private final AuthService authService = new AuthService();
 
     public AuctionService() {
     }
@@ -84,12 +84,29 @@ public class AuctionService {
             throw new IllegalArgumentException("Không tìm thấy phiên đấu giá với ID: " + auctionId);
         }
 
-        boolean success = updateAuctionStatus(auction, AuctionStatus.CANCELED);
+        // --- BẮT ĐẦU: LOGIC HOÀN TIỀN KHI ADMIN HỦY PHIÊN ---
+        Bidder highestBidderObj = auction.getHighestBidder();
+        if (highestBidderObj != null && highestBidderObj.getUsername() != null && !highestBidderObj.getUsername().isEmpty()) {
+            String highestBidderUsername = highestBidderObj.getUsername();
+            double amountToRefund = auction.getCurrentPrice();
 
-        if (!success) {
-            throw new IllegalStateException("Trạng thái hiện tại (" + auction.getStatus() + ") không cho phép hủy.");
+            // 1. Cộng lại tiền vào ví
+            authService.refundBalance(highestBidderUsername, amountToRefund);
+
+            // 2. Bắn sự kiện bắt giao diện Client nhảy số dư
+            BalanceUpdatedEvent refundEvent = new BalanceUpdatedEvent(
+                    authService.getBalance(highestBidderUsername),
+                    amountToRefund,
+                    "Phiên đấu giá bị hủy. " + amountToRefund + "đ đã được hoàn về ví của bạn."
+            );
+            com.auction.server.concurrency.ClientHandler.sendToUser(highestBidderUsername, refundEvent);
         }
+        // --- KẾT THÚC LOGIC HOÀN TIỀN ---
 
+        boolean success = updateAuctionStatus(auction, AuctionStatus.CANCELED);
+        if (!success) {
+            throw new IllegalStateException("Trạng thái hiện tại không cho phép hủy.");
+        }
         logger.info("[ADMIN ACTION] Phiên đấu giá {} đã bị hủy thành công.", auctionId);
     }
 
@@ -109,12 +126,58 @@ public class AuctionService {
             if (auction == null) {
                 return false;
             }
+
+            // --- BẮT ĐẦU: KIỂM TRA SỐ DƯ ---
+            double currentBalance = authService.getBalance(bidderUsername);
+            if (currentBalance < amount) {
+                // Đẩy lỗi ra để RequestRouter.handleBid gửi thông báo màu đỏ về màn hình người dùng
+                throw new IllegalArgumentException("Số dư không đủ. Vui lòng nạp thêm tiền!");
+            }
+            // ---------------------------------
+
+            Bidder previousBidderObj = auction.getHighestBidder();
+            String previousBidderUsername = (previousBidderObj != null) ? previousBidderObj.getUsername() : null;
+            double previousPrice = auction.getCurrentPrice();
+
+            String fullName = authService.getFullName(bidderUsername);
             Bidder bidder = new Bidder(bidderUsername, "", 0);
+            bidder.setFullName(fullName);
+
+            // Hàm này sẽ ném lỗi nếu bước giá không hợp lệ (validateBid)
             lockManager.lockAndRun(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, amount));
             auctionRepository.save(auction);
+
+            // --- BẮT ĐẦU: ĐÓNG BĂNG TIỀN VÀ HOÀN TIỀN CHO NGƯỜI CŨ ---
+            // Trừ tiền người vừa đặt thành công
+            authService.freezeBalance(bidderUsername, amount);
+
+            // Bắn Socket thông báo trừ tiền cho chính người vừa đặt để app tự nhảy số dư
+            BalanceUpdatedEvent deductEvent = new BalanceUpdatedEvent(
+                    authService.getBalance(bidderUsername),
+                    -amount,
+                    null
+            );
+            com.auction.server.concurrency.ClientHandler.sendToUser(bidderUsername, deductEvent);
+
+            // Nếu có người cũ bị vượt giá, hoàn tiền cho họ
+            if (previousBidderUsername != null && !previousBidderUsername.isEmpty() && !previousBidderUsername.equals(bidderUsername)) {
+                authService.refundBalance(previousBidderUsername, previousPrice);
+
+                BalanceUpdatedEvent refundEvent = new BalanceUpdatedEvent(
+                        authService.getBalance(previousBidderUsername),
+                        previousPrice,
+                        "Bạn đã bị vượt giá! " + previousPrice + "đ đã hoàn về ví."
+                );
+                com.auction.server.concurrency.ClientHandler.sendToUser(previousBidderUsername, refundEvent);
+            }
+            // ---------------------------------------------------------
+
             AuctionManager.getInstance().notifyObservers(auctionId,
                     auction.getBidHistory().get(auction.getBidHistory().size() - 1));
             return true;
+
+        } catch (IllegalArgumentException e) {
+            throw e; // Lỗi từ việc không đủ tiền hoặc sai bước giá ném thẳng ra ngoài
         } catch (Exception e) {
             logger.warn("[FAILED] Bid rejected: {}", e.getMessage());
             return false;

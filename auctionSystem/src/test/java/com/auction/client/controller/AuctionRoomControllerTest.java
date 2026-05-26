@@ -131,7 +131,7 @@ public class AuctionRoomControllerTest {
         assertEquals("AUC001", auctionIdLabel.getText());
         assertEquals("Item", itemNameLabel.getText());
 
-        assertEquals("Khác", itemTypeLabel.getText());
+        assertEquals("Loại: Khác", itemTypeLabel.getText());
     }
 
     @Test

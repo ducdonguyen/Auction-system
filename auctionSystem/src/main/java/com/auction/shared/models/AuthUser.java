@@ -10,44 +10,32 @@ public class AuthUser implements Serializable {
     private String email;
     private String passwordHash;
     private String role;
-    private double balance;
+    private double balance; // THÊM MỚI: Thuộc tính quản lý số dư ví tiền tài khoản
 
     public AuthUser() {
-        this.balance = 0.0;
     }
 
-    // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL)
+    // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL, số dư mặc định = 0.0)
     public AuthUser(String fullName, String username, String email, String passwordHash) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = "USER";
-        this.balance = 10000000.0; // Mặc định tặng 10tr để test
+        this.balance = 0.0;
     }
 
-    // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role)
+    // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role, số dư mặc định = 0.0)
     public AuthUser(String fullName, String username, String email, String passwordHash, String role) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        this.balance = 10000000.0;
+        this.balance = 0.0;
     }
 
-    // Constructor 6 tham số (Dùng cho các bản code cũ hơn)
-    public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role) {
-        this.id = id;
-        this.fullName = fullName;
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.role = role;
-        this.balance = 10000000.0;
-    }
-
-    // Constructor 7 THAM SỐ ĐẦY ĐỦ (Dùng khi lôi từ CSDL lên, bao gồm cả ví tiền)
+    // Constructor ĐẦY ĐỦ NHẤT (Dùng khi lôi từ CSDL lên, có cả ID và số dư)
     public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role, double balance) {
         this.id = id;
         this.fullName = fullName;
@@ -106,10 +94,12 @@ public class AuthUser implements Serializable {
         this.role = role;
     }
 
+    // THÊM MỚI: Getter cho balance
     public double getBalance() {
         return balance;
     }
 
+    // THÊM MỚI: Setter cho balance
     public void setBalance(double balance) {
         this.balance = balance;
     }

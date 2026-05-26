@@ -87,6 +87,15 @@ public final class DatabaseConfig {
         try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
             try (Statement statement = connection.createStatement()) {
                 statement.execute(sqlCreateUsersTable);
+
+                // Ép thêm cột balance nếu bảng đã tồn tại từ trước mà chưa có cột này
+                try {
+                    statement.execute("ALTER TABLE users ADD COLUMN balance DOUBLE DEFAULT 0.0");
+                    logger.info("[DB] Đã cập nhật: Thêm cột 'balance' vào bảng users hiện tại.");
+                } catch (SQLException e) {
+                    // Nếu cột đã tồn tại, MySQL sẽ ném lỗi. Ta cứ bỏ qua an toàn.
+                }
+
                 statement.execute(sqlCreateAuctionsTable);
                 statement.execute(sqlCreateBidTransactionsTable);
             }

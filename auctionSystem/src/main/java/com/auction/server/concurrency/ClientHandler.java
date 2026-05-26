@@ -5,6 +5,7 @@ import com.auction.server.core.AuctionObserver;
 import com.auction.server.core.AuctionService;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
+import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,6 +19,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientHandler implements Runnable, AuctionObserver {
   private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+  private static final ConcurrentHashMap<String, ClientHandler> activeClients = new ConcurrentHashMap<>();
+  private String username;
   private final Socket socket;
   private final AuctionService auctionService;
   private ObjectOutputStream out;
@@ -43,6 +46,27 @@ public class ClientHandler implements Runnable, AuctionObserver {
   public void setCurrentWatchingAuctionId(String auctionId) {
     this.currentWatchingAuctionId = auctionId;
   }
+
+  // Hàm để gán username khi login và đưa vào danh bạ
+  public void setUsername(String username) {
+    this.username = username;
+    activeClients.put(username, this);
+  }
+
+  // Hàm tĩnh để bắn gói tin Socket tới riêng một người dùng
+  public static void sendToUser(String username, Object message) {
+    ClientHandler handler = activeClients.get(username);
+    if (handler != null && handler.out != null) {
+      try {
+        handler.out.writeObject(message);
+        handler.out.flush();
+        logger.info("[ClientHandler] Đã gửi thông báo cá nhân tới user: {}", username);
+      } catch (IOException e) {
+        logger.error("Lỗi khi gửi tin riêng cho {}: {}", username, e.getMessage());
+      }
+    }
+  }
+
 
   @Override
   public void run() {
@@ -71,6 +95,11 @@ public class ClientHandler implements Runnable, AuctionObserver {
       // để tránh lỗi rò rỉ bộ nhớ (Memory Leak)
       if (currentWatchingAuctionId != null) {
         AuctionManager.getInstance().unsubscribe(currentWatchingAuctionId, this);
+      }
+
+      // Khi Client tắt app, nhớ xóa họ khỏi danh bạ
+      if (this.username != null) {
+        activeClients.remove(this.username);
       }
     }
   }

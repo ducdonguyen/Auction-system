@@ -74,6 +74,16 @@ public class AuthService {
         }
     }
 
+    public String getFullName(String username) {
+        try {
+            AuthUser user = userDao.findByUsername(username);
+            // Trả về tên thật, nếu lỗi hoặc không có thì fallback dùng lại username
+            return (user != null && user.getFullName() != null) ? user.getFullName() : username;
+        } catch (SQLException e) {
+            return username;
+        }
+    }
+
     /**
      * HÀM MỚI THÊM VÀO: Xử lý cộng dồn số tiền nạp vào tài khoản người dùng trong DB.
      * * @param username Định danh tài khoản cần nạp tiền.
@@ -106,6 +116,31 @@ public class AuthService {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new Exception("Lỗi hệ thống khi tương tác với Cơ sở dữ liệu: " + e.getMessage());
+        }
+    }
+
+    public double getBalance(String username) {
+        try {
+            return userDao.getBalance(username);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public void freezeBalance(String username, double amount) {
+        try {
+            userDao.freezeBalance(username, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void refundBalance(String username, double amount) {
+        try {
+            userDao.refundBalance(username, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
