@@ -3,16 +3,19 @@ package com.auction.client.controller;
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
+import com.auction.client.service.SessionContext;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
 import com.auction.shared.network.ServiceResult;
 import java.io.IOException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 
 /**
  * Controller cho phòng đấu giá trực tuyến.
@@ -20,6 +23,9 @@ import javafx.scene.control.TextField;
 public class AuctionRoomController {
   private final AuctionRoomService service = new AuctionRoomService();
   private String aid;
+
+  @FXML
+  private Label balanceLabel;
   @FXML
   private Label auctionIdLabel;
   @FXML
@@ -43,13 +49,7 @@ public class AuctionRoomController {
   @FXML
   private Label descriptionLabel;
   @FXML
-  private Label itemTypeLabel;
-  @FXML
-  private Label extraInfoLabel;
-  @FXML
   private TextField bidAmountField;
-  @FXML
-  private javafx.scene.control.Button btnPlaceBid;
   @FXML
   private ListView<String> bidHistoryList;
 
@@ -63,49 +63,53 @@ public class AuctionRoomController {
     render();
   }
 
-  private final java.text.NumberFormat cf = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.of("vi", "VN"));
-  private double stepPriceValue = 0;
-
   /**
    * Khởi tạo controller và thiết lập lắng nghe các sự kiện thời gian thực.
    */
   @FXML
   public void initialize() {
+    updateBalanceUI();
+
     SocketClient.getInstance().setRealtimeListener(new SocketClient.RealtimeListener() {
       @Override
       public void onNewBid(BidTransaction bidTransaction) {
-        // BẮT BUỘC: Nhờ luồng giao diện cập nhật để không bị sập app
-        javafx.application.Platform.runLater(() -> {
-          double newPrice = bidTransaction.bidAmount();
-          // TỰ ĐỘNG TÍNH TOÁN: Giá tối thiểu tiếp theo = Giá vừa đặt + Bước giá của phòng
-          double nextMinBid = newPrice + stepPriceValue;
-
-          // Cập nhật các nhãn bằng bộ định dạng tiền tệ cf để không bị dính chữ E
-          currentPriceLabel.setText(cf.format(newPrice));
-          minimumBidLabel.setText(cf.format(nextMinBid));
+        Platform.runLater(() -> {
+          currentPriceLabel.setText(String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
           highestBidderLabel.setText(bidTransaction.bidder().getUsername());
-
-          // Định dạng thời gian và đưa dòng lịch sử mới nhất lên đầu danh sách (Index 0)
-          String timeStr = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(bidTransaction.timestamp());
           bidHistoryList.getItems().add(0, bidTransaction.bidder().getUsername()
-                  + " đặt " + cf.format(newPrice)
-                  + " lúc " + timeStr);
+                  + " vừa đặt: " + String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
         });
       }
 
       @Override
       public void onStatusUpdate(AuctionStatus status) {
-        // BẮT BUỘC: Nhờ luồng giao diện cập nhật
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
           statusLabel.setText(status.name());
+          if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
+            bidAmountField.setDisable(true);
+            if (status == AuctionStatus.CANCELED) {
+              messageLabel.setText("Phiên đấu giá đã bị hủy!");
+              messageLabel.setTextFill(Color.RED);
+            } else {
+              messageLabel.setText("Phiên đã kết thúc!");
+            }
+          }
+        });
+      }
 
-          boolean isBiddable = (status == AuctionStatus.OPEN || status == AuctionStatus.RUNNING);
-          bidAmountField.setDisable(!isBiddable);
-          if (btnPlaceBid != null) btnPlaceBid.setDisable(!isBiddable);
+      @Override
+      public void onBalanceUpdate(double newBalance, double amountChanged, String reason) {
+        Platform.runLater(() -> {
+          if (SessionContext.getCurrentUser() != null) {
+            SessionContext.getCurrentUser().setBalance(newBalance);
+            updateBalanceUI();
 
-          if (!isBiddable) {
-            messageLabel.setText("Phiên đã kết thúc hoặc bị hủy!");
-            messageLabel.setStyle("-fx-text-fill: red;");
+            // Xử lý thông báo hoàn tiền khi phiên bị hủy (Nhiệm vụ Thành viên 4)
+            if (reason != null && reason.toLowerCase().contains("hoàn tiền")) {
+              String refundMsg = String.format("Phiên đã bị hủy. %,.0f VNĐ đã được hoàn về ví của bạn.", amountChanged);
+              messageLabel.setText(refundMsg);
+              messageLabel.setTextFill(Color.GREEN);
+            }
           }
         });
       }
@@ -114,22 +118,46 @@ public class AuctionRoomController {
 
   @FXML
   private void handlePlaceBidAction() {
-    // Gọi tầng Service xử lý và lấy kết quả kết nối mạng
-    ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountField.getText());
-
-    // Hiển thị thông điệp động (Server trả về lỗi gì thì hiện lỗi đó)
-    messageLabel.setText(result.message());
-
-    if (result.success()) {
-      messageLabel.setStyle("-fx-text-fill: #166534;");
-      bidAmountField.clear(); // Xóa sạch ô nhập để sẵn sàng cho lần đặt sau
-    } else {
-      messageLabel.setStyle("-fx-text-fill: #dc2626;");
+    String bidText = bidAmountField.getText();
+    if (bidText == null || bidText.isBlank()) {
+      showMessage("Vui lòng nhập số tiền!", false);
+      return;
     }
 
-    if (result.data() != null) {
-      bind(result.data());
+    try {
+      double amount = Double.parseDouble(bidText);
+      double currentBalance = SessionContext.getCurrentUser().getBalance();
+
+      // BẢO VỆ LUỒNG TIỀN: Chặn ngay tại Client (Nhiệm vụ Thành viên 4)
+      if (amount > currentBalance) {
+        showMessage("Số dư không đủ. Vui lòng nạp thêm!", false);
+        return;
+      }
+
+      ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidText);
+      if (result.success()) {
+        showMessage(result.message(), true);
+        if (result.data() != null) {
+          bind(result.data());
+        }
+      } else {
+        showMessage(result.message(), false);
+      }
+    } catch (NumberFormatException e) {
+      showMessage("Số tiền không hợp lệ!", false);
     }
+  }
+
+  private void updateBalanceUI() {
+    if (SessionContext.getCurrentUser() != null) {
+      double bal = SessionContext.getCurrentUser().getBalance();
+      balanceLabel.setText(String.format("%,.0f VNĐ", bal));
+    }
+  }
+
+  private void showMessage(String message, boolean success) {
+    messageLabel.setText(message);
+    messageLabel.setTextFill(success ? Color.GREEN : Color.RED);
   }
 
   @FXML
@@ -140,12 +168,13 @@ public class AuctionRoomController {
 
   private void render() {
     service.getAuctionRoom(aid).ifPresent(result -> bind(result.data()));
+    updateBalanceUI();
   }
 
   private void bind(AuctionRoomViewModel viewModel) {
     auctionIdLabel.setText(viewModel.auctionId());
     itemNameLabel.setText(viewModel.itemName());
-    sellerLabel.setText("Người bán: " + viewModel.sellerName());
+    sellerLabel.setText(viewModel.sellerName());
     statusLabel.setText(viewModel.status());
     currentPriceLabel.setText(viewModel.currentPrice());
     stepPriceLabel.setText(viewModel.stepPrice());
@@ -154,26 +183,5 @@ public class AuctionRoomController {
     scheduleLabel.setText(viewModel.schedule());
     descriptionLabel.setText(viewModel.description());
     bidHistoryList.setItems(FXCollections.observableArrayList(viewModel.bidHistory()));
-    itemTypeLabel.setText(viewModel.itemType());
-    extraInfoLabel.setText(viewModel.extraInfo());
-
-    try {
-      String cleanStep = viewModel.stepPrice().replaceAll("\\D", "");
-      this.stepPriceValue = Double.parseDouble(cleanStep);
-    } catch (Exception e) {
-      this.stepPriceValue = 0;
-    }
-
-    boolean isBiddable = viewModel.status().equals("OPEN") || viewModel.status().equals("RUNNING");
-    bidAmountField.setDisable(!isBiddable); // Khóa ô nhập
-    if (btnPlaceBid != null) btnPlaceBid.setDisable(!isBiddable); // Khóa nút bấm
-
-    if (!isBiddable) {
-      messageLabel.setText("Phiên đấu giá không trong trạng thái mở.");
-      messageLabel.setStyle("-fx-text-fill: red;");
-    } else {
-      messageLabel.setText(""); // Xóa thông báo lỗi nếu hợp lệ
-      messageLabel.setStyle("-fx-text-fill: black;");
-    }
   }
 }
