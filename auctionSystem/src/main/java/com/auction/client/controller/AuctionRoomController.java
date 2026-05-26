@@ -47,17 +47,10 @@ public class AuctionRoomController {
   private TextField bidAmountField;
   @FXML
   private ListView<String> bidHistoryList;
-    @FXML
-    private Label itemTypeLabel;   // THÊM MỚI
-    @FXML
-    private Label extraInfoLabel;   // THÊM MỚI
-
-  // THÊM MỚI 1: Ánh xạ các nhãn thông tin loại sản phẩm từ file FXML
   @FXML
-  private Label itemTypeLabel;
+  private Label itemTypeLabel;   // THÊM MỚI
   @FXML
-  private Label extraInfoLabel;
-
+  private Label extraInfoLabel;   // THÊM MỚI
   // THÊM MỚI 2: Ánh xạ ô hiển thị Số dư màu xanh biển cạnh ID phiên đấu giá
   @FXML
   private Label balanceLabel;
