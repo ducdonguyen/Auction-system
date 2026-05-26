@@ -106,9 +106,11 @@ public class RequestRouter {
         ServiceResult<Void> result;
         try {
             auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
-            result = new ServiceResult<>(true, "Bid placed successfully", null);
+            // SỬA TẠI ĐÂY: Thay "Bid placed successfully" thành tiếng Việt cho khớp Test
+            result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null);
         } catch (Exception e) {
-            result = new ServiceResult<>(false, e.getMessage(), null);
+            // SỬA TẠI ĐÂY: Thêm tiền tố "Lỗi xử lý hệ thống: " vào trước e.getMessage()
+            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null);
         }
         sendResponse(out, result);
     }
