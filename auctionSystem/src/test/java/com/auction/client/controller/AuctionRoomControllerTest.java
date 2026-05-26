@@ -136,18 +136,33 @@ public class AuctionRoomControllerTest {
 
     @Test
     public void testHandlePlaceBidAction() throws Exception {
-        injectField("aid", "AUC001");
-        bidAmountField.setText("1000");
+        // 1. Tạo đối tượng AuthUser giả lập dựa trên class AuthUser của bạn
+        com.auction.shared.models.AuthUser mockUser = new com.auction.shared.models.AuthUser();
+        mockUser.setUsername("user1");
+        mockUser.setBalance(5000.0); // Đặt số dư là 5000 VNĐ, đủ điều kiện để đặt mức thầu 1000 VNĐ
 
-        // SỬA Ở ĐÂY: Cho trả về null giống hệt logic thực tế của AuctionRoomService để không kích hoạt hàm bind()
-        when(service.placeBid(eq("AUC001"), eq("1000"))).thenReturn(new ServiceResult<>(true, "Bid placed", null));
+        // 2. Thiết lập SessionContext để hệ thống biết "ai" đang thao tác đặt thầu
+        com.auction.client.service.SessionContext.setCurrentUser(mockUser);
 
-        java.lang.reflect.Method method = AuctionRoomController.class.getDeclaredMethod("handlePlaceBidAction");
-        method.setAccessible(true);
-        method.invoke(controller);
+        try {
+            // --- Giữ nguyên logic inject và mock service cũ của bạn ---
+            injectField("aid", "AUC001");
+            bidAmountField.setText("1000");
 
-        // Lúc này chữ "Bid placed" sẽ không bị hàm bind() xóa đi nữa
-        assertEquals("Bid placed", messageLabel.getText());
+            // Cho trả về null giống hệt logic thực tế của AuctionRoomService để không kích hoạt hàm bind()
+            when(service.placeBid(eq("AUC001"), eq("1000"))).thenReturn(new ServiceResult<>(true, "Bid placed", null));
+
+            java.lang.reflect.Method method = AuctionRoomController.class.getDeclaredMethod("handlePlaceBidAction");
+            method.setAccessible(true);
+            method.invoke(controller);
+
+            // Lúc này chữ "Bid placed" sẽ không bị hàm bind() xóa đi nữa
+            assertEquals("Bid placed", messageLabel.getText());
+
+        } finally {
+            // 3. Giải phóng SessionContext sau khi test xong nhằm tránh rác dữ liệu sang các hàm test khác
+            com.auction.client.service.SessionContext.setCurrentUser(null);
+        }
     }
 
     @Test

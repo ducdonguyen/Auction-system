@@ -52,6 +52,10 @@ public class AuctionRoomController {
   private TextField bidAmountField;
   @FXML
   private ListView<String> bidHistoryList;
+    @FXML
+    private Label itemTypeLabel;   // THÊM MỚI
+    @FXML
+    private Label extraInfoLabel;   // THÊM MỚI
 
   /**
    * Thiết lập ID của phiên đấu giá và render giao diện.
@@ -182,6 +186,8 @@ public class AuctionRoomController {
     highestBidderLabel.setText(viewModel.highestBidder());
     scheduleLabel.setText(viewModel.schedule());
     descriptionLabel.setText(viewModel.description());
+    itemTypeLabel.setText(viewModel.itemType());
+    extraInfoLabel.setText(viewModel.extraInfo());
     bidHistoryList.setItems(FXCollections.observableArrayList(viewModel.bidHistory()));
   }
 }
