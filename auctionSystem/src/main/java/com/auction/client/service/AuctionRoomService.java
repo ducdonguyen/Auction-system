@@ -11,11 +11,14 @@ import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service xử lý logic cho phòng đấu giá tại Client.
  */
 public class AuctionRoomService {
+  private static final Logger logger = LoggerFactory.getLogger(AuctionRoomService.class);
   private final NumberFormat cf = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
   private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -40,7 +43,7 @@ public class AuctionRoomService {
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("Lỗi khi lấy thông tin phòng đấu giá ID: {}", auctionId, e);
     }
 
     // Fallback: Nếu rớt mạng hoặc có lỗi

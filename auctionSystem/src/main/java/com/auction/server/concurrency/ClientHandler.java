@@ -22,7 +22,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
   private static final ConcurrentHashMap<String, ClientHandler> activeClients = new ConcurrentHashMap<>();
   private String username;
   private final Socket socket;
-  private final AuctionService auctionService;
+  private final RequestRouter requestRouter;
   private ObjectOutputStream out;
 
   // Biến lưu trữ ID của phiên đấu giá mà Client này đang xem
@@ -32,11 +32,11 @@ public class ClientHandler implements Runnable, AuctionObserver {
    * Khởi tạo ClientHandler với socket và dịch vụ đấu giá.
    *
    * @param socket         Socket kết nối với client.
-   * @param auctionService Dịch vụ quản lý đấu giá.
+   * @param requestRouter Bộ định tuyến tiếp nhận và xử lý yêu cầu từ client.
    */
-  public ClientHandler(Socket socket, AuctionService auctionService) {
+  public ClientHandler(Socket socket, RequestRouter requestRouter) {
     this.socket = socket;
-    this.auctionService = auctionService;
+    this.requestRouter = requestRouter;
   }
 
   public String getCurrentWatchingAuctionId() {
@@ -81,7 +81,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
       while (!Thread.currentThread().isInterrupted()) {
         Object request = i.readObject();
         // Xử lý request qua RequestRouter
-        RequestRouter.route(request, this, out, auctionService);
+        this.requestRouter.route(request, this, out);
 
         logger.info("[ClientHandler] Nhận được yêu cầu từ Client: {}",
             request.getClass().getSimpleName());
@@ -144,7 +144,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
       out.writeObject(new com.auction.shared.network.ServiceResult<>(true, message, null));
       out.flush();
     } catch (java.io.IOException e) {
-      e.printStackTrace();
+      logger.error("Lỗi khi gửi tin nhắn hệ thống tới client: {}", e.getMessage(), e);
     }
   }
 }

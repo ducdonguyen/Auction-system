@@ -1,6 +1,7 @@
 package com.auction.client.controller;
 
 import com.auction.client.service.AuctionCatalogService;
+import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionRow;
 import com.auction.shared.network.ServiceResult;
@@ -12,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -177,7 +177,7 @@ public class AdminDashboardController {
 
   @FXML
   private void handleLogoutAction() throws IOException {
-    SceneNavigator.switchScene(logoutButton, "/views/Login.fxml", "Đăng nhập", 980, 640);
+    SceneNavigator.switchScene(logoutButton, Scene.LOGIN);
   }
 
   private void reload() {

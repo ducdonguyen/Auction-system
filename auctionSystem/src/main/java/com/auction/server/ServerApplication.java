@@ -2,9 +2,11 @@ package com.auction.server;
 
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.concurrency.ClientHandler;
+import com.auction.server.concurrency.RequestRouter; // 1. IMPORT MỚI
 import com.auction.server.core.AuctionScheduler;
 import com.auction.server.core.AuctionService;
 import com.auction.server.repository.AuctionRepository;
+import com.auction.server.service.AuthService; // 1. IMPORT MỚI
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -46,7 +48,11 @@ public class ServerApplication {
       AuctionLockManager lockManager = new AuctionLockManager();
       AuctionService auctionService = new AuctionService(lockManager, auctionRepository);
 
-      // 2. KHỞI TẠO BỘ ĐẾM THỜI GIAN (TỰ ĐỘNG ĐÓNG/MỞ PHIÊN)
+      // 2. KHỞI TẠO THÊM CÁC THÀNH PHẦN CHO ROUTER BẤT ĐỒNG BỘ
+      AuthService authService = new AuthService();
+      RequestRouter requestRouter = new RequestRouter(authService, auctionService);
+
+      // 3. KHỞI TẠO BỘ ĐẾM THỜI GIAN (TỰ ĐỘNG ĐÓNG/MỞ PHIÊN)
       ScheduledExecutorService sharedScheduler = Executors.newScheduledThreadPool(1);
       AuctionScheduler auctionScheduler =
               new AuctionScheduler(auctionRepository, auctionService, sharedScheduler);
@@ -83,8 +89,8 @@ public class ServerApplication {
             Socket clientSocket = serverSocket.accept();
             logger.info("--> CÓ KHÁCH! Client mới kết nối từ IP: {}", clientSocket.getInetAddress());
 
-            // Bước 3: Chấp nhận và Cử nhân viên phục vụ (Accepting & Serving)
-            ClientHandler handler = new ClientHandler(clientSocket, auctionService);
+            // Chuyển giao requestRouter cho ClientHandler làm việc
+            ClientHandler handler = new ClientHandler(clientSocket, requestRouter);
 
             // Giao việc cho ThreadPool (SAU)
             clientPool.submit(handler);

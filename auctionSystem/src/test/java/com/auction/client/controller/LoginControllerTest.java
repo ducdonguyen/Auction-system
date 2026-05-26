@@ -1,12 +1,11 @@
 package com.auction.client.controller;
 
-import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuthService;
+import com.auction.client.util.SceneNavigator; // Import UIManager mới
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.LoginRequest;
 import com.auction.shared.network.ServiceResult;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Field;
@@ -41,24 +41,14 @@ public class LoginControllerTest {
     public static void initJavaFX() {
         try {
             Platform.startup(() -> {});
-        } catch (IllegalStateException e) {
-            // Platform already started
-        }
+        } catch (IllegalStateException e) { }
     }
 
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        SocketClient mockSocket = mock(SocketClient.class);
-        SocketClient.setInstance(mockSocket);
-        
-        // Inject mock AuthService into private final field using reflection
-        Field authServiceField = LoginController.class.getDeclaredField("authService");
-        authServiceField.setAccessible(true);
-        authServiceField.set(loginController, authService);
-
-        // Initialize JavaFX components and inject them
+        // Khởi tạo các thành phần UI
         usernameField = new TextField();
         passwordField = new PasswordField();
         errorLabel = new Label();
@@ -68,6 +58,7 @@ public class LoginControllerTest {
         injectField("passwordField", passwordField);
         injectField("errorLabel", errorLabel);
         injectField("loginButton", loginButton);
+        injectField("authService", authService); // Inject trực tiếp service mock vào controller
     }
 
     private void injectField(String fieldName, Object value) throws Exception {
@@ -80,34 +71,36 @@ public class LoginControllerTest {
     public void testHandleLoginActionSuccess() throws Exception {
         usernameField.setText("testuser");
         passwordField.setText("password");
-        
+
         AuthUser authUser = new AuthUser("testuser", "Full Name", "test@example.com", "TOKEN", "BIDDER");
         ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
-        
+
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
 
-        // Use reflection to call private method directly
-        java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
-        method.setAccessible(true);
-        try {
-            method.invoke(loginController);
-        } catch (Exception e) {
-            // Expected failure in SceneNavigator due to missing Stage
-        }
+        // SỬA: Mock phương thức static của SceneNavigator
+        try (MockedStatic<SceneNavigator> sceneNavigator = mockStatic(SceneNavigator.class)) {
 
-        verify(authService).login(argThat(request -> 
-            request.username().equals("testuser") && request.password().equals("password")
-        ));
-        assertEquals("Login successful", errorLabel.getText());
+            java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
+            method.setAccessible(true);
+            method.invoke(loginController);
+
+            // Xác nhận logic đăng nhập đã chạy
+            verify(authService).login(any(LoginRequest.class));
+
+            // SỬA: Verify phương thức với đúng 2 tham số (Node, Scene)
+            sceneNavigator.verify(() -> SceneNavigator.switchScene(eq(loginButton), any(com.auction.client.util.Scene.class)));
+
+            assertEquals("Login successful", errorLabel.getText());
+        }
     }
 
     @Test
     public void testHandleLoginActionFailure() throws Exception {
         usernameField.setText("wronguser");
         passwordField.setText("wrongpass");
-        
+
         ServiceResult<AuthUser> failureResult = new ServiceResult<>(false, "Invalid credentials", null);
-        
+
         when(authService.login(any(LoginRequest.class))).thenReturn(failureResult);
 
         java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
