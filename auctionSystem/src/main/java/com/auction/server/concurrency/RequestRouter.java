@@ -73,6 +73,9 @@ public class RequestRouter {
         ServiceResult<AuthUser> result = AUTH_SERVICE.login(request);
 
         if (result.success()) {
+            // Ghi danh user vào hệ thống để có thể nhận tin nhắn hoàn tiền
+            handler.setUsername(request.username());
+
             AuctionManager.getInstance().addGlobalObserver(handler);
             logger.info("[RequestRouter] User {} đã đăng nhập và được thêm vào Global Observers", request.username());
         }
@@ -105,12 +108,18 @@ public class RequestRouter {
             throws IOException {
         ServiceResult<Void> result;
         try {
-            auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
-            // SỬA TẠI ĐÂY: Thay "Bid placed successfully" thành tiếng Việt cho khớp Test
-            result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null);
+            // SỬA LẠI: Bắt biến boolean để xem đặt giá thành công không
+            boolean success = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
+            if (success) {
+                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null);
+            } else {
+                result = new ServiceResult<>(false, "Không thể đặt giá thầu.", null);
+            }
+        } catch (IllegalArgumentException e) {
+            // NẾU SỐ DƯ KHÔNG ĐỦ, LỖI SẼ ĐƯỢC BẮT Ở ĐÂY VÀ GỬI CHỮ ĐỎ VỀ CLIENT
+            result = new ServiceResult<>(false, e.getMessage(), null);
         } catch (Exception e) {
-            // SỬA TẠI ĐÂY: Thêm tiền tố "Lỗi xử lý hệ thống: " vào trước e.getMessage()
-            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null);
+            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: Bid too low", null);
         }
         sendResponse(out, result);
     }

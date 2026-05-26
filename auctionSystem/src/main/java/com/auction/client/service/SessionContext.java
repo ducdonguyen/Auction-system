@@ -9,13 +9,13 @@ public class SessionContext {
   private SessionContext() {
   }
 
-  private static AuthUser currentUser;
+  private static volatile AuthUser currentUser;
 
-  public static AuthUser getCurrentUser() {
+  public static synchronized AuthUser getCurrentUser() {
     return currentUser;
   }
 
-  public static void setCurrentUser(AuthUser user) {
+  public static synchronized void setCurrentUser(AuthUser user) {
     currentUser = user;
   }
 }

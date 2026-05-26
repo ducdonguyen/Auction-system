@@ -98,4 +98,40 @@ public class UserDao {
             throw e; // Ném ngoại lệ để AuthService tầng trên nhận biết và log lỗi
         }
     }
+
+    public double getBalance(String username) throws SQLException {
+        String sql = "SELECT balance FROM users WHERE username = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("balance");
+                }
+            }
+        }
+        return 0.0;
+    }
+
+    // Đóng băng (trừ tiền) khi đặt giá
+    public void freezeBalance(String username, double amount) throws SQLException {
+        String sql = "UPDATE users SET balance = balance - ? WHERE username = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, amount);
+            ps.setString(2, username);
+            ps.executeUpdate();
+        }
+    }
+
+    // Hoàn tiền khi bị vượt giá hoặc Admin hủy phiên
+    public void refundBalance(String username, double amount) throws SQLException {
+        String sql = "UPDATE users SET balance = balance + ? WHERE username = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, amount);
+            ps.setString(2, username);
+            ps.executeUpdate();
+        }
+    }
 }

@@ -108,4 +108,29 @@ public class AuthService {
             throw new Exception("Lỗi hệ thống khi tương tác với Cơ sở dữ liệu: " + e.getMessage());
         }
     }
+
+    public double getBalance(String username) {
+        try {
+            return userDao.getBalance(username);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public void freezeBalance(String username, double amount) {
+        try {
+            userDao.freezeBalance(username, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void refundBalance(String username, double amount) {
+        try {
+            userDao.refundBalance(username, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
