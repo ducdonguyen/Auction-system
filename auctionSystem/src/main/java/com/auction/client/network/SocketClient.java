@@ -2,13 +2,17 @@ package com.auction.client.network;
 
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
+import com.auction.shared.network.BalanceUpdatedEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,9 @@ public class SocketClient {
   private ObjectInputStream in;
   private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<>();
   private final AtomicReference<RealtimeListener> realtimeListener = new AtomicReference<>();
+
+  // Map lưu trữ các bộ xử lý phản hồi đăng ký theo kiểu class
+  private final Map<Class<?>, Consumer<Object>> responseHandlers = new ConcurrentHashMap<>();
 
   /**
    * Interface để lắng nghe các sự kiện thời gian thực từ Server.
@@ -68,11 +75,24 @@ public class SocketClient {
     this.realtimeListener.set(l);
   }
 
+  /**
+   * Đăng ký bộ xử lý cho một loại phản hồi cụ thể.
+   *
+   * @param responseClass Lớp của đối tượng phản hồi.
+   * @param handler       Hàm xử lý.
+   * @param <T>           Kiểu dữ liệu phản hồi.
+   */
+  public <T> void registerResponseHandler(Class<T> responseClass, Consumer<Object> handler) {
+    responseHandlers.put(responseClass, handler);
+    logger.info("[Client] Đã đăng ký handler cho: {}", responseClass.getSimpleName());
+  }
+
   private void startListeningThread() {
     Thread t = new Thread(() -> {
       try {
         while (!Thread.currentThread().isInterrupted()) {
-          handle(in.readObject());
+          Object message = in.readObject();
+          handle(message);
         }
       } catch (Exception e) {
         logger.info("[Client] Listener stopped: {}", e.getMessage());
@@ -83,6 +103,16 @@ public class SocketClient {
   }
 
   private void handle(Object m) throws InterruptedException {
+    if (m == null) return;
+
+    // 1. Kiểm tra xem có handler đăng ký riêng cho loại message này không
+    Consumer<Object> handler = responseHandlers.get(m.getClass());
+    if (handler != null) {
+      handler.accept(m);
+      return;
+    }
+
+    // 2. Xử lý các sự kiện thời gian thực (Lobby/Room update)
     if (m instanceof BidTransaction b) {
       RealtimeListener l = realtimeListener.get();
       if (l != null) {
@@ -93,12 +123,13 @@ public class SocketClient {
       if (l != null) {
         Platform.runLater(() -> l.onStatusUpdate(s));
       }
-    } else if (m instanceof com.auction.shared.network.BalanceUpdatedEvent b) {
+    } else if (m instanceof BalanceUpdatedEvent b) {
       RealtimeListener l = realtimeListener.get();
       if (l != null) {
         Platform.runLater(() -> l.onBalanceUpdate(b.newBalance(), b.amountChanged(), b.reason()));
       }
     } else {
+      // 3. Nếu không có handler và không phải event, đưa vào queue để nhận đồng bộ qua receiveResponse()
       responseQueue.put(m);
     }
   }

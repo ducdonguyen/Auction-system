@@ -3,16 +3,19 @@ package com.auction.client.controller;
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
+import com.auction.client.service.SessionContext;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
 import com.auction.shared.network.ServiceResult;
 import java.io.IOException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 
 /**
  * Controller cho phòng đấu giá trực tuyến.
@@ -20,6 +23,9 @@ import javafx.scene.control.TextField;
 public class AuctionRoomController {
   private final AuctionRoomService service = new AuctionRoomService();
   private String aid;
+
+  @FXML
+  private Label balanceLabel;
   @FXML
   private Label auctionIdLabel;
   @FXML
@@ -62,26 +68,48 @@ public class AuctionRoomController {
    */
   @FXML
   public void initialize() {
+    updateBalanceUI();
+
     SocketClient.getInstance().setRealtimeListener(new SocketClient.RealtimeListener() {
       @Override
       public void onNewBid(BidTransaction bidTransaction) {
-        // BẮT BUỘC: Nhờ luồng giao diện cập nhật để không bị sập app
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
           currentPriceLabel.setText(String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
           highestBidderLabel.setText(bidTransaction.bidder().getUsername());
           bidHistoryList.getItems().add(0, bidTransaction.bidder().getUsername()
-                  + " vừa đặt: " + bidTransaction.bidAmount());
+                  + " vừa đặt: " + String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
         });
       }
 
       @Override
       public void onStatusUpdate(AuctionStatus status) {
-        // BẮT BUỘC: Nhờ luồng giao diện cập nhật
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
           statusLabel.setText(status.name());
           if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
             bidAmountField.setDisable(true);
-            messageLabel.setText("Phiên đã kết thúc!");
+            if (status == AuctionStatus.CANCELED) {
+              messageLabel.setText("Phiên đấu giá đã bị hủy!");
+              messageLabel.setTextFill(Color.RED);
+            } else {
+              messageLabel.setText("Phiên đã kết thúc!");
+            }
+          }
+        });
+      }
+
+      @Override
+      public void onBalanceUpdate(double newBalance, double amountChanged, String reason) {
+        Platform.runLater(() -> {
+          if (SessionContext.getCurrentUser() != null) {
+            SessionContext.getCurrentUser().setBalance(newBalance);
+            updateBalanceUI();
+
+            // Xử lý thông báo hoàn tiền khi phiên bị hủy (Nhiệm vụ Thành viên 4)
+            if (reason != null && reason.toLowerCase().contains("hoàn tiền")) {
+              String refundMsg = String.format("Phiên đã bị hủy. %,.0f VNĐ đã được hoàn về ví của bạn.", amountChanged);
+              messageLabel.setText(refundMsg);
+              messageLabel.setTextFill(Color.GREEN);
+            }
           }
         });
       }
@@ -90,11 +118,46 @@ public class AuctionRoomController {
 
   @FXML
   private void handlePlaceBidAction() {
-    ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountField.getText());
-    messageLabel.setText(result.message());
-    if (result.data() != null) {
-      bind(result.data());
+    String bidText = bidAmountField.getText();
+    if (bidText == null || bidText.isBlank()) {
+      showMessage("Vui lòng nhập số tiền!", false);
+      return;
     }
+
+    try {
+      double amount = Double.parseDouble(bidText);
+      double currentBalance = SessionContext.getCurrentUser().getBalance();
+
+      // BẢO VỆ LUỒNG TIỀN: Chặn ngay tại Client (Nhiệm vụ Thành viên 4)
+      if (amount > currentBalance) {
+        showMessage("Số dư không đủ. Vui lòng nạp thêm!", false);
+        return;
+      }
+
+      ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidText);
+      if (result.success()) {
+        showMessage(result.message(), true);
+        if (result.data() != null) {
+          bind(result.data());
+        }
+      } else {
+        showMessage(result.message(), false);
+      }
+    } catch (NumberFormatException e) {
+      showMessage("Số tiền không hợp lệ!", false);
+    }
+  }
+
+  private void updateBalanceUI() {
+    if (SessionContext.getCurrentUser() != null) {
+      double bal = SessionContext.getCurrentUser().getBalance();
+      balanceLabel.setText(String.format("%,.0f VNĐ", bal));
+    }
+  }
+
+  private void showMessage(String message, boolean success) {
+    messageLabel.setText(message);
+    messageLabel.setTextFill(success ? Color.GREEN : Color.RED);
   }
 
   @FXML
@@ -105,6 +168,7 @@ public class AuctionRoomController {
 
   private void render() {
     service.getAuctionRoom(aid).ifPresent(result -> bind(result.data()));
+    updateBalanceUI();
   }
 
   private void bind(AuctionRoomViewModel viewModel) {

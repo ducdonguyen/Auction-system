@@ -10,8 +10,10 @@ public class AuthUser implements Serializable {
     private String email;
     private String passwordHash;
     private String role;
+    private double balance;
 
     public AuthUser() {
+        this.balance = 0.0;
     }
 
     // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL)
@@ -21,6 +23,7 @@ public class AuthUser implements Serializable {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = "USER";
+        this.balance = 10000000.0; // Mặc định tặng 10tr để test
     }
 
     // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role)
@@ -30,9 +33,10 @@ public class AuthUser implements Serializable {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+        this.balance = 10000000.0;
     }
 
-    // Constructor ĐẦY ĐỦ NHẤT (Dùng khi lôi từ CSDL lên, có cả ID)
+    // Constructor 6 tham số (Dùng cho các bản code cũ hơn)
     public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role) {
         this.id = id;
         this.fullName = fullName;
@@ -40,6 +44,18 @@ public class AuthUser implements Serializable {
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
+        this.balance = 10000000.0;
+    }
+
+    // Constructor 7 THAM SỐ ĐẦY ĐỦ (Dùng khi lôi từ CSDL lên, bao gồm cả ví tiền)
+    public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role, double balance) {
+        this.id = id;
+        this.fullName = fullName;
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.balance = balance;
     }
 
     public Long getId() {
@@ -90,12 +106,21 @@ public class AuthUser implements Serializable {
         this.role = role;
     }
 
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
     @Override
     public String toString() {
         return "AuthUser{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
+                ", balance=" + balance +
                 '}';
     }
 }
