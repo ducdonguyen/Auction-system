@@ -52,20 +52,18 @@ public class AuctionListController {
     private Label resultLabel;
     @FXML
     private Button openAuctionButton;
-
     @FXML
     private Button createAuctionButton;
-
-    // Ánh xạ ô Số dư màu xanh biển từ file FXML mới gộp
     @FXML
     private Button balanceButton;
-
     @FXML
     private TableColumn<AuctionRow, String> idColumn;
     @FXML
     private TableColumn<AuctionRow, String> itemColumn;
     @FXML
     private TableColumn<AuctionRow, String> sellerColumn;
+    @FXML
+    private TableColumn<AuctionRow, String> highestBidderColumn;
     @FXML
     private TableColumn<AuctionRow, String> priceColumn;
     @FXML
@@ -82,16 +80,22 @@ public class AuctionListController {
     public void initialize() {
         statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
         statusFilter.setValue("Tất cả");
+
         idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
         itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
         sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
+        highestBidderColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().highestBidder()));
         priceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().currentPrice()));
         stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
         statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
         summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
+
         auctionTable.setItems(data);
 
         // 1. Cập nhật số dư hiển thị ban đầu lên nút xanh
+        if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
+            this.currentBalance = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
+        }
         updateBalanceUI(currentBalance);
 
         // 2. ĐĂNG KÝ BỘ LẮNG NGHE MẠNG REAL-TIME: Đón gói tin phản hồi nạp tiền từ Server
@@ -104,6 +108,11 @@ public class AuctionListController {
                     if (res.isSuccess()) {
                         this.currentBalance = res.getNewBalance();
                         updateBalanceUI(this.currentBalance); // Thay đổi con số trên màn hình ngay lập tức
+
+                        if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
+                            com.auction.client.service.SessionContext.getCurrentUser().setBalance(res.getNewBalance());
+                        }
+
                         showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", "Nạp tiền thành công: " + res.getMessage());
                     } else {
                         showAlertDialog(Alert.AlertType.ERROR, "Thất bại", "Nạp tiền thất bại: " + res.getMessage());
@@ -141,7 +150,7 @@ public class AuctionListController {
     }
 
     /**
-     * HÀM MỚI THÊM VÀO: Xử lý sự kiện khi bấm ô Số dư màu xanh biển.
+     * Xử lý sự kiện khi bấm ô Số dư màu xanh biển.
      * Hiển thị popup mốc tiền nạp nhanh và gửi yêu cầu Socket.
      */
     @FXML
@@ -159,7 +168,7 @@ public class AuctionListController {
                 // Lấy thông tin định danh người dùng hiện tại từ Session hệ thống
                 String userId = "Chưa xác định";
                 if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-                    userId = com.auction.client.service.SessionContext.getCurrentUser().getFullName();
+                    userId = com.auction.client.service.SessionContext.getCurrentUser().getUsername();
                 }
 
                 // Đóng gói request gửi bất đồng bộ lên Server qua đường truyền mạng Socket
@@ -173,7 +182,7 @@ public class AuctionListController {
     }
 
     /**
-     * HÀM PHỤ TRỢ MỚI: Định dạng tiền tệ hiển thị sắc nét trên ô màu xanh (Ví dụ: Số dư: 500,000 đ)
+     * Định dạng tiền tệ hiển thị sắc nét trên ô màu xanh (Ví dụ: Số dư: 500,000 đ)
      */
     private void updateBalanceUI(double balance) {
         if (balanceButton != null) {

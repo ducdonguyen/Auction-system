@@ -14,23 +14,28 @@
                 <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
             </padding>
             <children>
+
                 <HBox alignment="CENTER_LEFT" spacing="20.0"
                       style="-fx-background-color: #1e293b; -fx-background-radius: 16;">
                     <padding>
                         <Insets bottom="16.0" left="24.0" right="24.0" top="16.0"/>
+
                     </padding>
                     <children>
                         <VBox>
                             <children>
+
                                 <Label text="Bảng điều khiển Admin" textFill="WHITE">
                                     <font>
                                         <Font name="System Bold" size="24.0"/>
+
                                     </font>
                                 </Label>
                                 <Label text="Quản lý các phiên đấu giá toàn hệ thống" textFill="#94a3b8"/>
                             </children>
                         </VBox>
                         <Region HBox.hgrow="ALWAYS"/>
+
                         <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogoutAction"
                                 style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 8;"
                                 text="Đăng xuất">
@@ -40,10 +45,12 @@
                         </Button>
                     </children>
                 </HBox>
+
                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                     <children>
                         <TextField fx:id="searchField" prefHeight="40.0" prefWidth="300.0"
                                    promptText="Tìm kiếm sản phẩm..."
+
                                    style="-fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;"/>
                         <ComboBox fx:id="statusFilter" prefHeight="40.0" prefWidth="150.0"
                                   style="-fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;"/>
@@ -52,13 +59,16 @@
                                 text="Tìm kiếm">
                             <padding>
                                 <Insets left="20.0" right="20.0"/>
+
                             </padding>
                         </Button>
                         <Button mnemonicParsing="false" onAction="#handleRefreshAction" prefHeight="40.0"
+
                                 style="-fx-background-color: #f1f5f9; -fx-text-fill: #0f172a; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;"
                                 text="Làm mới">
                             <padding>
                                 <Insets left="20.0" right="20.0"/>
+
                             </padding>
                         </Button>
                         <Region HBox.hgrow="ALWAYS"/>
@@ -67,75 +77,99 @@
                 </HBox>
                 <TabPane fx:id="mainTabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" style="-fx-background-radius: 12;">
                     <tabs>
+
                         <Tab text="Tất cả phiên đấu giá">
                             <content>
                                 <TableView fx:id="auctionTable"
+
                                            style="-fx-background-radius: 0 0 12 12; -fx-border-radius: 0 0 12 12; -fx-overflow-x: hidden;">
                                     <columns>
-                                        <TableColumn fx:id="idColumn" prefWidth="80.0" text="ID"/>
-                                        <TableColumn fx:id="itemColumn" prefWidth="200.0" text="Sản phẩm"/>
-                                        <TableColumn fx:id="sellerColumn" prefWidth="150.0" text="Người bán"/>
-                                        <TableColumn fx:id="priceColumn" prefWidth="120.0" text="Giá hiện tại"/>
+                                        <TableColumn fx:id="idColumn" prefWidth="70.0" text="ID"/>
+
+                                        <TableColumn fx:id="itemColumn" prefWidth="160.0" text="Sản phẩm"/>
+                                        <TableColumn fx:id="sellerColumn" prefWidth="120.0" text="Người bán"/>
+
+                                        <TableColumn fx:id="allHighestBidderColumn" prefWidth="140.0" text="Người dẫn đầu"/>
+
+                                        <TableColumn fx:id="priceColumn" prefWidth="110.0" text="Giá hiện tại"/>
                                         <TableColumn fx:id="stepColumn" prefWidth="100.0" text="Bước giá"/>
-                                        <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trạng thái"/>
-                                        <TableColumn fx:id="summaryColumn" prefWidth="350.0" text="Mô tả"/>
+
+                                        <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Trạng thái"/>
+                                        <TableColumn fx:id="summaryColumn" prefWidth="280.0" text="Mô tả"/>
                                     </columns>
+
                                     <columnResizePolicy>
                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                                     </columnResizePolicy>
+
                                 </TableView>
                             </content>
                         </Tab>
+
                         <Tab text="Yêu cầu chờ duyệt">
                             <content>
                                 <TableView fx:id="pendingTable"
+
                                            style="-fx-background-radius: 0 0 12 12; -fx-border-radius: 0 0 12 12; -fx-overflow-x: hidden;">
                                     <columns>
                                         <TableColumn fx:id="pIdColumn" prefWidth="80.0" text="ID"/>
+
                                         <TableColumn fx:id="pItemColumn" prefWidth="200.0" text="Sản phẩm"/>
                                         <TableColumn fx:id="pSellerColumn" prefWidth="150.0" text="Người bán"/>
+
                                         <TableColumn fx:id="pPriceColumn" prefWidth="120.0" text="Giá khởi điểm"/>
                                         <TableColumn fx:id="pStepColumn" prefWidth="100.0" text="Bước giá"/>
+
                                         <TableColumn fx:id="pStatusColumn" prefWidth="120.0" text="Trạng thái"/>
                                         <TableColumn fx:id="pSummaryColumn" prefWidth="350.0" text="Mô tả"/>
                                     </columns>
+
                                     <columnResizePolicy>
                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                                     </columnResizePolicy>
+
                                 </TableView>
                             </content>
                         </Tab>
+
                     </tabs>
                 </TabPane>
                 <HBox alignment="CENTER_RIGHT" spacing="15.0">
                     <children>
                         <Label fx:id="actionMessageLabel" text="" />
+
                         <Button fx:id="approveButton" mnemonicParsing="false" onAction="#handleApproveAction"
                                 prefHeight="48.0" prefWidth="150.0"
                                 style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"
                                 text="PHÊ DUYỆT">
                             <font>
                                 <Font size="14.0"/>
+
                             </font>
                         </Button>
                         <Button fx:id="rejectButton" mnemonicParsing="false" onAction="#handleRejectAction"
+
                                 prefHeight="48.0" prefWidth="150.0"
                                 style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"
                                 text="TỪ CHỐI">
                             <font>
                                 <Font size="14.0"/>
+
                             </font>
                         </Button>
                         <Button fx:id="cancelAuctionButton" mnemonicParsing="false" onAction="#handleCancelAuctionAction"
+
                                 prefHeight="48.0" prefWidth="200.0"
                                 style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"
                                 text="HỦY PHIÊN ĐẤU GIÁ">
                             <font>
+
                                 <Font size="14.0"/>
                             </font>
                         </Button>
                     </children>
                 </HBox>
+
             </children>
         </VBox>
     </children>

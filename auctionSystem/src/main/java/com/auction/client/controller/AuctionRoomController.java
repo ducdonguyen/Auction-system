@@ -78,10 +78,23 @@ public class AuctionRoomController {
       public void onNewBid(BidTransaction bidTransaction) {
         // BẮT BUỘC: Nhờ luồng giao diện cập nhật để không bị sập app
         Platform.runLater(() -> {
+          String displayName = bidTransaction.bidder().getFullName();
+          if (displayName == null || displayName.trim().isEmpty()) {
+            displayName = bidTransaction.bidder().getUsername();
+          }
           currentPriceLabel.setText(String.format("%,.0f VNĐ", bidTransaction.bidAmount()));
-          highestBidderLabel.setText(bidTransaction.bidder().getUsername());
-          bidHistoryList.getItems().add(0, bidTransaction.bidder().getUsername()
-                  + " vừa đặt: " + bidTransaction.bidAmount() + " VNĐ");
+          highestBidderLabel.setText(displayName);
+          // Sử dụng ký hiệu %3$td (ngày), %3$tm (tháng), %3$tY (năm), %3$tH (giờ), %3$tM (phút)
+          // Số 3$ nghĩa là đều lấy dữ liệu từ tham số thứ 3 truyền vào (chính là thời gian của gói tin)
+          String historyLine = String.format(
+                  java.util.Locale.of("vi", "VN"), // 1. Ép Locale Việt Nam vào tham số đầu tiên
+                  "%1$s đặt %2$,.0f đ lúc %3$td/%3$tm/%3$tY %3$tH:%3$tM", // 2. Giữ nguyên cờ lệnh dấu phẩy ở đây
+                  displayName,
+                  bidTransaction.bidAmount(),
+                  bidTransaction.timestamp()
+          );
+
+          bidHistoryList.getItems().add(0, historyLine);
 
           // Tính toán lại giá đặt tối thiểu tiếp theo hiển thị trên màn hình Client
           try {
@@ -118,7 +131,11 @@ public class AuctionRoomController {
         Platform.runLater(() -> {
           // 1. Cập nhật số dư hiển thị sắc nét lên ô màu xanh biển trong phòng
           if (balanceLabel != null) {
-            balanceLabel.setText(String.format("Số dư: %,.0f đ", newBalance));
+            balanceLabel.setText(String.format("%,.0f đ", newBalance));
+          }
+
+          if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
+            com.auction.client.service.SessionContext.getCurrentUser().setBalance(newBalance);
           }
 
           // 2. In thông báo sự kiện (Hoàn tiền/Trừ tiền) trực quan lên màn hình phòng
@@ -186,7 +203,7 @@ public class AuctionRoomController {
     // ĐỒNG BỘ SỐ DƯ BAN ĐẦU: Lấy số dư tài khoản từ Session hệ thống đưa lên phòng khi vừa vào phòng
     if (balanceLabel != null && com.auction.client.service.SessionContext.getCurrentUser() != null) {
       double sessionBalance = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
-      balanceLabel.setText(String.format("Số dư: %,.0f đ", sessionBalance));
+      balanceLabel.setText(String.format("%,.0f đ", sessionBalance));
     }
   }
 

@@ -74,6 +74,16 @@ public class AuthService {
         }
     }
 
+    public String getFullName(String username) {
+        try {
+            AuthUser user = userDao.findByUsername(username);
+            // Trả về tên thật, nếu lỗi hoặc không có thì fallback dùng lại username
+            return (user != null && user.getFullName() != null) ? user.getFullName() : username;
+        } catch (SQLException e) {
+            return username;
+        }
+    }
+
     /**
      * HÀM MỚI THÊM VÀO: Xử lý cộng dồn số tiền nạp vào tài khoản người dùng trong DB.
      * * @param username Định danh tài khoản cần nạp tiền.

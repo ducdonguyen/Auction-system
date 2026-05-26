@@ -111,21 +111,38 @@ public class AuctionCatalogService {
       return true;
     }
     return a.getAuctionId().toLowerCase().contains(kw)
-        || a.getItem().getName().toLowerCase().contains(kw);
+            || a.getItem().getName().toLowerCase().contains(kw);
   }
 
   private AuctionRow toRow(Auction a) {
-    String bidder = (a.getHighestBidder() == null) ? "Chưa có" : a.getHighestBidder().getUsername();
+    // LẤY TÊN THẬT NGƯỜI DẪN ĐẦU
+    String topBidderName = "Chưa có";
+    if (a.getHighestBidder() != null) {
+      topBidderName = a.getHighestBidder().getFullName();
+      if (topBidderName == null || topBidderName.trim().isEmpty()) {
+        topBidderName = a.getHighestBidder().getUsername();
+      }
+    }
 
+    // LẤY TÊN THẬT NGƯỜI BÁN
+    String sellerName = "Ẩn danh";
+    if (a.getSeller() != null) {
+      sellerName = a.getSeller().getFullName();
+      if (sellerName == null || sellerName.trim().isEmpty()) {
+        sellerName = a.getSeller().getUsername();
+      }
+    }
+
+    // ĐÓNG GÓI THÀNH HÀNG DỮ LIỆU ĐÃ TÁCH CỘT
     return new AuctionRow(
-        a.getAuctionId(),
-        a.getItem().getName(),
-        a.getSeller().getUsername(),
-        currencyFormat.format(a.getCurrentPrice()),
-        currencyFormat.format(a.getStepPrice()),
-        a.getStatus().name(),
-        String.format("%s | Người dẫn đầu: %s", a.getItem().getDescription(), bidder),
-        bidder
+            a.getAuctionId(),
+            a.getItem().getName(),
+            sellerName,
+            topBidderName,
+            currencyFormat.format(a.getCurrentPrice()),
+            currencyFormat.format(a.getStepPrice()),
+            a.getStatus().name(),
+            a.getItem().getDescription()
     );
   }
 }

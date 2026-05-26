@@ -139,7 +139,9 @@ public class AuctionService {
             String previousBidderUsername = (previousBidderObj != null) ? previousBidderObj.getUsername() : null;
             double previousPrice = auction.getCurrentPrice();
 
+            String fullName = authService.getFullName(bidderUsername);
             Bidder bidder = new Bidder(bidderUsername, "", 0);
+            bidder.setFullName(fullName);
 
             // Hàm này sẽ ném lỗi nếu bước giá không hợp lệ (validateBid)
             lockManager.lockAndRun(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, amount));
@@ -148,6 +150,14 @@ public class AuctionService {
             // --- BẮT ĐẦU: ĐÓNG BĂNG TIỀN VÀ HOÀN TIỀN CHO NGƯỜI CŨ ---
             // Trừ tiền người vừa đặt thành công
             authService.freezeBalance(bidderUsername, amount);
+
+            // Bắn Socket thông báo trừ tiền cho chính người vừa đặt để app tự nhảy số dư
+            BalanceUpdatedEvent deductEvent = new BalanceUpdatedEvent(
+                    authService.getBalance(bidderUsername),
+                    -amount,
+                    null
+            );
+            com.auction.server.concurrency.ClientHandler.sendToUser(bidderUsername, deductEvent);
 
             // Nếu có người cũ bị vượt giá, hoàn tiền cho họ
             if (previousBidderUsername != null && !previousBidderUsername.isEmpty() && !previousBidderUsername.equals(bidderUsername)) {

@@ -50,12 +50,15 @@ public class AdminDashboardController {
   @FXML
   private Button logoutButton;
 
+  // CÁC CỘT CỦA BẢNG "TẤT CẢ PHIÊN ĐẤU GIÁ"
   @FXML
   private TableColumn<AuctionRow, String> idColumn;
   @FXML
   private TableColumn<AuctionRow, String> itemColumn;
   @FXML
   private TableColumn<AuctionRow, String> sellerColumn;
+  @FXML
+  private TableColumn<AuctionRow, String> allHighestBidderColumn;
   @FXML
   private TableColumn<AuctionRow, String> priceColumn;
   @FXML
@@ -65,6 +68,7 @@ public class AdminDashboardController {
   @FXML
   private TableColumn<AuctionRow, String> statusColumn;
 
+  // CÁC CỘT CỦA BẢNG "CHỜ DUYỆT"
   @FXML
   private TableColumn<AuctionRow, String> pIdColumn;
   @FXML
@@ -89,12 +93,13 @@ public class AdminDashboardController {
     idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
     itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
     sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
+    allHighestBidderColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().highestBidder()));
     priceColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().currentPrice()));
     stepColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().stepPrice()));
     statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
     summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
 
-    // Table "Chờ duyệt"
+    // Table "Chờ duyệt" (Không có cột Người dẫn đầu)
     pIdColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
     pItemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
     pSellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
@@ -144,7 +149,6 @@ public class AdminDashboardController {
       return;
     }
 
-    // Rejection can use the same cancelAuction call if defined on server for PENDING state
     ServiceResult<Void> result = service.cancelAuction(selected.auctionId());
     if (result.success()) {
       showMessage("Đã từ chối phiên: " + selected.auctionId(), true);

@@ -7,11 +7,11 @@ public record AuctionRow(
         String auctionId,
         String itemName,
         String sellerName,
+        String highestBidder,
         String currentPrice,
         String stepPrice,
         String status,
-        String summary,
-        String highestBidder
+        String summary
 ) {
 }
 

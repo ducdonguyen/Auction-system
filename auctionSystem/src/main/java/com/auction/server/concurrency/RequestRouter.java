@@ -100,6 +100,18 @@ public class RequestRouter {
         handler.setCurrentWatchingAuctionId(auctionId);
         AuctionManager.getInstance().subscribe(auctionId, handler);
         Auction currentAuction = auctionService.getAuctionById(auctionId);
+
+        if (currentAuction != null && currentAuction.getBidHistory() != null) {
+            for (com.auction.shared.models.BidTransaction tx : currentAuction.getBidHistory()) {
+                if (tx.bidder() != null) {
+                    tx.bidder().setFullName(AUTH_SERVICE.getFullName(tx.bidder().getUsername()));
+                }
+            }
+            if (currentAuction.getHighestBidder() != null) {
+                currentAuction.getHighestBidder().setFullName(AUTH_SERVICE.getFullName(currentAuction.getHighestBidder().getUsername()));
+            }
+        }
+
         sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction));
     }
 

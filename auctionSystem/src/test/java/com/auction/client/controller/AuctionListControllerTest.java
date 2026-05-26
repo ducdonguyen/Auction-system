@@ -36,6 +36,10 @@ public class AuctionListControllerTest {
     private TableColumn<AuctionRow, String> idColumn;
     private TableColumn<AuctionRow, String> itemColumn;
     private TableColumn<AuctionRow, String> sellerColumn;
+
+    // ĐÃ THÊM: Khai báo cột giả lập Người dẫn đầu
+    private TableColumn<AuctionRow, String> highestBidderColumn;
+
     private TableColumn<AuctionRow, String> priceColumn;
     private TableColumn<AuctionRow, String> stepColumn;
     private TableColumn<AuctionRow, String> statusColumn;
@@ -65,6 +69,10 @@ public class AuctionListControllerTest {
         idColumn = new TableColumn<>();
         itemColumn = new TableColumn<>();
         sellerColumn = new TableColumn<>();
+
+        // ĐÃ THÊM: Khởi tạo cột Người dẫn đầu
+        highestBidderColumn = new TableColumn<>();
+
         priceColumn = new TableColumn<>();
         stepColumn = new TableColumn<>();
         statusColumn = new TableColumn<>();
@@ -78,6 +86,10 @@ public class AuctionListControllerTest {
         injectField("idColumn", idColumn);
         injectField("itemColumn", itemColumn);
         injectField("sellerColumn", sellerColumn);
+
+        // ĐÃ THÊM: Bơm (inject) cột Người dẫn đầu vào controller
+        injectField("highestBidderColumn", highestBidderColumn);
+
         injectField("priceColumn", priceColumn);
         injectField("stepColumn", stepColumn);
         injectField("statusColumn", statusColumn);
@@ -105,14 +117,12 @@ public class AuctionListControllerTest {
 
     @Test
     public void testReload() throws Exception {
-        AuctionRow row = new AuctionRow("AUC001", "Item", "Seller", "1,000", "100", "OPEN", "Desc", "None");
+        // ĐÃ CẬP NHẬT: Tham số mảng AuctionRow theo đúng thứ tự mới (Tách riêng TopBidder)
+        AuctionRow row = new AuctionRow("AUC001", "Item", "Seller", "TopBidder", "1,000", "100", "OPEN", "Desc");
         when(service.filterAuctions(anyString(), anyString())).thenReturn(List.of(row));
         searchField.setText("test");
         statusFilter.setValue("OPEN");
 
-        // We need to inject the 'data' field because reload() modifies it directly
-        // and initialize() might have been called already or not.
-        // AuctionListController has: private final ObservableList<AuctionRow> data = FXCollections.observableArrayList();
         Field dataField = AuctionListController.class.getDeclaredField("data");
         dataField.setAccessible(true);
         javafx.collections.ObservableList<AuctionRow> data = (javafx.collections.ObservableList<AuctionRow>) dataField.get(controller);

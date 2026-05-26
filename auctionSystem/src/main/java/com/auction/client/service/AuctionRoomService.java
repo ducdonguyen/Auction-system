@@ -92,8 +92,13 @@ public class AuctionRoomService {
   private AuctionRoomViewModel convert(Auction auction) {
     // Chuyển đổi và định dạng danh sách lịch sử đặt giá từ DB
     java.util.List<String> history = new java.util.ArrayList<>(auction.getBidHistory().stream()
-            .map(tx -> tx.bidder().getUsername() + " đặt " + cf.format(tx.bidAmount())
-                    + " lúc " + df.format(tx.timestamp()))
+            .map(tx -> {
+              String displayName = tx.bidder().getFullName();
+              if (displayName == null || displayName.trim().isEmpty()) {
+                displayName = tx.bidder().getUsername(); // Fallback nếu chưa có tên thật
+              }
+              return displayName + " đặt " + cf.format(tx.bidAmount()) + " lúc " + df.format(tx.timestamp());
+            })
             .toList());
 
     // ĐẢO NGƯỢC DANH SÁCH: Đưa các giao dịch mới nhất lên vị trí đầu tiên (Index 0)
