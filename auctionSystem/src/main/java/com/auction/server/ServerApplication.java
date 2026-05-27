@@ -2,11 +2,11 @@ package com.auction.server;
 
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.concurrency.ClientHandler;
-import com.auction.server.concurrency.RequestRouter; // 1. IMPORT MỚI
+import com.auction.server.concurrency.RequestRouter;
 import com.auction.server.core.AuctionScheduler;
 import com.auction.server.core.AuctionService;
 import com.auction.server.repository.AuctionRepository;
-import com.auction.server.service.AuthService; // 1. IMPORT MỚI
+import com.auction.server.service.AuthService;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -39,9 +39,10 @@ public class ServerApplication {
     logger.info("=== SERVER ĐẤU GIÁ ĐANG KHỞI ĐỘNG ===");
 
     try {
-      logger.info("Đang kiểm tra cấu trúc cơ sở dữ liệu (MySQL)...");
+      // Thay đổi dòng thông báo rõ ràng sang môi trường Cloud mạng WAN
+      logger.info("Đang kết nối và kiểm tra cấu trúc cơ sở dữ liệu trên Cloud (Aiven MySQL)...");
       com.auction.server.config.DatabaseConfig.initializeDatabase();
-      logger.info("Khởi tạo Database thành công!");
+      logger.info("Khởi tạo và đồng bộ Database trên Aiven Cloud thành công!");
 
       // 1. KHỞI TẠO CÁC THÀNH PHẦN DÙNG CHUNG (Dựa trên SOLID)
       AuctionRepository auctionRepository = new AuctionRepository();
@@ -109,7 +110,7 @@ public class ServerApplication {
       }
 
     } catch (Exception e) {
-      logger.error("Lỗi khi khởi động Server: ", e);
+      logger.error("Không thể khởi động Server (Hãy kiểm tra trạng thái RUNNING trên Aiven hoặc thông tin mật khẩu): ", e);
     }
   }
 }
