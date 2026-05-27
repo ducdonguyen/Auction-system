@@ -1,28 +1,27 @@
 package com.auction.server.config;
 
 import java.sql.*;
-
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Cấu hình cơ sở dữ liệu cho hệ thống đấu giá.
+ * Cấu hình cơ sở dữ liệu cho hệ thống đấu giá kết nối qua Aiven Cloud.
  */
 public final class DatabaseConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
 
-    private static final String BASE_URL = "jdbc:mysql://localhost:3306"
-            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/auction_system"
-            + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+    // Cập nhật URL kết nối tới Aiven. Bắt buộc giữ tham số ssl-mode=REQUIRED ở cuối.
+    private static final String DB_URL = "jdbc:mysql://auction-system-ducdo252322-9887.c.aivencloud.com:22336/defaultdb"
+            + "?ssl-mode=REQUIRED&serverTimezone=UTC&allowPublicKeyRetrieval=true";
 
-    // BẢO MẬT: Ưu tiên đọc từ Biến môi trường (Environment Variables), nếu không có mới dùng mặc định
+    // BẢO MẬT: Ưu tiên lấy từ biến môi trường hệ thống, nếu không có sẽ lấy mặc định của Aiven
     private static final String USERNAME = System.getenv("DB_USER") != null
-            ? System.getenv("DB_USER") : "root";
+            ? System.getenv("DB_USER") : "avnadmin"; // User mặc định của Aiven là avnadmin
+
     private static final String PASSWORD = System.getenv("DB_PASSWORD") != null
-            ? System.getenv("DB_PASSWORD") : "123456";
+            ? System.getenv("DB_PASSWORD") : "AVNS_6mwRR35RDHdCxUz0YT-"; // <-- THAY MẬT KHẨU CỦA BẠN VÀO ĐÂY
 
     // ĐA LUỒNG: Từ khóa volatile đảm bảo các luồng luôn đọc được giá trị mới nhất từ Main Memory
     private static volatile boolean initialized = false;
@@ -53,13 +52,11 @@ public final class DatabaseConfig {
     }
 
     /**
-     * Khởi tạo cấu trúc cơ sở dữ liệu và dữ liệu mặc định.
+     * Khởi tạo cấu trúc cơ sở dữ liệu và dữ liệu mặc định trực tiếp trên defaultdb của Aiven.
      */
     public static void initializeDatabase() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(BASE_URL, USERNAME, PASSWORD);
-             Statement statement = connection.createStatement()) {
-            statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
-        }
+        // BỎ HOÀN TOÀN khối try-catch thực thi "CREATE DATABASE IF NOT EXISTS" cũ
+        // vì tài khoản trên Cloud không được phép tạo database mới tự do.
 
         String sqlCreateUsersTable = """
         CREATE TABLE IF NOT EXISTS users (
@@ -69,7 +66,7 @@ public final class DatabaseConfig {
             email VARCHAR(100) NOT NULL UNIQUE,
             password_hash VARCHAR(255) NOT NULL,
             account_role VARCHAR(20) DEFAULT 'USER',
-            balance DOUBLE DEFAULT 0.0, -- Cột mới thêm để quản lý số dư nạp tiền
+            balance DOUBLE DEFAULT 0.0, 
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """;
@@ -109,18 +106,10 @@ public final class DatabaseConfig {
                    VALUES ('nguyen_admin', 'admin', ?, 'admin@gmail.com', 'ADMIN')
             """;
 
+        // Kết nối thẳng tới DB_URL (tức là defaultdb) để khởi tạo bảng dữ liệu
         try (Connection connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD)) {
             try (Statement statement = connection.createStatement()) {
                 statement.execute(sqlCreateUsersTable);
-
-                // Ép thêm cột balance nếu bảng đã tồn tại từ trước mà chưa có cột này
-                try {
-                    statement.execute("ALTER TABLE users ADD COLUMN balance DOUBLE DEFAULT 0.0");
-                    logger.info("[DB] Đã cập nhật: Thêm cột 'balance' vào bảng users hiện tại.");
-                } catch (SQLException e) {
-                    // Nếu cột đã tồn tại, MySQL sẽ ném lỗi. Ta cứ bỏ qua an toàn.
-                }
-
                 statement.execute(sqlCreateAuctionsTable);
                 statement.execute(sqlCreateBidTransactionsTable);
             }
@@ -131,6 +120,6 @@ public final class DatabaseConfig {
                 ps.executeUpdate();
             }
         }
-        logger.info("[DB] Đã đảm bảo bảng 'users', 'auctions' và 'bid_transactions' tồn tại.");
+        logger.info("[DB] Đã kết nối Cloud thành công. Đảm bảo cấu trúc bảng 'users', 'auctions' và 'bid_transactions' sẵn sàng.");
     }
 }
