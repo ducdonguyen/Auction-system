@@ -1,83 +1,54 @@
 package com.auction.client.util;
 
-import java.io.IOException;
-import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-/**
- * Tiện ích hỗ trợ chuyển đổi giữa các màn hình trong ứng dụng JavaFX.
- */
+import java.io.IOException;
+import java.util.function.Consumer;
+
 public final class SceneNavigator {
-  private SceneNavigator() {
-    throw new UnsupportedOperationException("Không thể khởi tạo trực tiếp Scene Navigator");
-  }
 
-  /**
-   * Chuyển đổi sang một màn hình mới.
-   *
-   * @param sourceNode Node hiện tại.
-   * @param fxmlPath   Đường dẫn đến file FXML.
-   * @param title      Tiêu đề cửa sổ.
-   * @param w          Chiều rộng.
-   * @param h          Chiều cao.
-   * @param init       Hành động khởi tạo controller.
-   * @param <T>        Kiểu của controller.
-   * @throws IOException Nếu không thể tải file FXML.
-   */
-  public static <T> void switchScene(Node sourceNode, String fxmlPath, String title,
-                                     double w, double h,
-                                     Consumer<T> init) throws IOException {
+    private static final String SUCCESS_STYLE = "-fx-text-fill: green;";
+    private static final String ERROR_STYLE = "-fx-text-fill: red;";
 
-    String normalizedPath = "/" + fxmlPath.replaceAll("^/+", "");
-
-    java.net.URL fxmlResource = SceneNavigator.class.getResource(normalizedPath);
-
-    FXMLLoader loader = new FXMLLoader(fxmlResource);
-    AnchorPane view = loader.load();
-
-    if (init != null) {
-      init.accept(loader.getController());
+    private SceneNavigator() {
+        throw new UnsupportedOperationException("Utility class");
     }
 
-    Stage stage = (Stage) sourceNode.getScene().getWindow();
-    stage.setMaximized(false);
-    stage.setScene(new Scene(view, w, h));
-    stage.setTitle(title);
-    if (fxmlPath.contains("AuctionList") || fxmlPath.contains("AuctionRoom") ||
-            fxmlPath.contains("Admin") || fxmlPath.contains("Register")) {
-
-      stage.setMaximized(true);
-    } else {
-      // Các màn hình còn lại (như Login) thì giữ nguyên kích thước nhỏ gọn và căn giữa
-      stage.setWidth(w);
-      stage.setHeight(h);
-      Platform.runLater(() -> {
-        stage.centerOnScreen();
-      });
+    // --- PHẦN HỖ TRỢ HIỂN THỊ (Đã gộp từ ViewUtil vào) ---
+    public static void showMessage(Label label, String message, boolean success) {
+        label.setStyle(success ? SUCCESS_STYLE : ERROR_STYLE);
+        label.setText(message);
     }
 
-    Platform.runLater(() -> {
-      stage.centerOnScreen();
-    });
-  }
+    // --- PHẦN ĐIỀU HƯỚNG MÀN HÌNH (Dùng Enum Scene) ---
+    public static <T> void switchScene(Node sourceNode, com.auction.client.util.Scene scene, Consumer<T> init) throws IOException {
+        FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(scene.fxmlPath));
+        AnchorPane view = loader.load();
 
-  /**
-   * Chuyển đổi sang một màn hình mới (không có khởi tạo controller).
-   *
-   * @param sourceNode Node hiện tại.
-   * @param fxmlPath   Đường dẫn đến file FXML.
-   * @param title      Tiêu đề cửa sổ.
-   * @param w          Chiều rộng.
-   * @param h          Chiều cao.
-   * @throws IOException Nếu không thể tải file FXML.
-   */
-  public static void switchScene(Node sourceNode, String fxmlPath, String title, double w, double h)
-          throws IOException {
-    switchScene(sourceNode, fxmlPath, title, w, h, null);
-  }
+        if (init != null) {
+            init.accept(loader.getController());
+        }
+
+        Stage stage = (Stage) sourceNode.getScene().getWindow();
+        stage.setTitle(scene.title);
+        stage.setScene(new Scene(view, scene.width, scene.height));
+        stage.setMaximized(scene.isMaximized);
+
+        if (!scene.isMaximized) {
+            stage.setWidth(scene.width);
+            stage.setHeight(scene.height);
+            Platform.runLater(stage::centerOnScreen);
+        }
+    }
+
+    // Overload để dùng khi không cần init controller
+    public static void switchScene(Node sourceNode, com.auction.client.util.Scene scene) throws IOException {
+        switchScene(sourceNode, scene, null);
+    }
 }

@@ -12,42 +12,67 @@ import org.slf4j.LoggerFactory;
 public final class DatabaseConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
+
     private static final String BASE_URL = "jdbc:mysql://localhost:3306"
             + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/auction_system"
             + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "123456";
-    private static boolean initialized = false;
+
+    // BẢO MẬT: Ưu tiên đọc từ Biến môi trường (Environment Variables), nếu không có mới dùng mặc định
+    private static final String USERNAME = System.getenv("DB_USER") != null
+            ? System.getenv("DB_USER") : "root";
+    private static final String PASSWORD = System.getenv("DB_PASSWORD") != null
+            ? System.getenv("DB_PASSWORD") : "123456";
+
+    // ĐA LUỒNG: Từ khóa volatile đảm bảo các luồng luôn đọc được giá trị mới nhất từ Main Memory
+    private static volatile boolean initialized = false;
+
+    // Khóa Lock dành cho Double-check locking
+    private static final Object LOCK = new Object();
 
     private DatabaseConfig() {
+        // Ngăn chặn khởi tạo object từ bên ngoài
     }
 
+    /**
+     * Lấy kết nối đến Database an toàn trong môi trường đa luồng.
+     */
     public static Connection getConnection() throws SQLException {
+        // Kiểm tra lần 1 (Không khóa để tối ưu hiệu suất)
         if (!initialized) {
-            initializeDatabase();
-            initialized = true;
+            // Chỉ những luồng chạy vào đây lúc DB chưa khởi tạo mới phải xếp hàng (Lock)
+            synchronized (LOCK) {
+                // Kiểm tra lần 2 (Đảm bảo luồng vào sau không chạy lại hàm khởi tạo)
+                if (!initialized) {
+                    initializeDatabase();
+                    initialized = true;
+                }
+            }
         }
         return DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
     }
 
+    /**
+     * Khởi tạo cấu trúc cơ sở dữ liệu và dữ liệu mặc định.
+     */
     public static void initializeDatabase() throws SQLException {
         try (Connection connection = DriverManager.getConnection(BASE_URL, USERNAME, PASSWORD);
              Statement statement = connection.createStatement()) {
             statement.execute("CREATE DATABASE IF NOT EXISTS auction_system");
         }
+
         String sqlCreateUsersTable = """
-    CREATE TABLE IF NOT EXISTS users (
-        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        full_name VARCHAR(100) NOT NULL,
-        username VARCHAR(50) NOT NULL UNIQUE,
-        email VARCHAR(100) NOT NULL UNIQUE,
-        password_hash VARCHAR(255) NOT NULL,
-        account_role VARCHAR(20) DEFAULT 'USER',
-        balance DOUBLE DEFAULT 0.0, -- Cột mới thêm để quản lý số dư nạp tiền
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """;
+        CREATE TABLE IF NOT EXISTS users (
+            id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            full_name VARCHAR(100) NOT NULL,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL,
+            account_role VARCHAR(20) DEFAULT 'USER',
+            balance DOUBLE DEFAULT 0.0, -- Cột mới thêm để quản lý số dư nạp tiền
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """;
 
         String sqlCreateAuctionsTable = """
         CREATE TABLE IF NOT EXISTS auctions (

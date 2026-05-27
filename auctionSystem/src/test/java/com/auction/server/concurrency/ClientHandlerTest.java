@@ -22,7 +22,7 @@ public class ClientHandlerTest {
     private Socket socket;
 
     @Mock
-    private AuctionService auctionService;
+    private RequestRouter requestRouter;
 
     @Mock
     private ObjectOutputStream out;
@@ -32,7 +32,7 @@ public class ClientHandlerTest {
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        clientHandler = new ClientHandler(socket, auctionService);
+        clientHandler = new ClientHandler(socket, requestRouter);
         
         // Inject the mocked output stream using reflection since it's private and initialized in run()
         java.lang.reflect.Field outField = ClientHandler.class.getDeclaredField("out");

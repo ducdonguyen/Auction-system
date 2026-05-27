@@ -29,12 +29,23 @@ import org.slf4j.LoggerFactory;
  * Lớp định tuyến các yêu cầu từ Client đến các phương thức xử lý tương ứng.
  */
 public class RequestRouter {
-    private RequestRouter() {
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(RequestRouter.class);
-    // Sử dụng AuthService từ phiên bản 1 thay cho UserDao
-    private static final AuthService AUTH_SERVICE = new AuthService();
+
+    // Các dependency được tiêm qua constructor thay vì hard-code
+    private final AuthService authService;
+    private final AuctionService auctionService;
+
+    /**
+     * Khởi tạo RequestRouter với các dịch vụ cần thiết.
+     *
+     * @param authService    Dịch vụ xác thực.
+     * @param auctionService Dịch vụ đấu giá.
+     */
+    public RequestRouter(AuthService authService, AuctionService auctionService) {
+        this.authService = authService;
+        this.auctionService = auctionService;
+    }
 
     /**
      * Định tuyến yêu cầu.
@@ -42,21 +53,19 @@ public class RequestRouter {
      * @param request        Đối tượng yêu cầu.
      * @param handler        ClientHandler xử lý kết nối.
      * @param out            Luồng ghi phản hồi.
-     * @param auctionService Dịch vụ đấu giá.
      */
-    public static void route(Object request, ClientHandler handler, ObjectOutputStream out,
-                             AuctionService auctionService) {
+    public void route(Object request, ClientHandler handler, ObjectOutputStream out) {
         try {
             switch (request) {
                 case LoginRequest login -> handleLogin(login, handler, out);
-                case BidRequest bid -> handleBid(bid, out, auctionService);
-                case JoinRoomRequest join -> handleJoinRoom(join, handler, out, auctionService);
+                case BidRequest bid -> handleBid(bid, out);
+                case JoinRoomRequest join -> handleJoinRoom(join, handler, out);
                 case RegistrationRequest register -> handleRegister(register, out);
-                case GetAllAuctionsRequest getAll -> handleGetAllAuctions(out, auctionService);
-                case CancelAuctionRequest cancel -> handleCancelAuction(cancel, out, auctionService);
-                case CreateAuctionRequest createReq -> handleCreateAuction(createReq, handler, out, auctionService);
-                case GetPendingAuctionsRequest getPending -> handleGetPendingAuctions(out, auctionService);
-                case ApproveAuctionRequest approve -> handleApproveAuction(approve, out, auctionService);
+                case GetAllAuctionsRequest getAll -> handleGetAllAuctions(out);
+                case CancelAuctionRequest cancel -> handleCancelAuction(cancel, out);
+                case CreateAuctionRequest createReq -> handleCreateAuction(createReq, handler, out);
+                case GetPendingAuctionsRequest getPending -> handleGetPendingAuctions(out);
+                case ApproveAuctionRequest approve -> handleApproveAuction(approve, out);
 
                 // NHÁNH MỚI: Bắt gói tin yêu cầu nạp tiền real-time
                 case TopUpRequest topUpReq -> handleTopUp(topUpReq, out);
@@ -68,9 +77,9 @@ public class RequestRouter {
         }
     }
 
-    private static void handleLogin(LoginRequest request, ClientHandler handler, ObjectOutputStream out)
+    private void handleLogin(LoginRequest request, ClientHandler handler, ObjectOutputStream out)
             throws IOException {
-        ServiceResult<AuthUser> result = AUTH_SERVICE.login(request);
+        ServiceResult<AuthUser> result = authService.login(request);
 
         if (result.success()) {
             // Ghi danh user vào hệ thống để có thể nhận tin nhắn hoàn tiền
@@ -83,14 +92,14 @@ public class RequestRouter {
         sendResponse(out, result);
     }
 
-    private static void handleRegister(RegistrationRequest request, ObjectOutputStream out)
+    private void handleRegister(RegistrationRequest request, ObjectOutputStream out)
             throws IOException {
-        ServiceResult<AuthUser> result = AUTH_SERVICE.register(request);
+        ServiceResult<AuthUser> result = authService.register(request);
         sendResponse(out, result);
     }
 
-    private static void handleJoinRoom(JoinRoomRequest request, ClientHandler handler,
-                                       ObjectOutputStream out, AuctionService auctionService)
+    private void handleJoinRoom(JoinRoomRequest request, ClientHandler handler,
+                                       ObjectOutputStream out)
             throws IOException {
         String auctionId = request.getAuctionId();
         String oldAuctionId = handler.getCurrentWatchingAuctionId();
@@ -104,19 +113,18 @@ public class RequestRouter {
         if (currentAuction != null && currentAuction.getBidHistory() != null) {
             for (com.auction.shared.models.BidTransaction tx : currentAuction.getBidHistory()) {
                 if (tx.bidder() != null) {
-                    tx.bidder().setFullName(AUTH_SERVICE.getFullName(tx.bidder().getUsername()));
+                    tx.bidder().setFullName(authService.getFullName(tx.bidder().getUsername()));
                 }
             }
             if (currentAuction.getHighestBidder() != null) {
-                currentAuction.getHighestBidder().setFullName(AUTH_SERVICE.getFullName(currentAuction.getHighestBidder().getUsername()));
+                currentAuction.getHighestBidder().setFullName(authService.getFullName(currentAuction.getHighestBidder().getUsername()));
             }
         }
 
         sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction));
     }
 
-    private static void handleBid(BidRequest request, ObjectOutputStream out,
-                                  AuctionService auctionService)
+    private void handleBid(BidRequest request, ObjectOutputStream out)
             throws IOException {
         ServiceResult<Void> result;
         try {
@@ -136,13 +144,12 @@ public class RequestRouter {
         sendResponse(out, result);
     }
 
-    private static void handleGetAllAuctions(ObjectOutputStream out, AuctionService auctionService) throws IOException {
+    private void handleGetAllAuctions(ObjectOutputStream out) throws IOException {
         java.util.List<Auction> allAuctions = auctionService.getAllAuctions();
         sendResponse(out, new ServiceResult<>(true, "Lấy danh sách thành công", allAuctions));
     }
 
-    private static void handleCancelAuction(CancelAuctionRequest request, ObjectOutputStream out,
-                                            AuctionService auctionService) throws IOException {
+    private void handleCancelAuction(CancelAuctionRequest request, ObjectOutputStream out) throws IOException {
         ServiceResult<Void> result;
         try {
             auctionService.cancelAuction(request.auctionId());
@@ -156,8 +163,8 @@ public class RequestRouter {
     /**
      * Xử lý yêu cầu tạo phiên đấu giá từ Client đưa xuống Service.
      */
-    private static void handleCreateAuction(CreateAuctionRequest request, ClientHandler handler,
-                                            ObjectOutputStream out, AuctionService auctionService) throws IOException {
+    private void handleCreateAuction(CreateAuctionRequest request, ClientHandler handler,
+                                            ObjectOutputStream out) throws IOException {
         ServiceResult<Void> result;
         try {
             String sellerUsername = request.getSellerUsername();
@@ -197,7 +204,7 @@ public class RequestRouter {
     /**
      * Xử lý yêu cầu lấy danh sách phiên đấu giá chờ duyệt (Dành cho Admin)
      */
-    private static void handleGetPendingAuctions(ObjectOutputStream out, AuctionService auctionService) throws IOException {
+    private void handleGetPendingAuctions(ObjectOutputStream out) throws IOException {
         try {
             java.util.List<Auction> pendingList = auctionService.getPendingAuctions();
             sendResponse(out, new ServiceResult<>(true, "Lấy danh sách chờ duyệt thành công", pendingList));
@@ -209,8 +216,7 @@ public class RequestRouter {
     /**
      * Xử lý yêu cầu phê duyệt phiên đấu giá (Dành cho Admin)
      */
-    private static void handleApproveAuction(ApproveAuctionRequest req, ObjectOutputStream out,
-                                             AuctionService auctionService) throws IOException {
+    private void handleApproveAuction(ApproveAuctionRequest req, ObjectOutputStream out) throws IOException {
         try {
             Auction auction = auctionService.getAuctionById(req.getAuctionId());
             if (auction == null) {
@@ -233,11 +239,11 @@ public class RequestRouter {
     /**
      * HÀM MỚI THÊM VÀO: Tiếp nhận và điều hướng xử lý cộng tiền từ TopUpRequest
      */
-    private static void handleTopUp(TopUpRequest request, ObjectOutputStream out) throws IOException {
+    private void handleTopUp(TopUpRequest request, ObjectOutputStream out) throws IOException {
         TopUpResponse response;
         try {
             // Thực hiện nghiệp vụ nạp tiền thông qua AuthService của bạn
-            double newBalance = AUTH_SERVICE.topUpBalance(request.getUserId(), request.getAmount());
+            double newBalance = authService.topUpBalance(request.getUserId(), request.getAmount());
 
             // Khởi tạo gói tin phản hồi thành công gửi lại Client
             response = new TopUpResponse(true, String.format("Đã cộng %,.0f đ vào tài khoản.", request.getAmount()), newBalance);
@@ -249,7 +255,7 @@ public class RequestRouter {
         sendResponse(out, response);
     }
 
-    private static void sendResponse(ObjectOutputStream out, Object response) throws IOException {
+    private void sendResponse(ObjectOutputStream out, Object response) throws IOException {
         out.writeObject(response);
         out.flush();
     }

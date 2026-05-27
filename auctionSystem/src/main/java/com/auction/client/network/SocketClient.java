@@ -10,6 +10,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
@@ -145,13 +147,33 @@ public class SocketClient {
   }
 
   /**
-   * Nhận phản hồi từ Server.
+   * Nhận phản hồi từ Server với thời gian chờ tùy chỉnh.
+   *
+   * @param timeoutSeconds Thời gian chờ tối đa (tính bằng giây).
+   * @return Đối tượng phản hồi.
+   * @throws InterruptedException Nếu luồng bị gián đoạn trong lúc chờ.
+   * @throws TimeoutException Nếu server không phản hồi sau khoảng thời gian quy định.
+   */
+  public Object receiveResponse(long timeoutSeconds) throws InterruptedException, TimeoutException {
+    // Sử dụng poll thay vì take để có thể set timeout
+    Object response = responseQueue.poll(timeoutSeconds, TimeUnit.SECONDS);
+
+    // Nếu hết thời gian mà vẫn chưa có dữ liệu (response == null)
+    if (response == null) {
+      throw new TimeoutException("Server không phản hồi trong vòng " + timeoutSeconds + " giây.");
+    }
+    return response;
+  }
+
+  /**
+   * Nhận phản hồi từ Server với thời gian chờ mặc định.
    *
    * @return Đối tượng phản hồi.
    * @throws InterruptedException Nếu luồng bị gián đoạn.
+   * @throws TimeoutException Nếu server không phản hồi sau 10 giây.
    */
-  public Object receiveResponse() throws InterruptedException {
-    return responseQueue.take();
+  public Object receiveResponse() throws InterruptedException, TimeoutException {
+    return receiveResponse(10); // Mặc định chờ 10 giây
   }
 
   /**
