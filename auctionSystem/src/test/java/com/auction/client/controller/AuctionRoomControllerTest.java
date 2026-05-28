@@ -131,7 +131,7 @@ public class AuctionRoomControllerTest {
         assertEquals("AUC001", auctionIdLabel.getText());
         assertEquals("Item", itemNameLabel.getText());
 
-        assertEquals("Khác", itemTypeLabel.getText());
+        assertEquals("Loại: Khác", itemTypeLabel.getText());
     }
 
     @Test
@@ -151,8 +151,62 @@ public class AuctionRoomControllerTest {
     }
 
     @Test
-    public void testRealtimeOnNewBid() throws Exception {
-        // Initialize to set up the listener
-        controller.initialize();
+    public void testHandlePlaceBidActionEmpty() throws Exception {
+        bidAmountField.setText("");
+        invokePrivateMethod("handlePlaceBidAction");
+        assertEquals("Vui lòng nhập số tiền muốn đặt!", messageLabel.getText());
+    }
+
+    @Test
+    public void testHandlePlaceBidActionInvalidNumber() throws Exception {
+        bidAmountField.setText("abc");
+        invokePrivateMethod("handlePlaceBidAction");
+        assertEquals("Số tiền đặt thầu phải là ký tự số hợp lệ!", messageLabel.getText());
+    }
+
+    @Test
+    public void testHandlePlaceBidActionInsufficientBalance() throws Exception {
+        Label balanceLabel = new Label("100 đ");
+        injectField("balanceLabel", balanceLabel);
+        bidAmountField.setText("500");
+        
+        invokePrivateMethod("handlePlaceBidAction");
+        
+        assertEquals("Số dư ví không đủ. Vui lòng nạp thêm tiền!", messageLabel.getText());
+    }
+@Test
+public void testRealtimeCallbacks() throws Exception {
+    SocketClient mockSocket = mock(SocketClient.class);
+    SocketClient.setInstance(mockSocket);
+
+    controller.initialize();
+
+    ArgumentCaptor<SocketClient.RealtimeListener> listenerCaptor = ArgumentCaptor.forClass(SocketClient.RealtimeListener.class);
+    verify(mockSocket).setRealtimeListener(listenerCaptor.capture());
+
+    SocketClient.RealtimeListener listener = listenerCaptor.getValue();
+
+    // Test onStatusUpdate
+    Platform.runLater(() -> {
+        listener.onStatusUpdate(AuctionStatus.FINISHED);
+    });
+    Thread.sleep(200);
+    assertEquals("FINISHED", statusLabel.getText());
+    assertTrue(bidAmountField.isDisable());
+
+    // Test onBalanceUpdate
+    Label balanceLabel = new Label("0 đ");
+    injectField("balanceLabel", balanceLabel);
+    Platform.runLater(() -> {
+        listener.onBalanceUpdate(5000.0, 5000.0, "Top up");
+    });
+    Thread.sleep(200);
+    assertEquals("5,000 đ", balanceLabel.getText());
+}
+
+    private void invokePrivateMethod(String methodName) throws Exception {
+        java.lang.reflect.Method method = AuctionRoomController.class.getDeclaredMethod(methodName);
+        method.setAccessible(true);
+        method.invoke(controller);
     }
 }

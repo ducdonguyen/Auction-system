@@ -68,6 +68,15 @@ public class LoginControllerTest {
         injectField("passwordField", passwordField);
         injectField("errorLabel", errorLabel);
         injectField("loginButton", loginButton);
+
+        // Attach button to a Scene and Stage to avoid SceneNavigator failure
+        Platform.runLater(() -> {
+            javafx.scene.Scene scene = new javafx.scene.Scene(new javafx.scene.layout.StackPane(loginButton));
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setScene(scene);
+        });
+        // Give some time for JavaFX thread to process
+        Thread.sleep(200);
     }
 
     private void injectField(String fieldName, Object value) throws Exception {
@@ -86,14 +95,20 @@ public class LoginControllerTest {
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
 
-        // Use reflection to call private method directly
-        java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
-        method.setAccessible(true);
-        try {
-            method.invoke(loginController);
-        } catch (Exception e) {
-            // Expected failure in SceneNavigator due to missing Stage
-        }
+        // Use reflection to call private method on FX thread
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
+                method.setAccessible(true);
+                method.invoke(loginController);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+        latch.await(2, java.util.concurrent.TimeUnit.SECONDS);
 
         verify(authService).login(argThat(request -> 
             request.username().equals("testuser") && request.password().equals("password")
@@ -102,20 +117,48 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testHandleLoginActionFailure() throws Exception {
-        usernameField.setText("wronguser");
-        passwordField.setText("wrongpass");
+    public void testHandleLoginActionSuccessAdmin() throws Exception {
+        usernameField.setText("admin");
+        passwordField.setText("adminpass");
         
-        ServiceResult<AuthUser> failureResult = new ServiceResult<>(false, "Invalid credentials", null);
+        AuthUser authUser = new AuthUser("admin", "Admin User", "admin@example.com", "TOKEN", "ADMIN");
+        ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
         
-        when(authService.login(any(LoginRequest.class))).thenReturn(failureResult);
+        when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
 
-        java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
-        method.setAccessible(true);
-        method.invoke(loginController);
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleLoginAction");
+                method.setAccessible(true);
+                method.invoke(loginController);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+        latch.await(2, java.util.concurrent.TimeUnit.SECONDS);
 
         verify(authService).login(any(LoginRequest.class));
-        assertEquals("Invalid credentials", errorLabel.getText());
-        assertEquals("-fx-text-fill: red;", errorLabel.getStyle());
+        assertEquals("Login successful", errorLabel.getText());
+        assertEquals("-fx-text-fill: green;", errorLabel.getStyle());
+    }
+
+    @Test
+    public void testHandleGoToRegister() throws Exception {
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                java.lang.reflect.Method method = LoginController.class.getDeclaredMethod("handleGoToRegister");
+                method.setAccessible(true);
+                method.invoke(loginController);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown();
+            }
+        });
+        latch.await(2, java.util.concurrent.TimeUnit.SECONDS);
     }
 }

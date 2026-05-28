@@ -5,6 +5,7 @@ import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.RegistrationRequest;
 import com.auction.shared.network.ServiceResult;
 import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -148,6 +149,27 @@ public class RegisterControllerTest {
         assertEquals("Username already exists", messageLabel.getText());
         // Verify fields are NOT cleared
         assertEquals("Full Name", fullNameField.getText());
+    }
+
+    @Test
+    public void testHandleBackToLogin() throws Exception {
+        Button backToLoginButton = new Button();
+        injectField("backToLoginButton", backToLoginButton);
+        
+        Platform.runLater(() -> {
+            javafx.scene.Scene scene = new javafx.scene.Scene(new javafx.scene.layout.StackPane(backToLoginButton));
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setScene(scene);
+            
+            try {
+                java.lang.reflect.Method method = RegisterController.class.getDeclaredMethod("handleBackToLogin");
+                method.setAccessible(true);
+                method.invoke(registerController);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        Thread.sleep(200);
     }
 
     private void invokeHandleRegisterAction() throws Exception {

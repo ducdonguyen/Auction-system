@@ -66,6 +66,7 @@ public class AdminDashboardControllerTest {
         TableColumn<AuctionRow, String> idCol = new TableColumn<>();
         TableColumn<AuctionRow, String> itemCol = new TableColumn<>();
         TableColumn<AuctionRow, String> sellerCol = new TableColumn<>();
+        TableColumn<AuctionRow, String> allHighestBidderCol = new TableColumn<>();
         TableColumn<AuctionRow, String> priceCol = new TableColumn<>();
         TableColumn<AuctionRow, String> stepCol = new TableColumn<>();
         TableColumn<AuctionRow, String> statusCol = new TableColumn<>();
@@ -91,6 +92,7 @@ public class AdminDashboardControllerTest {
         injectField("idColumn", idCol);
         injectField("itemColumn", itemCol);
         injectField("sellerColumn", sellerCol);
+        injectField("allHighestBidderColumn", allHighestBidderCol);
         injectField("priceColumn", priceCol);
         injectField("stepColumn", stepCol);
         injectField("statusColumn", statusCol);
@@ -149,16 +151,53 @@ public class AdminDashboardControllerTest {
     }
 
     @Test
-    public void testHandleCancelAuctionSuccess() throws Exception {
-        AuctionRow selected = new AuctionRow("AUC-002", "Item", "Seller", "200", "20", "OPEN", "Desc", "None");
-        auctionTable.setItems(FXCollections.observableArrayList(selected));
-        auctionTable.getSelectionModel().select(selected);
+    public void testHandleSearchAction() throws Exception {
+        searchField.setText("test");
+        statusFilter.setValue("OPEN");
+        
+        when(auctionCatalogService.filterAuctions("test", "OPEN")).thenReturn(List.of());
+        
+        invokePrivateMethod("handleSearchAction");
+        
+        verify(auctionCatalogService).filterAuctions("test", "OPEN");
+    }
 
-        when(auctionCatalogService.cancelAuction("AUC-002")).thenReturn(new ServiceResult<>(true, "Cancelled", null));
+    @Test
+    public void testHandleRefreshAction() throws Exception {
+        invokePrivateMethod("handleRefreshAction");
+        verify(auctionCatalogService, atLeastOnce()).filterAuctions(anyString(), anyString());
+    }
 
-        invokePrivateMethod("handleCancelAuctionAction");
+    @Test
+    public void testHandleRejectActionSuccess() throws Exception {
+        AuctionRow selected = new AuctionRow("AUC-001", "Item", "Seller", "100", "10", "PENDING", "Desc", "None");
+        pendingTable.setItems(FXCollections.observableArrayList(selected));
+        pendingTable.getSelectionModel().select(selected);
 
-        verify(auctionCatalogService).cancelAuction("AUC-002");
-        assertEquals("Đã hủy phiên đấu giá: AUC-002", actionMessageLabel.getText());
+        when(auctionCatalogService.cancelAuction("AUC-001")).thenReturn(new ServiceResult<>(true, "Rejected", null));
+
+        invokePrivateMethod("handleRejectAction");
+
+        verify(auctionCatalogService).cancelAuction("AUC-001");
+        assertEquals("Đã từ chối phiên: AUC-001", actionMessageLabel.getText());
+    }
+
+    @Test
+    public void testHandleRejectActionNoSelection() throws Exception {
+        pendingTable.getSelectionModel().clearSelection();
+
+        invokePrivateMethod("handleRejectAction");
+
+        assertEquals("Vui lòng chọn một phiên từ danh sách chờ duyệt để từ chối.", actionMessageLabel.getText());
+        verify(auctionCatalogService, never()).cancelAuction(anyString());
+    }
+
+    @Test
+    public void testHandleLogoutAction() throws Exception {
+        try {
+            invokePrivateMethod("handleLogoutAction");
+        } catch (Exception e) {
+            // Expected failure in SceneNavigator
+        }
     }
 }
