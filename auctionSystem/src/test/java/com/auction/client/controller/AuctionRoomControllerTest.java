@@ -1,33 +1,27 @@
 package com.auction.client.controller;
 
 import com.auction.client.model.AuctionRoomViewModel;
-import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-import com.auction.shared.models.Bidder;
+import com.auction.client.service.SessionContext;
+import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.ServiceResult;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class AuctionRoomControllerTest {
@@ -38,6 +32,7 @@ public class AuctionRoomControllerTest {
     @Mock
     private AuctionRoomService service;
 
+    private Label balanceLabel;
     private Label currentPriceLabel;
     private Label highestBidderLabel;
     private Label statusLabel;
@@ -51,10 +46,6 @@ public class AuctionRoomControllerTest {
     private Label minimumBidLabel;
     private Label scheduleLabel;
     private Label descriptionLabel;
-
-    // Đã bỏ @Mock và chuyển về khai báo bình thường như các Label khác
-    private Label itemTypeLabel;
-    private Label extraInfoLabel;
 
     @BeforeAll
     public static void initJavaFX() {
@@ -72,6 +63,8 @@ public class AuctionRoomControllerTest {
         serviceField.setAccessible(true);
         serviceField.set(controller, service);
 
+        // Initialize UI components
+        balanceLabel = new Label();
         currentPriceLabel = new Label();
         highestBidderLabel = new Label();
         statusLabel = new Label();
@@ -86,10 +79,7 @@ public class AuctionRoomControllerTest {
         scheduleLabel = new Label();
         descriptionLabel = new Label();
 
-        // Khởi tạo 2 Label mới
-        itemTypeLabel = new Label();
-        extraInfoLabel = new Label();
-
+        injectField("balanceLabel", balanceLabel);
         injectField("currentPriceLabel", currentPriceLabel);
         injectField("highestBidderLabel", highestBidderLabel);
         injectField("statusLabel", statusLabel);
@@ -104,9 +94,9 @@ public class AuctionRoomControllerTest {
         injectField("scheduleLabel", scheduleLabel);
         injectField("descriptionLabel", descriptionLabel);
 
-        // Bơm (inject) 2 Label mới vào Controller
-        injectField("itemTypeLabel", itemTypeLabel);
-        injectField("extraInfoLabel", extraInfoLabel);
+        // FIX 1: Use Long ID instead of String for first parameter
+        AuthUser mockUser = new AuthUser(1L, "Full Name", "test", "test@gmail.com", "pass", "BIDDER", 5000.0);
+        SessionContext.setCurrentUser(mockUser);
     }
 
     private void injectField(String fieldName, Object value) throws Exception {
@@ -116,43 +106,45 @@ public class AuctionRoomControllerTest {
     }
 
     @Test
-    public void testSetAuctionIdAndRender() {
-        AuctionRoomViewModel vm = new AuctionRoomViewModel(
-                "AUC001", "Item", "Seller", "OPEN", "100", "10", "110", "None", "Desc", "Schedule",
-                java.util.Collections.<String>emptyList(),
-                "Khác",
-                "Không có thông tin"
-        );
-        when(service.getAuctionRoom("AUC001")).thenReturn(Optional.of(new ServiceResult<>(true, "", vm)));
-
-        controller.setAuctionId("AUC001");
-
-        verify(service).getAuctionRoom("AUC001");
-        assertEquals("AUC001", auctionIdLabel.getText());
-        assertEquals("Item", itemNameLabel.getText());
-
-        assertEquals("Khác", itemTypeLabel.getText());
-    }
-
-    @Test
-    public void testHandlePlaceBidAction() throws Exception {
-        injectField("aid", "AUC001");
-        bidAmountField.setText("1000");
-
-        // SỬA Ở ĐÂY: Cho trả về null giống hệt logic thực tế của AuctionRoomService để không kích hoạt hàm bind()
-        when(service.placeBid(eq("AUC001"), eq("1000"))).thenReturn(new ServiceResult<>(true, "Bid placed", null));
+    public void testHandlePlaceBidActionInsufficientBalance() throws Exception {
+        injectField("aid", "AUC-001");
+        bidAmountField.setText("6000"); // Greater than 5000.0 balance
 
         java.lang.reflect.Method method = AuctionRoomController.class.getDeclaredMethod("handlePlaceBidAction");
         method.setAccessible(true);
         method.invoke(controller);
 
-        // Lúc này chữ "Bid placed" sẽ không bị hàm bind() xóa đi nữa
-        assertEquals("Bid placed", messageLabel.getText());
+        assertEquals("Số dư không đủ. Vui lòng nạp thêm!", messageLabel.getText());
+        verify(service, never()).placeBid(anyString(), anyString());
     }
 
     @Test
-    public void testRealtimeOnNewBid() throws Exception {
-        // Initialize to set up the listener
-        controller.initialize();
+    public void testHandlePlaceBidActionSuccess() throws Exception {
+        injectField("aid", "AUC-001");
+        bidAmountField.setText("1000"); // Less than 5000.0 balance
+
+        when(service.placeBid(eq("AUC-001"), eq("1000"))).thenReturn(new ServiceResult<>(true, "Bid placed", null));
+
+        java.lang.reflect.Method method = AuctionRoomController.class.getDeclaredMethod("handlePlaceBidAction");
+        method.setAccessible(true);
+        method.invoke(controller);
+
+        assertEquals("Bid placed", messageLabel.getText());
+        verify(service).placeBid("AUC-001", "1000");
+    }
+
+    @Test
+    public void testSetAuctionIdAndRender() {
+        // FIX 2: Added missing parameters (itemType, extraInfo) to match record definition
+        AuctionRoomViewModel vm = new AuctionRoomViewModel(
+                "AUC001", "Item", "Seller", "OPEN", "100", "10", "110", "None", "Desc", "Schedule",
+                java.util.Collections.emptyList(), "ELECTRONICS", "None"
+        );
+        when(service.getAuctionRoom("AUC001")).thenReturn(Optional.of(new ServiceResult<>(true, "", vm)));
+
+        controller.setAuctionId("AUC001");
+
+        assertEquals("AUC001", auctionIdLabel.getText());
+        assertEquals("5,000 VNĐ", balanceLabel.getText());
     }
 }

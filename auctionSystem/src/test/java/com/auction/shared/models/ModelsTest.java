@@ -87,7 +87,7 @@ class ModelsTest {
     @Test
     @DisplayName("Kiểm thử AuthUser")
     void testAuthUser() {
-        AuthUser au = new AuthUser("Full Name", "user", "email@test.com", "hash", "BIDDER");
+        AuthUser au = new AuthUser("Full Name", "user", "email@test.com", "hash", "USER");
         au.setId(10L);
         assertEquals(10L, au.getId());
         assertEquals("Full Name", au.getFullName());

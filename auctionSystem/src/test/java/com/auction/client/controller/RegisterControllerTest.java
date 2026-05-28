@@ -131,6 +131,25 @@ public class RegisterControllerTest {
         assertTrue(fullNameField.getText().isEmpty());
     }
 
+    @Test
+    public void testHandleRegisterActionServerFailure() throws Exception {
+        fullNameField.setText("Full Name");
+        usernameField.setText("existinguser");
+        emailField.setText("test@example.com");
+        passwordField.setText("pass");
+        confirmPasswordField.setText("pass");
+
+        when(authService.register(any(RegistrationRequest.class)))
+            .thenReturn(new ServiceResult<>(false, "Username already exists", null));
+
+        invokeHandleRegisterAction();
+
+        verify(authService).register(any(RegistrationRequest.class));
+        assertEquals("Username already exists", messageLabel.getText());
+        // Verify fields are NOT cleared
+        assertEquals("Full Name", fullNameField.getText());
+    }
+
     private void invokeHandleRegisterAction() throws Exception {
         java.lang.reflect.Method method = RegisterController.class.getDeclaredMethod("handleRegisterAction");
         method.setAccessible(true);

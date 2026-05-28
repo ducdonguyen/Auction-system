@@ -40,7 +40,7 @@ class ClientServicesTest {
         mockedSocketClient = mockStatic(SocketClient.class);
         mockedSocketClient.when(SocketClient::getInstance).thenReturn(mockSocketClient);
 
-        SessionContext.setCurrentUser(new AuthUser("Test User", "testuser", "test@test.com", "hash", "BIDDER"));
+        SessionContext.setCurrentUser(new AuthUser("Full Name", "testuser", "test@test.com", "hash", "USER"));
     }
 
     @AfterEach
@@ -51,7 +51,7 @@ class ClientServicesTest {
     @Test
     @DisplayName("Kiểm thử AuthService login thành công")
     void testAuthServiceLogin_Success() throws Exception {
-        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "BIDDER");
+        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "USER");
         ServiceResult<AuthUser> expected = new ServiceResult<>(true, "Success", user);
 
         when(mockSocketClient.receiveResponse()).thenReturn(expected);
@@ -89,7 +89,7 @@ class ClientServicesTest {
     @DisplayName("Kiểm thử AuthService register thành công")
     void testAuthServiceRegister_Success() throws Exception {
         RegistrationRequest request = new RegistrationRequest("Full Name", "user", "email", "pass");
-        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "BIDDER");
+        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "USER");
         ServiceResult<AuthUser> expected = new ServiceResult<>(true, "Success", user);
 
         when(mockSocketClient.receiveResponse()).thenReturn(expected);

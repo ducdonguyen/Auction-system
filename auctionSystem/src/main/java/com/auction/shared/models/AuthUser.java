@@ -16,17 +16,17 @@ public class AuthUser implements Serializable {
         this.balance = 0.0;
     }
 
-    // Constructor dùng khi Đăng ký (Chưa có ID từ CSDL)
+    // Constructor dùng khi Đăng ký (4 tham số String)
     public AuthUser(String fullName, String username, String email, String passwordHash) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = "USER";
-        this.balance = 10000000.0; // Mặc định tặng 10tr để test
+        this.balance = 10000000.0;
     }
 
-    // Constructor dùng khi test hoặc khởi tạo nhanh (Có Role)
+    // Constructor dùng khi khởi tạo nhanh (5 tham số String)
     public AuthUser(String fullName, String username, String email, String passwordHash, String role) {
         this.fullName = fullName;
         this.username = username;
@@ -36,7 +36,7 @@ public class AuthUser implements Serializable {
         this.balance = 10000000.0;
     }
 
-    // Constructor 6 tham số (Dùng cho các bản code cũ hơn)
+    // Constructor 6 tham số (Long ID + 5 String)
     public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role) {
         this.id = id;
         this.fullName = fullName;
@@ -47,7 +47,7 @@ public class AuthUser implements Serializable {
         this.balance = 10000000.0;
     }
 
-    // Constructor 7 THAM SỐ ĐẦY ĐỦ (Dùng khi lôi từ CSDL lên, bao gồm cả ví tiền)
+    // Constructor 7 THAM SỐ ĐẦY ĐỦ (Long ID + 5 String + double balance)
     public AuthUser(Long id, String fullName, String username, String email, String passwordHash, String role, double balance) {
         this.id = id;
         this.fullName = fullName;
