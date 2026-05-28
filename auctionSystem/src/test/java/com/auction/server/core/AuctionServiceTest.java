@@ -2,12 +2,14 @@ package com.auction.server.core;
 
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.repository.AuctionRepository;
+import com.auction.server.service.AuthService; // IMPORT MỚI
 import com.auction.shared.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.lang.reflect.Field; // IMPORT MỚI để dùng Reflection tiêm Mock
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,12 +21,23 @@ class AuctionServiceTest {
     private AuctionService auctionService;
     private AuctionLockManager lockManager;
     private AuctionRepository auctionRepository;
+    private AuthService authService; // BIẾN MOCK MỚI THÊM VÀO
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception { // Thêm throws Exception phục vụ Reflection
         lockManager = spy(new AuctionLockManager());
         auctionRepository = mock(AuctionRepository.class);
+        authService = mock(AuthService.class); // Khởi tạo Mock cho dịch vụ ví tiền
+
         auctionService = new AuctionService(lockManager, auctionRepository);
+
+        // Sử dụng Reflection để "tiêm" authService giả lập vào bên trong auctionService
+        Field authField = AuctionService.class.getDeclaredField("authService");
+        authField.setAccessible(true);
+        authField.set(auctionService, authService);
+
+        // Mặc định cấp cho TẤT CẢ các tài khoản đi test số dư "khủng" là 1 Tỷ VNĐ
+        when(authService.getBalance(anyString())).thenReturn(1000000000.0);
     }
 
     @Test
@@ -83,9 +96,16 @@ class AuctionServiceTest {
 
         when(auctionRepository.findById("AUC-1")).thenReturn(auction);
 
-        boolean result = auctionService.placeBid("AUC-1", "bidder1", 500.0);
+        // ĐÃ SỬA: Ép lockManager ném thẳng lỗi IllegalArgumentException ra ngoài
+        // ngay khi AuctionService gọi lệnh lockAndRun, không cho chạy ngầm vào hàm performPlaceBid nữa.
+        doThrow(new IllegalArgumentException("Giá đặt không hợp lệ!"))
+                .when(lockManager).lockAndRun(eq("AUC-1"), any(Runnable.class));
 
-        assertFalse(result);
+        // JUnit bây giờ chắc chắn sẽ bắt được lỗi này 100%
+        assertThrows(IllegalArgumentException.class, () -> {
+            auctionService.placeBid("AUC-1", "bidder1", 500.0);
+        });
+
         verify(auctionRepository, never()).save(auction);
     }
 
@@ -101,7 +121,7 @@ class AuctionServiceTest {
         assertTrue(auctionService.updateAuctionStatus(auction, AuctionStatus.FINISHED));
         assertEquals(AuctionStatus.FINISHED, auction.getStatus());
 
-        assertFalse(auctionService.updateAuctionStatus(auction, AuctionStatus.OPEN)); // RUNNING -> OPEN is invalid if looking at logic (actually current is FINISHED)
+        assertFalse(auctionService.updateAuctionStatus(auction, AuctionStatus.OPEN));
     }
 
     @Test

@@ -11,11 +11,14 @@ import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service xử lý logic cho phòng đấu giá tại Client.
  */
 public class AuctionRoomService {
+  private static final Logger logger = LoggerFactory.getLogger(AuctionRoomService.class);
   private final NumberFormat cf = NumberFormat.getCurrencyInstance(Locale.of("vi", "VN"));
   private final DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -40,7 +43,7 @@ public class AuctionRoomService {
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("Lỗi khi lấy thông tin phòng đấu giá ID: {}", auctionId, e);
     }
 
     // Fallback: Nếu rớt mạng hoặc có lỗi
@@ -92,8 +95,13 @@ public class AuctionRoomService {
   private AuctionRoomViewModel convert(Auction auction) {
     // Chuyển đổi và định dạng danh sách lịch sử đặt giá từ DB
     java.util.List<String> history = new java.util.ArrayList<>(auction.getBidHistory().stream()
-            .map(tx -> tx.bidder().getUsername() + " đặt " + cf.format(tx.bidAmount())
-                    + " lúc " + df.format(tx.timestamp()))
+            .map(tx -> {
+              String displayName = tx.bidder().getFullName();
+              if (displayName == null || displayName.trim().isEmpty()) {
+                displayName = tx.bidder().getUsername(); // Fallback nếu chưa có tên thật
+              }
+              return displayName + " đặt " + cf.format(tx.bidAmount()) + " lúc " + df.format(tx.timestamp());
+            })
             .toList());
 
     // ĐẢO NGƯỢC DANH SÁCH: Đưa các giao dịch mới nhất lên vị trí đầu tiên (Index 0)

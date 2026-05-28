@@ -81,7 +81,7 @@ public class LoginControllerTest {
         usernameField.setText("testuser");
         passwordField.setText("password");
         
-        AuthUser authUser = new AuthUser("Full Name", "testuser", "test@example.com", "hash", "BIDDER");
+        AuthUser authUser = new AuthUser("testuser", "Full Name", "test@example.com", "TOKEN", "BIDDER");
         ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);

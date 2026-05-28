@@ -5,6 +5,7 @@ import com.auction.server.core.AuctionObserver;
 import com.auction.server.core.AuctionService;
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
+import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,8 +19,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientHandler implements Runnable, AuctionObserver {
   private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+  private static final ConcurrentHashMap<String, ClientHandler> activeClients = new ConcurrentHashMap<>();
+  private String username;
   private final Socket socket;
-  private final AuctionService auctionService;
+  private final RequestRouter requestRouter;
   private ObjectOutputStream out;
 
   // Biến lưu trữ ID của phiên đấu giá mà Client này đang xem
@@ -29,11 +32,11 @@ public class ClientHandler implements Runnable, AuctionObserver {
    * Khởi tạo ClientHandler với socket và dịch vụ đấu giá.
    *
    * @param socket         Socket kết nối với client.
-   * @param auctionService Dịch vụ quản lý đấu giá.
+   * @param requestRouter Bộ định tuyến tiếp nhận và xử lý yêu cầu từ client.
    */
-  public ClientHandler(Socket socket, AuctionService auctionService) {
+  public ClientHandler(Socket socket, RequestRouter requestRouter) {
     this.socket = socket;
-    this.auctionService = auctionService;
+    this.requestRouter = requestRouter;
   }
 
   public String getCurrentWatchingAuctionId() {
@@ -43,6 +46,27 @@ public class ClientHandler implements Runnable, AuctionObserver {
   public void setCurrentWatchingAuctionId(String auctionId) {
     this.currentWatchingAuctionId = auctionId;
   }
+
+  // Hàm để gán username khi login và đưa vào danh bạ
+  public void setUsername(String username) {
+    this.username = username;
+    activeClients.put(username, this);
+  }
+
+  // Hàm tĩnh để bắn gói tin Socket tới riêng một người dùng
+  public static void sendToUser(String username, Object message) {
+    ClientHandler handler = activeClients.get(username);
+    if (handler != null && handler.out != null) {
+      try {
+        handler.out.writeObject(message);
+        handler.out.flush();
+        logger.info("[ClientHandler] Đã gửi thông báo cá nhân tới user: {}", username);
+      } catch (IOException e) {
+        logger.error("Lỗi khi gửi tin riêng cho {}: {}", username, e.getMessage());
+      }
+    }
+  }
+
 
   @Override
   public void run() {
@@ -57,7 +81,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
       while (!Thread.currentThread().isInterrupted()) {
         Object request = i.readObject();
         // Xử lý request qua RequestRouter
-        RequestRouter.route(request, this, out, auctionService);
+        this.requestRouter.route(request, this, out);
 
         logger.info("[ClientHandler] Nhận được yêu cầu từ Client: {}",
             request.getClass().getSimpleName());
@@ -71,6 +95,11 @@ public class ClientHandler implements Runnable, AuctionObserver {
       // để tránh lỗi rò rỉ bộ nhớ (Memory Leak)
       if (currentWatchingAuctionId != null) {
         AuctionManager.getInstance().unsubscribe(currentWatchingAuctionId, this);
+      }
+
+      // Khi Client tắt app, nhớ xóa họ khỏi danh bạ
+      if (this.username != null) {
+        activeClients.remove(this.username);
       }
     }
   }
@@ -115,7 +144,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
       out.writeObject(new com.auction.shared.network.ServiceResult<>(true, message, null));
       out.flush();
     } catch (java.io.IOException e) {
-      e.printStackTrace();
+      logger.error("Lỗi khi gửi tin nhắn hệ thống tới client: {}", e.getMessage(), e);
     }
   }
 }

@@ -2,17 +2,18 @@ package com.auction.client.network;
 
 import com.auction.shared.models.AuctionStatus;
 import com.auction.shared.models.BidTransaction;
-import com.auction.shared.network.BalanceUpdatedEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+
 import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,7 @@ public class SocketClient {
   private ObjectInputStream in;
   private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<>();
   private final AtomicReference<RealtimeListener> realtimeListener = new AtomicReference<>();
-
-  // Map lưu trữ các bộ xử lý phản hồi đăng ký theo kiểu class
-  private final Map<Class<?>, Consumer<Object>> responseHandlers = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<Class<?>, Consumer<Object>> handlers = new ConcurrentHashMap<>();
 
   /**
    * Interface để lắng nghe các sự kiện thời gian thực từ Server.
@@ -75,24 +74,15 @@ public class SocketClient {
     this.realtimeListener.set(l);
   }
 
-  /**
-   * Đăng ký bộ xử lý cho một loại phản hồi cụ thể.
-   *
-   * @param responseClass Lớp của đối tượng phản hồi.
-   * @param handler       Hàm xử lý.
-   * @param <T>           Kiểu dữ liệu phản hồi.
-   */
-  public <T> void registerResponseHandler(Class<T> responseClass, Consumer<Object> handler) {
-    responseHandlers.put(responseClass, handler);
-    logger.info("[Client] Đã đăng ký handler cho: {}", responseClass.getSimpleName());
+  public <T> void registerResponseHandler(Class<T> clazz, Consumer<Object> handler) {
+    handlers.put(clazz, handler);
   }
 
   private void startListeningThread() {
     Thread t = new Thread(() -> {
       try {
         while (!Thread.currentThread().isInterrupted()) {
-          Object message = in.readObject();
-          handle(message);
+          handle(in.readObject());
         }
       } catch (Exception e) {
         logger.info("[Client] Listener stopped: {}", e.getMessage());
@@ -103,16 +93,6 @@ public class SocketClient {
   }
 
   private void handle(Object m) throws InterruptedException {
-    if (m == null) return;
-
-    // 1. Kiểm tra xem có handler đăng ký riêng cho loại message này không
-    Consumer<Object> handler = responseHandlers.get(m.getClass());
-    if (handler != null) {
-      handler.accept(m);
-      return;
-    }
-
-    // 2. Xử lý các sự kiện thời gian thực (Lobby/Room update)
     if (m instanceof BidTransaction b) {
       RealtimeListener l = realtimeListener.get();
       if (l != null) {
@@ -123,14 +103,18 @@ public class SocketClient {
       if (l != null) {
         Platform.runLater(() -> l.onStatusUpdate(s));
       }
-    } else if (m instanceof BalanceUpdatedEvent b) {
+    } else if (m instanceof com.auction.shared.network.BalanceUpdatedEvent b) {
       RealtimeListener l = realtimeListener.get();
       if (l != null) {
-        Platform.runLater(() -> l.onBalanceUpdate(b.newBalance(), b.amountChanged(), b.reason()));
+        Platform.runLater(() -> l.onBalanceUpdate(b.getNewBalance(), b.getAmountChanged(), b.getReason()));
       }
     } else {
-      // 3. Nếu không có handler và không phải event, đưa vào queue để nhận đồng bộ qua receiveResponse()
-      responseQueue.put(m);
+      Consumer<Object> handler = handlers.get(m.getClass());
+      if (handler != null) {
+        handler.accept(m);
+      } else {
+        responseQueue.put(m);
+      }
     }
   }
 
@@ -163,13 +147,33 @@ public class SocketClient {
   }
 
   /**
-   * Nhận phản hồi từ Server.
+   * Nhận phản hồi từ Server với thời gian chờ tùy chỉnh.
+   *
+   * @param timeoutSeconds Thời gian chờ tối đa (tính bằng giây).
+   * @return Đối tượng phản hồi.
+   * @throws InterruptedException Nếu luồng bị gián đoạn trong lúc chờ.
+   * @throws TimeoutException Nếu server không phản hồi sau khoảng thời gian quy định.
+   */
+  public Object receiveResponse(long timeoutSeconds) throws InterruptedException, TimeoutException {
+    // Sử dụng poll thay vì take để có thể set timeout
+    Object response = responseQueue.poll(timeoutSeconds, TimeUnit.SECONDS);
+
+    // Nếu hết thời gian mà vẫn chưa có dữ liệu (response == null)
+    if (response == null) {
+      throw new TimeoutException("Server không phản hồi trong vòng " + timeoutSeconds + " giây.");
+    }
+    return response;
+  }
+
+  /**
+   * Nhận phản hồi từ Server với thời gian chờ mặc định.
    *
    * @return Đối tượng phản hồi.
    * @throws InterruptedException Nếu luồng bị gián đoạn.
+   * @throws TimeoutException Nếu server không phản hồi sau 10 giây.
    */
-  public Object receiveResponse() throws InterruptedException {
-    return responseQueue.take();
+  public Object receiveResponse() throws InterruptedException, TimeoutException {
+    return receiveResponse(10); // Mặc định chờ 10 giây
   }
 
   /**

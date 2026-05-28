@@ -28,6 +28,15 @@ import org.slf4j.LoggerFactory;
 public class AuctionRepository {
   private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
 
+  // 1. CHUỖI SQL CỐT LÕI: Tự động LEFT JOIN lấy kèm Tên thật (Full Name) của Người Bán và Người Dẫn Đầu
+  private static final String BASE_AUCTION_SQL =
+          "SELECT a.*, " +
+                  "u1.full_name AS seller_full_name, " +
+                  "u2.full_name AS bidder_full_name " +
+                  "FROM auctions a " +
+                  "LEFT JOIN users u1 ON a.seller_username = u1.username " +
+                  "LEFT JOIN users u2 ON a.highest_bidder_username = u2.username ";
+
   public AuctionRepository() {
   }
 
@@ -40,30 +49,37 @@ public class AuctionRepository {
   }
 
   /**
+   * Hàm phụ trợ phục hồi thông tin Người dẫn đầu (Kèm Tên Thật) cho các danh sách (Sảnh, Admin)
+   */
+  private void applyHighestBidderForList(Auction auction, ResultSet rs) throws SQLException {
+    String bidderUsername = rs.getString("highest_bidder_username");
+    if (bidderUsername != null) {
+      Bidder b = new Bidder(bidderUsername, "", 0);
+
+      // BƠM TÊN THẬT CHO NGƯỜI DẪN ĐẦU
+      String bidderFullName = rs.getString("bidder_full_name");
+      if (bidderFullName != null && !bidderFullName.trim().isEmpty()) {
+        b.setFullName(bidderFullName);
+      }
+
+      BidTransaction txLobby = new BidTransaction("TX-LOBBY", b, auction.getCurrentPrice(), LocalDateTime.now());
+      auction.updateAuctionState(b, auction.getCurrentPrice(), txLobby);
+    }
+  }
+
+  /**
    * Lấy toàn bộ danh sách phòng đấu giá (Dành cho màn hình Sảnh - Lobby)
    */
   public List<Auction> findAll() {
     List<Auction> results = new ArrayList<>();
-    String sql = "SELECT * FROM auctions WHERE status != 'PENDING'";
+    String sql = BASE_AUCTION_SQL + "WHERE a.status != 'PENDING'";
+
     try (Connection connection = DatabaseConfig.getConnection();
          PreparedStatement ps = connection.prepareStatement(sql);
          ResultSet rs = ps.executeQuery()) {
       while (rs.next()) {
-        //Lấy vỏ phòng đấu giá
         Auction auction = map(rs);
-
-        //PHỤC HỒI TÊN NGƯỜI DẪN ĐẦU CHO MÀN HÌNH SẢNH
-        String bidderUsername = rs.getString("highest_bidder_username");
-        if (bidderUsername != null) {
-          Bidder b = new Bidder(bidderUsername, "", 0);
-
-          // Tại sao dùng giao dịch Ảo ở đây lại AN TOÀN?
-          // Vì màn hình Sảnh (Lobby) CHỈ đọc Tên người thắng, KHÔNG BAO GIỜ in danh sách lịch sử ra.
-          // Do đó, ta truyền một giao dịch đại diện vào đây để làm mồi mà không sợ sập App!
-          BidTransaction txLobby = new BidTransaction("TX-LOBBY", b, auction.getCurrentPrice(), LocalDateTime.now());
-          auction.updateAuctionState(b, auction.getCurrentPrice(), txLobby);
-        }
-
+        applyHighestBidderForList(auction, rs); // Phục hồi Người dẫn đầu
         results.add(auction);
       }
     } catch (SQLException e) {
@@ -77,32 +93,28 @@ public class AuctionRepository {
    */
   public List<Auction> findPendingAuctions(){
     List <Auction> pending = new ArrayList<>();
-    String sql = "SELECT * FROM auctions WHERE status = 'PENDING'";
-    // Sử dụng try-with-resources để tự động đóng Connection, PreparedStatement và ResultSet
+    String sql = BASE_AUCTION_SQL + "WHERE a.status = 'PENDING'";
+
     try (Connection conn = DatabaseConfig.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql);
          ResultSet rs = stmt.executeQuery()) {
-
-      // Duyệt qua từng dòng kết quả trả về từ Database
       while (rs.next()) {
-        // Khởi tạo đối tượng Auction từ dữ liệu trong từng hàng
         Auction auction = map(rs);
-        // Thêm vào danh sách trả về
+        applyHighestBidderForList(auction, rs); // Phục hồi Người dẫn đầu
         pending.add(auction);
       }
     } catch (SQLException e) {
-      // Ghi log lỗi nếu có vấn đề xảy ra với Database (Có thể dùng SLF4J log giống trong pom.xml của bạn)
-      System.err.println("Lỗi khi lấy danh sách phiên đấu giá đang chờ duyệt: " + e.getMessage());
-      e.printStackTrace();
+      logger.error("Lỗi khi lấy danh sách phiên đấu giá đang chờ duyệt: {}", e.getMessage());
     }
     return pending;
   }
+
   /**
    * Lấy chi tiết phòng đấu giá và toàn bộ lịch sử đặt giá (Dành cho người vào phòng)
    */
   public Auction findById(String auctionId) {
     Auction auction = null;
-    String sql = "SELECT * FROM auctions WHERE id = ?";
+    String sql = BASE_AUCTION_SQL + "WHERE a.id = ?";
 
     try (Connection connection = DatabaseConfig.getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -114,22 +126,32 @@ public class AuctionRepository {
         }
       }
 
-      // NẾU CÓ PHÒNG -> KÉO LỊCH SỬ THẬT TỪ BẢNG bid_transactions ĐẮP VÀO
+      // NẾU CÓ PHÒNG -> KÉO LỊCH SỬ THẬT TỪ BẢNG bid_transactions (LEFT JOIN LẤY KÈM TÊN THẬT)
       if (auction != null) {
-        String sqlBids = "SELECT * FROM bid_transactions WHERE auction_id = ? ORDER BY bid_time ASC";
+        String sqlBids =
+                "SELECT bt.*, u.full_name AS bidder_full_name " +
+                        "FROM bid_transactions bt " +
+                        "LEFT JOIN users u ON bt.bidder_username = u.username " +
+                        "WHERE bt.auction_id = ? ORDER BY bt.bid_time ASC";
+
         try (PreparedStatement psBids = connection.prepareStatement(sqlBids)) {
           psBids.setString(1, auctionId);
           try (ResultSet rsBids = psBids.executeQuery()) {
-            // Đọc từ cũ nhất đến mới nhất và phát lại giao dịch
             while (rsBids.next()) {
               Bidder b = new Bidder(rsBids.getString("bidder_username"), "", 0);
+
+              // BƠM TÊN THẬT TỪ DATABASE VÀO LỊCH SỬ GIAO DỊCH
+              String bidderFullName = rsBids.getString("bidder_full_name");
+              if (bidderFullName != null && !bidderFullName.trim().isEmpty()) {
+                b.setFullName(bidderFullName);
+              }
+
               BidTransaction tx = new BidTransaction(
                       rsBids.getString("id"),
                       b,
                       rsBids.getDouble("bid_amount"),
                       rsBids.getTimestamp("bid_time").toLocalDateTime()
               );
-              // Tính năng Replay: Phát lại từng giao dịch để cập nhật giá hiện tại cho phòng
               auction.updateAuctionState(b, tx.bidAmount(), tx);
             }
           }
@@ -172,7 +194,6 @@ public class AuctionRepository {
       preparedStatement.setString(14, auction.getStatus().name());
       preparedStatement.executeUpdate();
 
-      // BƠM LỊCH SỬ ĐẶT GIÁ VÀO BẢNG bid_transactions (Sử dụng ExecuteBatch siêu tốc)
       if (auction.getBidHistory() != null && !auction.getBidHistory().isEmpty()) {
         String sqlBid = "INSERT IGNORE INTO bid_transactions (id, auction_id, bidder_username, bid_amount, bid_time) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement psBid = connection.prepareStatement(sqlBid)) {
@@ -182,12 +203,11 @@ public class AuctionRepository {
             psBid.setString(3, tx.bidder().getUsername());
             psBid.setDouble(4, tx.bidAmount());
             psBid.setTimestamp(5, Timestamp.valueOf(tx.timestamp()));
-            psBid.addBatch(); // Cho vào giỏ hàng
+            psBid.addBatch();
           }
-          psBid.executeBatch(); // Chạy lệnh lưu toàn bộ lô
+          psBid.executeBatch();
         }
       }
-
     } catch (SQLException e) {
       logger.error("Save failed {}: {}", auction.getAuctionId(), e.getMessage());
     }
@@ -195,11 +215,11 @@ public class AuctionRepository {
   }
 
   public List<Auction> findByStatusAndStartTimeBefore(AuctionStatus status, LocalDateTime time) {
-    return findBy("SELECT * FROM auctions WHERE status = ? AND start_time <= ?", status.name(), Timestamp.valueOf(time));
+    return findBy(BASE_AUCTION_SQL + "WHERE a.status = ? AND a.start_time <= ?", status.name(), Timestamp.valueOf(time));
   }
 
   public List<Auction> findByStatusAndEndTimeBefore(AuctionStatus status, LocalDateTime time) {
-    return findBy("SELECT * FROM auctions WHERE status = ? AND end_time <= ?", status.name(), Timestamp.valueOf(time));
+    return findBy(BASE_AUCTION_SQL + "WHERE a.status = ? AND a.end_time <= ?", status.name(), Timestamp.valueOf(time));
   }
 
   private List<Auction> findBy(String sql, String param1, Timestamp param2) {
@@ -210,7 +230,9 @@ public class AuctionRepository {
       preparedStatement.setTimestamp(2, param2);
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         while (resultSet.next()) {
-          results.add(map(resultSet));
+          Auction auction = map(resultSet);
+          applyHighestBidderForList(auction, resultSet);
+          results.add(auction);
         }
       }
     } catch (SQLException e) {
@@ -220,7 +242,7 @@ public class AuctionRepository {
   }
 
   /**
-   * Ánh xạ ResultSet thành đối tượng Auction (Chỉ lấy vỏ, không có lịch sử)
+   * Ánh xạ ResultSet thành đối tượng Auction và bơm Tên thật cho Người Bán.
    */
   private Auction map(ResultSet resultSet) throws SQLException {
     String id = resultSet.getString("id");
@@ -230,10 +252,17 @@ public class AuctionRepository {
     String extra = resultSet.getString("item_extra_info");
     double startingPrice = resultSet.getDouble("item_starting_price");
 
-    // ĐÃ SỬA: Chuyển toàn bộ logic tạo đối tượng cho ItemFactory xử lý
     Item item = ItemFactory.createItem(type, name, desc, startingPrice, extra);
 
-    Auction auction = new Auction(id, item, new Seller(resultSet.getString("seller_username"), ""),
+    Seller seller = new Seller(resultSet.getString("seller_username"), "");
+
+    // 2. BƠM TÊN THẬT CHO NGƯỜI BÁN TẠI ĐÂY
+    String sellerFullName = resultSet.getString("seller_full_name");
+    if (sellerFullName != null && !sellerFullName.trim().isEmpty()) {
+      seller.setFullName(sellerFullName);
+    }
+
+    Auction auction = new Auction(id, item, seller,
             resultSet.getDouble("current_price"), resultSet.getDouble("step_price"),
             resultSet.getTimestamp("start_time").toLocalDateTime(), resultSet.getTimestamp("end_time").toLocalDateTime());
 
@@ -241,4 +270,5 @@ public class AuctionRepository {
 
     return auction;
   }
+
 }

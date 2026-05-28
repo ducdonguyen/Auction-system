@@ -1,6 +1,7 @@
 package com.auction.client.controller;
 
 import com.auction.client.service.AuthService;
+import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.AuthUser;
 import com.auction.shared.network.RegistrationRequest;
@@ -79,7 +80,7 @@ public class RegisterController {
 
   @FXML
   private void handleBackToLogin() throws IOException {
-    SceneNavigator.switchScene(backToLoginButton, "/views/Login.fxml", "Đăng nhập", 980, 640);
+    SceneNavigator.switchScene(backToLoginButton, Scene.LOGIN);
   }
 
   private void clearForm() {

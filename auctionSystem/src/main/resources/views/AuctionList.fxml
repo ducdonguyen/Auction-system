@@ -85,13 +85,16 @@
                 <TableView fx:id="auctionTable" VBox.vgrow="ALWAYS"
                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-overflow-x: hidden;">
                     <columns>
-                        <TableColumn fx:id="idColumn" prefWidth="80.0" text="ID"/>
-                        <TableColumn fx:id="itemColumn" prefWidth="200.0" text="Sản phẩm"/>
-                        <TableColumn fx:id="sellerColumn" prefWidth="150.0" text="Người bán"/>
-                        <TableColumn fx:id="priceColumn" prefWidth="120.0" text="Giá hiện tại"/>
+                        <TableColumn fx:id="idColumn" prefWidth="70.0" text="ID"/>
+                        <TableColumn fx:id="itemColumn" prefWidth="160.0" text="Sản phẩm"/>
+                        <TableColumn fx:id="sellerColumn" prefWidth="120.0" text="Người bán"/>
+
+                        <TableColumn fx:id="highestBidderColumn" prefWidth="140.0" text="Người dẫn đầu"/>
+
+                        <TableColumn fx:id="priceColumn" prefWidth="110.0" text="Giá hiện tại"/>
                         <TableColumn fx:id="stepColumn" prefWidth="100.0" text="Bước giá"/>
-                        <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Trạng thái"/>
-                        <TableColumn fx:id="summaryColumn" prefWidth="350.0" text="Mô tả"/>
+                        <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Trạng thái"/>
+                        <TableColumn fx:id="summaryColumn" prefWidth="280.0" text="Mô tả"/>
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
