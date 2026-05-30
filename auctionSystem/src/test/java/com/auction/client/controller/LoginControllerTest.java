@@ -89,8 +89,8 @@ public class LoginControllerTest {
     public void testHandleLoginActionSuccess() throws Exception {
         usernameField.setText("testuser");
         passwordField.setText("password");
-        
-        AuthUser authUser = new AuthUser("testuser", "Full Name", "test@example.com", "TOKEN", "BIDDER");
+
+        AuthUser authUser = new AuthUser("Full Name", "testuser", "test@example.com", "TOKEN", "BIDDER");
         ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
@@ -120,8 +120,8 @@ public class LoginControllerTest {
     public void testHandleLoginActionSuccessAdmin() throws Exception {
         usernameField.setText("admin");
         passwordField.setText("adminpass");
-        
-        AuthUser authUser = new AuthUser("admin", "Admin User", "admin@example.com", "TOKEN", "ADMIN");
+
+        AuthUser authUser = new AuthUser("Admin User", "admin", "admin@example.com", "TOKEN", "ADMIN");
         ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);

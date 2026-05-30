@@ -24,10 +24,10 @@ class AuctionServiceTest {
     private AuthService authService; // BIẾN MOCK MỚI THÊM VÀO
 
     @BeforeEach
-    void setUp() throws Exception { // Thêm throws Exception phục vụ Reflection
+    void setUp() throws Exception {
         lockManager = spy(new AuctionLockManager());
         auctionRepository = mock(AuctionRepository.class);
-        authService = mock(AuthService.class); // Khởi tạo Mock cho dịch vụ ví tiền
+        authService = mock(AuthService.class);
 
         auctionService = new AuctionService(lockManager, auctionRepository);
 
@@ -38,6 +38,15 @@ class AuctionServiceTest {
 
         // Mặc định cấp cho TẤT CẢ các tài khoản đi test số dư "khủng" là 1 Tỷ VNĐ
         when(authService.getBalance(anyString())).thenReturn(1000000000.0);
+
+        // ✅ THÊM: Mock cho freezeBalance - cần return true để test pass
+        when(authService.freezeBalance(anyString(), anyDouble())).thenReturn(true);
+
+        // ✅ THÊM: Mock cho getFullName - trả về username nếu không tìm thấy
+        when(authService.getFullName(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // ✅ THÊM: Mock cho refundBalance - không cần làm gì
+        doNothing().when(authService).refundBalance(anyString(), anyDouble());
     }
 
     @Test

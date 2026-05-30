@@ -113,25 +113,51 @@ public class UserDao {
         return 0.0;
     }
 
-    // Đóng băng (trừ tiền) khi đặt giá
-    public void freezeBalance(String username, double amount) throws SQLException {
-        String sql = "UPDATE users SET balance = balance - ? WHERE username = ?";
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDouble(1, amount);
-            ps.setString(2, username);
-            ps.executeUpdate();
+    /**
+     * Đóng băng (trừ tiền) khi đặt giá - Sử dụng Transaction để đảm bảo tính nguyên tử.
+     * FIX: Thêm transaction management để tránh partial failures
+     */
+    public boolean freezeBalance(String username, double amount) throws SQLException {
+        String sql = "UPDATE users SET balance = balance - ? WHERE username = ? AND balance >= ?";
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            conn.setAutoCommit(false);  // ✅ BẬT TRANSACTION
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setDouble(1, amount);
+                ps.setString(2, username);
+                ps.setDouble(3, amount);
+                int updated = ps.executeUpdate();
+
+                if (updated == 1) {
+                    conn.commit();  // ✅ COMMIT NẾU THÀNH CÔNG
+                    return true;
+                } else {
+                    conn.rollback();  // ✅ ROLLBACK NẾU KHÔNG CẬP NHẬT
+                    return false;
+                }
+            } catch (SQLException e) {
+                conn.rollback();  // ✅ ROLLBACK NGAY NẾU CÓ EXCEPTION
+                throw e;
+            }
         }
     }
 
-    // Hoàn tiền khi bị vượt giá hoặc Admin hủy phiên
+    /**
+     * Hoàn tiền khi bị vượt giá hoặc Admin hủy phiên.
+     * FIX: Thêm transaction management để đảm bảo tính nguyên tử
+     */
     public void refundBalance(String username, double amount) throws SQLException {
         String sql = "UPDATE users SET balance = balance + ? WHERE username = ?";
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDouble(1, amount);
-            ps.setString(2, username);
-            ps.executeUpdate();
+        try (Connection conn = DatabaseConfig.getConnection()) {
+            conn.setAutoCommit(false);  // ✅ BẬT TRANSACTION
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setDouble(1, amount);
+                ps.setString(2, username);
+                ps.executeUpdate();
+                conn.commit();  // ✅ COMMIT THÀNH CÔNG
+            } catch (SQLException e) {
+                conn.rollback();  // ✅ ROLLBACK NẾU CÓ EXCEPTION
+                throw e;
+            }
         }
     }
 }

@@ -154,6 +154,10 @@ public class AuctionRoomController {
     });
   }
 
+   /**
+   * Xử lý sự kiện đặt giá - Bỏ kiểm tra balance phía client vì không an toàn.
+   * FIX: Để server kiểm tra và chặn, client chỉ validate format
+   */
   @FXML
   private void handlePlaceBidAction() {
     String bidAmountStr = bidAmountField.getText().trim();
@@ -163,17 +167,14 @@ public class AuctionRoomController {
       return;
     }
 
-    // KIỂM TRA SỐ DƯ NGAY TẠI CLIENT: Bảo vệ luồng, tránh gửi Request vô ích lên mạng
+    // ✅ CHỈ VALIDATE FORMAT, KHÔNG VALIDATE BALANCE
     try {
       double bidAmount = Double.parseDouble(bidAmountStr);
-      if (balanceLabel != null) {
-        // Trích xuất con số từ nhãn hiển thị số dư hiện tại
-        double currentBalance = Double.parseDouble(balanceLabel.getText().replaceAll("[^0-9]", ""));
-        if (bidAmount > currentBalance) {
-          messageLabel.setStyle("-fx-text-fill: #b91c1c;"); // Thiết lập màu đỏ cảnh báo
-          messageLabel.setText("Số dư ví không đủ. Vui lòng nạp thêm tiền!");
+
+      if (bidAmount <= 0) {
+          messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+          messageLabel.setText("Số tiền phải lớn hơn 0!");
           return;
-        }
       }
     } catch (NumberFormatException e) {
       messageLabel.setStyle("-fx-text-fill: #b91c1c;");
