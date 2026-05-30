@@ -1,7 +1,7 @@
 package com.auction.server.dao;
 
 import com.auction.server.config.DatabaseConfig;
-import com.auction.shared.models.AuthUser;
+import com.auction.shared.models.auth.UserAccount;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +69,7 @@ class UserDaoTest {
     @Test
     @DisplayName("Nên gọi executeUpdate khi đăng ký")
     void testRegister() throws SQLException {
-        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "USER");
+        UserAccount user = new UserAccount("Full Name", "user", "email", "hash", "USER");
         userDao.register(user);
 
         verify(mockPreparedStatement).setString(1, "Full Name");
@@ -90,7 +90,7 @@ class UserDaoTest {
         when(mockResultSet.getString("password_hash")).thenReturn("hash");
         when(mockResultSet.getLong("id")).thenReturn(1L);
 
-        AuthUser user = userDao.findByUsername("user");
+        UserAccount user = userDao.findByUsername("user");
         assertNotNull(user);
         assertEquals("user", user.getUsername());
         assertEquals(1L, user.getId());
@@ -102,7 +102,7 @@ class UserDaoTest {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
 
-        AuthUser user = userDao.findByUsername("user");
+        UserAccount user = userDao.findByUsername("user");
         assertNull(user);
     }
     @Test
@@ -116,7 +116,7 @@ class UserDaoTest {
     @DisplayName("Nên ném ngoại lệ SQLException trong register")
     void testRegister_SQLException() throws SQLException {
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("DB Error"));
-        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "USER");
+        UserAccount user = new UserAccount("Full Name", "user", "email", "hash", "USER");
         assertThrows(SQLException.class, () -> userDao.register(user));
     }
 

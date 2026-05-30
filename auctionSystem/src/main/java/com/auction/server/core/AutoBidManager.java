@@ -1,7 +1,7 @@
 package com.auction.server.core;
 
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.Bidder;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auth.Bidder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -3,8 +3,8 @@ package com.auction.client.controller;
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.network.responses.ServiceResult;
 import javafx.application.Platform;
 import javafx.scene.control.Label; // <-- Khai báo đúng đã có sẵn ở đây
 import javafx.scene.control.ListView;
@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class AuctionRoomControllerTest {

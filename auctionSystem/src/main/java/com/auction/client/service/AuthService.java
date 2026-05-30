@@ -1,10 +1,10 @@
 package com.auction.client.service;
 
 import com.auction.client.network.SocketClient;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.RegistrationRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,15 +21,15 @@ public class AuthService {
    * @return Kết quả đăng nhập.
    */
   @SuppressWarnings("unchecked")
-  public ServiceResult<AuthUser> login(LoginRequest request) {
+  public ServiceResult<UserAccount> login(LoginRequest request) {
     if (request.username() == null || request.username().isBlank()
         || request.password() == null || request.password().isBlank()) {
       return new ServiceResult<>(false, "Nhập đủ thông tin.", null);
     }
     try {
       SocketClient.getInstance().sendRequest(request);
-      ServiceResult<AuthUser> result =
-          (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
+      ServiceResult<UserAccount> result =
+          (ServiceResult<UserAccount>) SocketClient.getInstance().receiveResponse();
       if (result.success() && result.data() != null) {
         SessionContext.setCurrentUser(result.data());
       }
@@ -47,10 +47,10 @@ public class AuthService {
    * @return Kết quả đăng ký.
    */
   @SuppressWarnings("unchecked")
-  public ServiceResult<AuthUser> register(RegistrationRequest request) {
+  public ServiceResult<UserAccount> register(RegistrationRequest request) {
     try {
       SocketClient.getInstance().sendRequest(request);
-      return (ServiceResult<AuthUser>) SocketClient.getInstance().receiveResponse();
+      return (ServiceResult<UserAccount>) SocketClient.getInstance().receiveResponse();
     } catch (Exception e) {
       logger.error("Reg error: {}", e.getMessage());
       return new ServiceResult<>(false, "Lỗi kết nối.", null);

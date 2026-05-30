@@ -1,9 +1,10 @@
 package com.auction.client.controller;
 
 import com.auction.client.service.AuctionCatalogService;
-import com.auction.shared.models.AuctionRow;
+import com.auction.shared.models.auction.AuctionRow;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.CreateAuctionRequest;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -173,12 +174,12 @@ public class AuctionListControllerTest {
         method.setAccessible(true);
         
         // Mock SessionContext user
-        com.auction.shared.models.AuthUser mockUser = new com.auction.shared.models.AuthUser("user", "Full Name", "email", "token", "BIDDER");
+        UserAccount mockUser = new UserAccount("user", "Full Name", "email", "token", "BIDDER");
         com.auction.client.service.SessionContext.setCurrentUser(mockUser);
 
         Object request = method.invoke(controller, formInputs);
-        assertTrue(request instanceof com.auction.shared.network.CreateAuctionRequest);
-        com.auction.shared.network.CreateAuctionRequest req = (com.auction.shared.network.CreateAuctionRequest) request;
+        assertTrue(request instanceof CreateAuctionRequest);
+        CreateAuctionRequest req = (CreateAuctionRequest) request;
         assertEquals("Product", req.getProductName());
         assertEquals(1000.0, req.getStartingPrice());
     }

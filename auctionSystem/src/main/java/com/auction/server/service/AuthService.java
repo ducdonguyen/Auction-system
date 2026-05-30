@@ -2,16 +2,16 @@ package com.auction.server.service;
 
 import com.auction.server.dao.UserDao;
 import com.auction.server.util.PasswordUtil;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.RegistrationRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import java.sql.SQLException;
 
 public class AuthService {
     private final UserDao userDao = new UserDao();
 
-    public ServiceResult<AuthUser> login(LoginRequest request) {
+    public ServiceResult<UserAccount> login(LoginRequest request) {
         // Kiểm tra dữ liệu đầu vào cơ bản
         if (request.username() == null || request.username().isBlank() ||
                 request.password() == null || request.password().isBlank()) {
@@ -20,7 +20,7 @@ public class AuthService {
 
         try {
             // Xuống DB tìm User theo username (Đã lấy kèm cột account_role)
-            AuthUser user = userDao.findByUsername(request.username());
+            UserAccount user = userDao.findByUsername(request.username());
 
             if (user == null) {
                 return new ServiceResult<>(false, "Tài khoản không tồn tại.", null);
@@ -40,7 +40,7 @@ public class AuthService {
         }
     }
 
-    public ServiceResult<AuthUser> register(RegistrationRequest request) {
+    public ServiceResult<UserAccount> register(RegistrationRequest request) {
         // Kiểm tra dữ liệu đầu vào cơ bản
         if (request.username() == null || request.username().isBlank() ||
                 request.password() == null || request.password().isBlank() ||
@@ -54,7 +54,7 @@ public class AuthService {
                 return new ServiceResult<>(false, "Tên đăng nhập hoặc Email đã tồn tại.", null);
             }
 
-            AuthUser newUser = new AuthUser(
+            UserAccount newUser = new UserAccount(
                     request.fullName(),
                     request.username(),
                     request.email(),
@@ -76,7 +76,7 @@ public class AuthService {
 
     public String getFullName(String username) {
         try {
-            AuthUser user = userDao.findByUsername(username);
+            UserAccount user = userDao.findByUsername(username);
             // Trả về tên thật, nếu lỗi hoặc không có thì fallback dùng lại username
             return (user != null && user.getFullName() != null) ? user.getFullName() : username;
         } catch (SQLException e) {
@@ -102,7 +102,7 @@ public class AuthService {
 
         try {
             // 2. Xác thực tài khoản người dùng có tồn tại hay không
-            AuthUser user = userDao.findByUsername(username);
+            UserAccount user = userDao.findByUsername(username);
             if (user == null) {
                 throw new IllegalArgumentException("Tài khoản người dùng không tồn tại trên hệ thống.");
             }

@@ -4,9 +4,9 @@ import com.auction.client.service.AuthService;
 import com.auction.client.service.ServiceFactory;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -31,14 +31,14 @@ public class LoginController {
 
   @FXML
   private void handleLoginAction() {
-    ServiceResult<AuthUser> result = authService.login(
+    ServiceResult<UserAccount> result = authService.login(
             new LoginRequest(usernameField.getText(), passwordField.getText()));
 
     errorLabel.setText(result.message());
     errorLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
 
     if (result.success()) {
-      AuthUser user = result.data();
+      UserAccount user = result.data();
       if (user != null) {
         try {
           // Dùng Enum Scene để điều hướng

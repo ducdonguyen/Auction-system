@@ -2,6 +2,14 @@ package com.auction.shared.models;
 
 import com.auction.shared.exceptions.AuctionClosedException;
 import com.auction.shared.exceptions.InvalidBidException;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.models.item.Art;
+import com.auction.shared.models.item.Electronics;
+import com.auction.shared.models.item.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

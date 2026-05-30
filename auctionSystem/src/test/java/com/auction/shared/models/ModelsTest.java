@@ -1,5 +1,13 @@
 package com.auction.shared.models;
 
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.models.item.Art;
+import com.auction.shared.models.item.Electronics;
+import com.auction.shared.models.item.Vehicle;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -87,7 +95,7 @@ class ModelsTest {
     @Test
     @DisplayName("Kiểm thử AuthUser")
     void testAuthUser() {
-        AuthUser au = new AuthUser("Full Name", "user", "email@test.com", "hash", "USER");
+        UserAccount au = new UserAccount("Full Name", "user", "email@test.com", "hash", "USER");
         au.setId(10L);
         assertEquals(10L, au.getId());
         assertEquals("Full Name", au.getFullName());
@@ -104,7 +112,7 @@ class ModelsTest {
         assertEquals("new@test.com", au.getEmail());
         assertEquals("newhash", au.getPasswordHash());
         
-        AuthUser empty = new AuthUser();
+        UserAccount empty = new UserAccount();
         assertNull(empty.getId());
     }
 

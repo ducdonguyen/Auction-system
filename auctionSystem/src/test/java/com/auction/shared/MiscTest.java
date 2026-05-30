@@ -6,10 +6,14 @@ import com.auction.server.core.AuctionObserver;
 import com.auction.shared.exceptions.AuctionClosedException;
 import com.auction.shared.exceptions.AuthenticationException;
 import com.auction.shared.exceptions.InvalidBidException;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-import com.auction.shared.network.*;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.network.requests.BidRequest;
+import com.auction.shared.network.requests.JoinRoomRequest;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

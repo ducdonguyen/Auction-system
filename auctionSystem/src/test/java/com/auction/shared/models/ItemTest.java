@@ -1,5 +1,8 @@
 package com.auction.shared.models;
 
+import com.auction.shared.models.item.Art;
+import com.auction.shared.models.item.Electronics;
+import com.auction.shared.models.item.Vehicle;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

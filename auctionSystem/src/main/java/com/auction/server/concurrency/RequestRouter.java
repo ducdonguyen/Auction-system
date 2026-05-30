@@ -1,25 +1,27 @@
 package com.auction.server.concurrency;
 
-import com.auction.shared.network.CreateAuctionRequest;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.network.requests.CreateAuctionRequest;
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionService;
 import com.auction.server.service.AuthService;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.models.ItemFactory;
-import com.auction.shared.models.Item;
-import com.auction.shared.models.Seller;
-import com.auction.shared.network.BidRequest;
-import com.auction.shared.network.CancelAuctionRequest;
-import com.auction.shared.network.GetPendingAuctionsRequest;
-import com.auction.shared.network.ApproveAuctionRequest;
-import com.auction.shared.network.GetAllAuctionsRequest;
-import com.auction.shared.network.JoinRoomRequest;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.RegistrationRequest;
-import com.auction.shared.network.ServiceResult;
-import com.auction.shared.network.TopUpRequest;   // IMPORT MỚI
-import com.auction.shared.network.TopUpResponse;  // IMPORT MỚI
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.models.item.ItemFactory;
+import com.auction.shared.models.item.Item;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.network.requests.BidRequest;
+import com.auction.shared.network.requests.CancelAuctionRequest;
+import com.auction.shared.network.requests.GetPendingAuctionsRequest;
+import com.auction.shared.network.requests.ApproveAuctionRequest;
+import com.auction.shared.network.requests.GetAllAuctionsRequest;
+import com.auction.shared.network.requests.JoinRoomRequest;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
+import com.auction.shared.network.requests.TopUpRequest;   // IMPORT MỚI
+import com.auction.shared.network.responses.TopUpResponse;  // IMPORT MỚI
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import org.slf4j.Logger;
@@ -79,7 +81,7 @@ public class RequestRouter {
 
     private void handleLogin(LoginRequest request, ClientHandler handler, ObjectOutputStream out)
             throws IOException {
-        ServiceResult<AuthUser> result = authService.login(request);
+        ServiceResult<UserAccount> result = authService.login(request);
 
         if (result.success()) {
             // Ghi danh user vào hệ thống để có thể nhận tin nhắn hoàn tiền
@@ -94,7 +96,7 @@ public class RequestRouter {
 
     private void handleRegister(RegistrationRequest request, ObjectOutputStream out)
             throws IOException {
-        ServiceResult<AuthUser> result = authService.register(request);
+        ServiceResult<UserAccount> result = authService.register(request);
         sendResponse(out, result);
     }
 
@@ -111,7 +113,7 @@ public class RequestRouter {
         Auction currentAuction = auctionService.getAuctionById(auctionId);
 
         if (currentAuction != null && currentAuction.getBidHistory() != null) {
-            for (com.auction.shared.models.BidTransaction tx : currentAuction.getBidHistory()) {
+            for (BidTransaction tx : currentAuction.getBidHistory()) {
                 if (tx.bidder() != null) {
                     tx.bidder().setFullName(authService.getFullName(tx.bidder().getUsername()));
                 }
@@ -224,7 +226,7 @@ public class RequestRouter {
                 return;
             }
 
-            boolean success = auctionService.updateAuctionStatus(auction, com.auction.shared.models.AuctionStatus.OPEN);
+            boolean success = auctionService.updateAuctionStatus(auction, AuctionStatus.OPEN);
 
             if (success) {
                 sendResponse(out, new ServiceResult<>(true, "Đã duyệt thành công! Phiên đấu giá đã hiện trên Sảnh.", null));

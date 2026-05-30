@@ -1,8 +1,8 @@
 package com.auction.server.core;
 
 import com.auction.server.repository.AuctionRepository;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

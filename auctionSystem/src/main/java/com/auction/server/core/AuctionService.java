@@ -1,16 +1,15 @@
 package com.auction.server.core;
 
-import com.auction.shared.network.CreateAuctionRequest;
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.repository.AuctionRepository;
 import com.auction.server.service.AuthService;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-import com.auction.shared.models.Bidder;
-import com.auction.shared.models.Item;
-import com.auction.shared.models.Seller;
-import com.auction.shared.network.BalanceUpdatedEvent;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.models.item.Item;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.network.events.BalanceUpdatedEvent;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

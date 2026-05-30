@@ -1,7 +1,7 @@
 package com.auction.client.network;
 
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
+import com.auction.shared.network.events.BalanceUpdatedEvent;
 import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +104,7 @@ public class SocketClient {
       if (l != null) {
         Platform.runLater(() -> l.onStatusUpdate(s));
       }
-    } else if (m instanceof com.auction.shared.network.BalanceUpdatedEvent b) {
+    } else if (m instanceof BalanceUpdatedEvent b) {
       RealtimeListener l = realtimeListener.get();
       if (l != null) {
         Platform.runLater(() -> l.onBalanceUpdate(b.getNewBalance(), b.getAmountChanged(), b.getReason()));

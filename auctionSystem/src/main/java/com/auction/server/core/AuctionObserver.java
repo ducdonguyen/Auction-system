@@ -1,7 +1,7 @@
 package com.auction.server.core;
 
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
 
 public interface AuctionObserver {
     // Hàm này sẽ được gọi mỗi khi có một mức giá mới được cập nhật thành công

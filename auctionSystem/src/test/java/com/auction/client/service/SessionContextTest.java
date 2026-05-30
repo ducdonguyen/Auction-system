@@ -1,6 +1,6 @@
 package com.auction.client.service;
 
-import com.auction.shared.models.AuthUser;
+import com.auction.shared.models.auth.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ class SessionContextTest {
     @Test
     @DisplayName("Kiểm thử SessionContext")
     void testSessionContext() {
-        AuthUser user = new AuthUser("Name", "user", "email", "hash", "USER");
+        UserAccount user = new UserAccount("Name", "user", "email", "hash", "USER");
         SessionContext.setCurrentUser(user);
         assertEquals(user, SessionContext.getCurrentUser());
         

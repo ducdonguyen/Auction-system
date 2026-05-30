@@ -2,11 +2,11 @@ package com.auction.client.service;
 
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.BidRequest;
-import com.auction.shared.network.JoinRoomRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.BidRequest;
+import com.auction.shared.network.requests.JoinRoomRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -66,7 +66,7 @@ public class AuctionRoomService {
         return new ServiceResult<>(false, "Số tiền đặt giá phải lớn hơn 0!", null);
       }
 
-      AuthUser currentUser = SessionContext.getCurrentUser();
+      UserAccount currentUser = SessionContext.getCurrentUser();
       if (currentUser == null) {
         return new ServiceResult<>(false, "Bạn cần đăng nhập để đặt giá.", null);
       }

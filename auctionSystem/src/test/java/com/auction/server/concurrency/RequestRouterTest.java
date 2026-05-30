@@ -2,8 +2,16 @@ package com.auction.server.concurrency;
 
 import com.auction.server.core.AuctionService;
 import com.auction.server.service.AuthService;
-import com.auction.shared.models.*;
-import com.auction.shared.network.*;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.models.item.Item;
+import com.auction.shared.network.requests.*;
+import com.auction.shared.network.responses.ServiceResult;
+import com.auction.shared.network.responses.TopUpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,8 +55,8 @@ public class RequestRouterTest {
     public void testRouteLoginRequest_Success() throws Exception {
         LoginRequest request = new LoginRequest("user1", "pass1");
         // Sử dụng Constructor 4 tham số thực tế của AuthUser
-        AuthUser mockUser = new AuthUser("User One", "user1", "user1@gmail.com", "hashed_pass");
-        ServiceResult<AuthUser> mockResult = new ServiceResult<>(true, "Login success", mockUser);
+        UserAccount mockUser = new UserAccount("User One", "user1", "user1@gmail.com", "hashed_pass");
+        ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Login success", mockUser);
 
         when(authService.login(request)).thenReturn(mockResult);
 
@@ -61,7 +69,7 @@ public class RequestRouterTest {
     @Test
     public void testRouteLoginRequest_Failure() throws Exception {
         LoginRequest request = new LoginRequest("user1", "wrong_pass");
-        ServiceResult<AuthUser> mockResult = new ServiceResult<>(false, "Login failed", null);
+        ServiceResult<UserAccount> mockResult = new ServiceResult<>(false, "Login failed", null);
 
         when(authService.login(request)).thenReturn(mockResult);
 
@@ -77,7 +85,7 @@ public class RequestRouterTest {
     @Test
     public void testRouteRegistrationRequest() throws Exception {
         RegistrationRequest request = new RegistrationRequest("user2", "pass2", "User Two", "user2@gmail.com");
-        ServiceResult<AuthUser> mockResult = new ServiceResult<>(true, "Register success", null);
+        ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Register success", null);
 
         when(authService.register(request)).thenReturn(mockResult);
 

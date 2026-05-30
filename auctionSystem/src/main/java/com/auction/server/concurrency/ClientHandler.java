@@ -2,14 +2,15 @@ package com.auction.server.concurrency;
 
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionObserver;
-import com.auction.server.core.AuctionService;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+import com.auction.shared.network.responses.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +142,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
   public void receiveSystemMessage(String message) {
     try {
       // Đóng gói thành ServiceResult báo thành công và mang theo message
-      out.writeObject(new com.auction.shared.network.ServiceResult<>(true, message, null));
+      out.writeObject(new ServiceResult<>(true, message, null));
       out.flush();
     } catch (java.io.IOException e) {
       logger.error("Lỗi khi gửi tin nhắn hệ thống tới client: {}", e.getMessage(), e);

@@ -1,6 +1,7 @@
 package com.auction.shared.network;
 
-import com.auction.shared.models.Bidder;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.network.requests.LoginRequest;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;

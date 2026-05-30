@@ -1,9 +1,9 @@
 package com.auction.client.service;
 
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionRow;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionRow;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.responses.ServiceResult;
 import com.auction.client.model.AuctionRoomViewModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.auction.client.network.SocketClient;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.RegistrationRequest;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.requests.RegistrationRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.mockito.MockedStatic;
 
@@ -40,7 +40,7 @@ class ClientServicesTest {
         mockedSocketClient = mockStatic(SocketClient.class);
         mockedSocketClient.when(SocketClient::getInstance).thenReturn(mockSocketClient);
 
-        SessionContext.setCurrentUser(new AuthUser("Full Name", "testuser", "test@test.com", "hash", "USER"));
+        SessionContext.setCurrentUser(new UserAccount("Full Name", "testuser", "test@test.com", "hash", "USER"));
     }
 
     @AfterEach
@@ -51,13 +51,13 @@ class ClientServicesTest {
     @Test
     @DisplayName("Kiểm thử AuthService login thành công")
     void testAuthServiceLogin_Success() throws Exception {
-        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "USER");
-        ServiceResult<AuthUser> expected = new ServiceResult<>(true, "Success", user);
+        UserAccount user = new UserAccount("Full Name", "user", "email", "hash", "USER");
+        ServiceResult<UserAccount> expected = new ServiceResult<>(true, "Success", user);
 
         when(mockSocketClient.receiveResponse()).thenReturn(expected);
 
         LoginRequest request = new LoginRequest("user", "pass");
-        ServiceResult<AuthUser> result = authService.login(request);
+        ServiceResult<UserAccount> result = authService.login(request);
 
         assertTrue(result.success());
         assertEquals("user", SessionContext.getCurrentUser().getUsername());
@@ -68,7 +68,7 @@ class ClientServicesTest {
     @DisplayName("Kiểm thử AuthService login thất bại (thiếu thông tin)")
     void testAuthServiceLogin_MissingInfo() {
         LoginRequest request = new LoginRequest("", "");
-        ServiceResult<AuthUser> result = authService.login(request);
+        ServiceResult<UserAccount> result = authService.login(request);
         assertFalse(result.success());
         assertEquals("Nhập đủ thông tin.", result.message());
     }
@@ -79,7 +79,7 @@ class ClientServicesTest {
         doThrow(new IOException("Conn error")).when(mockSocketClient).sendRequest(any());
 
         LoginRequest request = new LoginRequest("user", "pass");
-        ServiceResult<AuthUser> result = authService.login(request);
+        ServiceResult<UserAccount> result = authService.login(request);
 
         assertFalse(result.success());
         assertEquals("Lỗi kết nối.", result.message());
@@ -89,12 +89,12 @@ class ClientServicesTest {
     @DisplayName("Kiểm thử AuthService register thành công")
     void testAuthServiceRegister_Success() throws Exception {
         RegistrationRequest request = new RegistrationRequest("Full Name", "user", "email", "pass");
-        AuthUser user = new AuthUser("Full Name", "user", "email", "hash", "USER");
-        ServiceResult<AuthUser> expected = new ServiceResult<>(true, "Success", user);
+        UserAccount user = new UserAccount("Full Name", "user", "email", "hash", "USER");
+        ServiceResult<UserAccount> expected = new ServiceResult<>(true, "Success", user);
 
         when(mockSocketClient.receiveResponse()).thenReturn(expected);
 
-        ServiceResult<AuthUser> result = authService.register(request);
+        ServiceResult<UserAccount> result = authService.register(request);
         assertTrue(result.success());
         verify(mockSocketClient).sendRequest(request);
     }

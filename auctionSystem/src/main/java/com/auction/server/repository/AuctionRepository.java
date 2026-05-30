@@ -1,16 +1,13 @@
 package com.auction.server.repository;
 
 import com.auction.server.config.DatabaseConfig;
-import com.auction.shared.models.Art;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-import com.auction.shared.models.Bidder;
-import com.auction.shared.models.Electronics;
-import com.auction.shared.models.Item;
-import com.auction.shared.models.Seller;
-import com.auction.shared.models.Vehicle;
-import com.auction.shared.models.ItemFactory;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.models.item.Item;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.models.item.ItemFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

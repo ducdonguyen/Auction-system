@@ -1,9 +1,9 @@
 package com.auction.server.concurrency;
 
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.BidTransaction;
-import com.auction.shared.models.Bidder;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Bidder;
+import com.auction.shared.network.responses.ServiceResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.io.ObjectInputStream; // THÊM IMPORT NÀY ĐỂ HẾT LỖI ĐỎ
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.time.LocalDateTime;

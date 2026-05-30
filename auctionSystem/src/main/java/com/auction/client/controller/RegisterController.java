@@ -3,9 +3,9 @@ package com.auction.client.controller;
 import com.auction.client.service.AuthService;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.RegistrationRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -66,7 +66,7 @@ public class RegisterController {
     RegistrationRequest request = new RegistrationRequest(fullName, username, email, password);
 
     // 3. GỌI SERVICE XỬ LÝ MẠNG
-    ServiceResult<AuthUser> result = authService.register(request);
+    ServiceResult<UserAccount> result = authService.register(request);
 
     // 4. HIỂN THỊ KẾT QUẢ
     messageLabel.setText(result.message());

@@ -2,11 +2,10 @@ package com.auction.client.controller;
 
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuthService;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.LoginRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auth.UserAccount;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -90,8 +89,8 @@ public class LoginControllerTest {
         usernameField.setText("testuser");
         passwordField.setText("password");
 
-        AuthUser authUser = new AuthUser("Full Name", "testuser", "test@example.com", "TOKEN", "BIDDER");
-        ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
+        UserAccount userAccount = new UserAccount("Full Name", "testuser", "test@example.com", "TOKEN", "BIDDER");
+        ServiceResult<UserAccount> successResult = new ServiceResult<>(true, "Login successful", userAccount);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
 
@@ -121,8 +120,8 @@ public class LoginControllerTest {
         usernameField.setText("admin");
         passwordField.setText("adminpass");
 
-        AuthUser authUser = new AuthUser("Admin User", "admin", "admin@example.com", "TOKEN", "ADMIN");
-        ServiceResult<AuthUser> successResult = new ServiceResult<>(true, "Login successful", authUser);
+        UserAccount userAccount = new UserAccount("Admin User", "admin", "admin@example.com", "TOKEN", "ADMIN");
+        ServiceResult<UserAccount> successResult = new ServiceResult<>(true, "Login successful", userAccount);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
 

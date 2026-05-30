@@ -1,9 +1,8 @@
 package com.auction.client.controller;
 
 import com.auction.client.service.AuthService;
-import com.auction.shared.models.AuthUser;
-import com.auction.shared.network.RegistrationRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

@@ -1,8 +1,8 @@
 package com.auction.server.core;
 
 import com.auction.server.repository.AuctionRepository;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;

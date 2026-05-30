@@ -1,12 +1,13 @@
 package com.auction.shared;
 
-import com.auction.shared.network.*;
 import com.auction.shared.exceptions.*;
-import com.auction.shared.models.Bidder;
+import com.auction.shared.network.requests.BidRequest;
+import com.auction.shared.network.requests.JoinRoomRequest;
+import com.auction.shared.network.requests.LoginRequest;
+import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 

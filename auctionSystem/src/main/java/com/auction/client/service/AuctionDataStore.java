@@ -1,10 +1,10 @@
 package com.auction.client.service;
 
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionStatus;
-import com.auction.shared.models.Item;
-import com.auction.shared.models.ItemFactory;
-import com.auction.shared.models.Seller;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.item.Item;
+import com.auction.shared.models.item.ItemFactory;
+import com.auction.shared.models.auth.Seller;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

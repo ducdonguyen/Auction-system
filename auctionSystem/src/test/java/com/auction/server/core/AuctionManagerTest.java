@@ -1,7 +1,11 @@
 package com.auction.server.core;
 
 import com.auction.shared.exceptions.AuthenticationException;
-import com.auction.shared.models.*;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.models.item.Art;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

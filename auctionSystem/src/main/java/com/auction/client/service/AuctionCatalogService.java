@@ -1,18 +1,18 @@
 package com.auction.client.service;
 
 import com.auction.client.network.SocketClient;
-import com.auction.shared.models.Auction;
-import com.auction.shared.models.AuctionRow;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionRow;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import com.auction.shared.network.ApproveAuctionRequest;
-import com.auction.shared.network.CancelAuctionRequest;
-import com.auction.shared.network.GetAllAuctionsRequest;
-import com.auction.shared.network.GetPendingAuctionsRequest;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.network.requests.ApproveAuctionRequest;
+import com.auction.shared.network.requests.CancelAuctionRequest;
+import com.auction.shared.network.requests.GetAllAuctionsRequest;
+import com.auction.shared.network.requests.GetPendingAuctionsRequest;
+import com.auction.shared.network.responses.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +124,7 @@ public class AuctionCatalogService {
    * Gửi yêu cầu phê duyệt phiên đấu giá lên server.
    */
   @SuppressWarnings("unchecked")
-  public com.auction.shared.network.ServiceResult<Void> approveAuction(String auctionId) {
+  public ServiceResult<Void> approveAuction(String auctionId) {
     try {
       SocketClient.getInstance().sendRequest(new ApproveAuctionRequest(auctionId));
       return (ServiceResult<Void>) SocketClient.getInstance().receiveResponse();

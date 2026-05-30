@@ -3,11 +3,14 @@ package com.auction.server.core;
 import com.auction.server.concurrency.AuctionLockManager;
 import com.auction.server.repository.AuctionRepository;
 import com.auction.server.service.AuthService; // IMPORT MỚI
-import com.auction.shared.models.*;
+import com.auction.shared.models.auction.Auction;
+import com.auction.shared.models.auction.AuctionStatus;
+import com.auction.shared.models.auth.Seller;
+import com.auction.shared.models.item.Electronics;
+import com.auction.shared.models.item.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.lang.reflect.Field; // IMPORT MỚI để dùng Reflection tiêm Mock
 import java.time.LocalDateTime;

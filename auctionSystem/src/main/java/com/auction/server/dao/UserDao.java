@@ -1,7 +1,7 @@
 package com.auction.server.dao;
 
 import com.auction.server.config.DatabaseConfig;
-import com.auction.shared.models.AuthUser;
+import com.auction.shared.models.auth.UserAccount;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +24,7 @@ public class UserDao {
         }
     }
 
-    public void register(AuthUser user) throws SQLException {
+    public void register(UserAccount user) throws SQLException {
         String sql = "INSERT INTO users (full_name, username, email, password_hash, account_role, balance) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -38,7 +38,7 @@ public class UserDao {
         }
     }
 
-    public AuthUser findByUsername(String username) throws SQLException {
+    public UserAccount findByUsername(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE username = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -49,7 +49,7 @@ public class UserDao {
                 }
 
                 // CẬP NHẬT: Sử dụng Constructor đầy đủ để ánh xạ cột 'balance' từ DB lên Object bộ nhớ
-                AuthUser user = new AuthUser(
+                UserAccount user = new UserAccount(
                         rs.getLong("id"),
                         rs.getString("full_name"),
                         rs.getString("username"),

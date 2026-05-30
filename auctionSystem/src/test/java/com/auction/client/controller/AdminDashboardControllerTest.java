@@ -1,8 +1,8 @@
 package com.auction.client.controller;
 
 import com.auction.client.service.AuctionCatalogService;
-import com.auction.shared.models.AuctionRow;
-import com.auction.shared.network.ServiceResult;
+import com.auction.shared.models.auction.AuctionRow;
+import com.auction.shared.network.responses.ServiceResult;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
