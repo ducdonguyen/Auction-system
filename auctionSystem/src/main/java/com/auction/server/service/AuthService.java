@@ -109,9 +109,7 @@ public class AuthService {
 
             // 3. Thực hiện cập nhật số dư tăng thêm trực tiếp vào Database thông qua UserDao.
             // Phương thức updateBalance này sẽ trả về con số tổng (Số dư cũ + Số tiền mới nạp).
-            double newBalance = userDao.updateBalance(username, amount);
-
-            return newBalance;
+            return userDao.updateBalance(username, amount);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -128,11 +126,12 @@ public class AuthService {
         }
     }
 
-    public void freezeBalance(String username, double amount) {
+    public boolean freezeBalance(String username, double amount) {
         try {
-            userDao.freezeBalance(username, amount);
+            return userDao.freezeBalance(username, amount);
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
