@@ -19,9 +19,11 @@ import com.auction.shared.network.requests.GetAllAuctionsRequest;
 import com.auction.shared.network.requests.JoinRoomRequest;
 import com.auction.shared.network.requests.LoginRequest;
 import com.auction.shared.network.requests.RegistrationRequest;
+import com.auction.shared.network.requests.SetAutoBidRequest;
+import com.auction.shared.network.requests.CancelAutoBidRequest;
 import com.auction.shared.network.responses.ServiceResult;
-import com.auction.shared.network.requests.TopUpRequest;   // IMPORT MỚI
-import com.auction.shared.network.responses.TopUpResponse;  // IMPORT MỚI
+import com.auction.shared.network.requests.TopUpRequest;
+import com.auction.shared.network.responses.TopUpResponse;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import org.slf4j.Logger;
@@ -68,9 +70,9 @@ public class RequestRouter {
                 case CreateAuctionRequest createReq -> handleCreateAuction(createReq, handler, out);
                 case GetPendingAuctionsRequest getPending -> handleGetPendingAuctions(out);
                 case ApproveAuctionRequest approve -> handleApproveAuction(approve, out);
-
-                // NHÁNH MỚI: Bắt gói tin yêu cầu nạp tiền real-time
                 case TopUpRequest topUpReq -> handleTopUp(topUpReq, out);
+                case SetAutoBidRequest setAutoBid -> handleSetAutoBid(setAutoBid, handler, out);
+                case CancelAutoBidRequest cancelAutoBid -> handleCancelAutoBid(cancelAutoBid, handler, out);
 
                 default -> logger.warn("Unknown request: {}", request.getClass().getName());
             }
@@ -239,7 +241,7 @@ public class RequestRouter {
     }
 
     /**
-     * HÀM MỚI THÊM VÀO: Tiếp nhận và điều hướng xử lý cộng tiền từ TopUpRequest
+     * Tiếp nhận và điều hướng xử lý cộng tiền từ TopUpRequest
      */
     private void handleTopUp(TopUpRequest request, ObjectOutputStream out) throws IOException {
         TopUpResponse response;
@@ -260,5 +262,52 @@ public class RequestRouter {
     private void sendResponse(ObjectOutputStream out, Object response) throws IOException {
         out.writeObject(response);
         out.flush();
+    }
+
+    /**
+     * Tiếp nhận yêu cầu BẬT Auto-bid từ Client
+     */
+    private void handleSetAutoBid(SetAutoBidRequest request, ClientHandler handler, ObjectOutputStream out) throws IOException {
+        try {
+            // Lấy trực tiếp username từ session kết nối hiện tại để đảm bảo bảo mật (không tin tưởng Client gửi lên)
+            String username = handler.getUsername();
+            if (username == null) {
+                sendResponse(out, new ServiceResult<>(false, "Bạn cần đăng nhập để sử dụng tính năng này.", null));
+                return;
+            }
+
+            // Đẩy dữ liệu vào AuctionService
+            auctionService.registerAutoBid(request.getAuctionId(), username, request.getMaxBid(), request.getIncrement());
+
+            logger.info("[SERVER] User {} đã BẬT Auto-Bid cho phòng {}", username, request.getAuctionId());
+            sendResponse(out, new ServiceResult<>(true, "Đã bật Auto-bid thành công!", null));
+
+        } catch (Exception e) {
+            logger.error("[SERVER] Lỗi bật Auto-bid", e);
+            sendResponse(out, new ServiceResult<>(false, "Lỗi Server khi bật Auto-bid: " + e.getMessage(), null));
+        }
+    }
+
+    /**
+     * Tiếp nhận yêu cầu TẮT Auto-bid từ Client
+     */
+    private void handleCancelAutoBid(CancelAutoBidRequest request, ClientHandler handler, ObjectOutputStream out) throws IOException {
+        try {
+            String username = handler.getUsername();
+            if (username == null) {
+                sendResponse(out, new ServiceResult<>(false, "Bạn cần đăng nhập để sử dụng tính năng này.", null));
+                return;
+            }
+
+            // Gọi service để gỡ bỏ Bot
+            auctionService.removeAutoBid(request.getAuctionId(), username);
+
+            logger.info("[SERVER] User {} đã TẮT Auto-Bid cho phòng {}", username, request.getAuctionId());
+            sendResponse(out, new ServiceResult<>(true, "Đã tắt hệ thống Auto-bid.", null));
+
+        } catch (Exception e) {
+            logger.error("[SERVER] Lỗi tắt Auto-bid", e);
+            sendResponse(out, new ServiceResult<>(false, "Lỗi Server khi tắt Auto-bid: " + e.getMessage(), null));
+        }
     }
 }

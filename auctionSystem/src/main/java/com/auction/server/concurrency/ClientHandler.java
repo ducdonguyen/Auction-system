@@ -54,6 +54,10 @@ public class ClientHandler implements Runnable, AuctionObserver {
     activeClients.put(username, this);
   }
 
+  public String getUsername() {
+    return this.username;
+  }
+
   // Hàm tĩnh để bắn gói tin Socket tới riêng một người dùng
   public static void sendToUser(String username, Object message) {
     ClientHandler handler = activeClients.get(username);

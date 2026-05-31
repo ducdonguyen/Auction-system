@@ -261,8 +261,10 @@ public class AuctionService {
 
     // --- BẮT ĐẦU: LOGIC AUTO-BID ---
 
-    public void registerAutoBid(String auctionId, String bidderUsername, double maxBid) {
-        autoBidManager.registerAutoBid(auctionId, bidderUsername, maxBid);
+
+    public void registerAutoBid(String auctionId, String bidderUsername, double maxBid, double increment) {
+        autoBidManager.registerAutoBid(auctionId, bidderUsername, maxBid, increment);
+
         triggerAutoBids(auctionId);
     }
 
@@ -291,7 +293,9 @@ public class AuctionService {
                     break;
                 }
 
-                double nextBidPrice = auction.getCurrentPrice() + auction.getStepPrice();
+                // Lấy bước nhảy do chính user cài đặt (có bảo vệ tối thiểu bằng bước giá của phòng)
+                double actualIncrement = Math.max(eligible.getIncrement(), auction.getStepPrice());
+                double nextBidPrice = auction.getCurrentPrice() + actualIncrement;
 
                 double balance = authService.getBalance(eligible.getBidderUsername());
                 if (balance < nextBidPrice) {

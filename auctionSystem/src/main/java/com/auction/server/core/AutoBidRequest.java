@@ -8,11 +8,13 @@ import java.time.LocalDateTime;
 public class AutoBidRequest implements Comparable<AutoBidRequest> {
     private final String bidderUsername;
     private final double maxBid;
+    private final double increment;
     private final LocalDateTime setupTime;
 
-    public AutoBidRequest(String bidderUsername, double maxBid) {
+    public AutoBidRequest(String bidderUsername, double maxBid, double increment) {
         this.bidderUsername = bidderUsername;
         this.maxBid = maxBid;
+        this.increment = increment;
         this.setupTime = LocalDateTime.now();
     }
 
@@ -22,6 +24,10 @@ public class AutoBidRequest implements Comparable<AutoBidRequest> {
 
     public double getMaxBid() {
         return maxBid;
+    }
+
+    public double getIncrement() {
+        return increment;
     }
 
     public LocalDateTime getSetupTime() {

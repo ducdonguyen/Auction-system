@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -43,25 +44,28 @@ class AutoBidManagerTest {
 
         // Mặc định cho số dư lớn để các test chạy không bị lỗi số dư
         when(authService.getBalance(anyString())).thenReturn(1000000.0);
+
+        // ĐÃ THÊM MỚI: Cấu hình để hệ thống luôn cho phép trừ tiền thành công đối với các Bot
+        when(authService.freezeBalance(anyString(), anyDouble())).thenReturn(true);
+
         when(authService.getFullName(anyString())).thenAnswer(invocation -> "Fullname of " + invocation.getArgument(0));
     }
 
     @Test
     @DisplayName("Kiểm thử độ ưu tiên của hàng đợi Auto-bid")
     void testAutoBidRequestPriority() throws InterruptedException {
-        // Cài giá trần khác nhau: maxBid cao hơn phải đứng trước
-        AutoBidRequest req1 = new AutoBidRequest("user1", 1500.0);
-        AutoBidRequest req2 = new AutoBidRequest("user2", 1800.0);
-        
+        AutoBidRequest req1 = new AutoBidRequest("user1", 1500.0, 100.0);
+        AutoBidRequest req2 = new AutoBidRequest("user2", 1800.0, 100.0);
+
         // So sánh: req2 có maxBid lớn hơn nên phải được xếp trước (tức là so sánh trả về số âm khi đứng trước)
         assertTrue(req2.compareTo(req1) < 0);
         assertTrue(req1.compareTo(req2) > 0);
 
         // Cài giá trần giống nhau: cài trước (setupTime nhỏ hơn) phải đứng trước
-        AutoBidRequest req3 = new AutoBidRequest("user3", 1500.0);
+        AutoBidRequest req3 = new AutoBidRequest("user3", 1500.0, 100.0);
         // Ngủ 15 mili-giây để đảm bảo thời gian tạo khác biệt rõ ràng
         Thread.sleep(15);
-        AutoBidRequest req4 = new AutoBidRequest("user4", 1500.0);
+        AutoBidRequest req4 = new AutoBidRequest("user4", 1500.0, 100.0);
 
         assertTrue(req3.compareTo(req4) < 0);
         assertTrue(req4.compareTo(req3) > 0);
@@ -79,9 +83,8 @@ class AutoBidManagerTest {
         when(auctionRepository.findById("AUC-BOT-1")).thenReturn(auction);
         when(auctionRepository.save(any(Auction.class))).thenReturn(auction);
 
-        // Đăng ký auto-bid cho bidder1 với maxBid = 1500.0
-        // Hệ thống tự động đặt giá khởi điểm 1100.0 cho bidder1 ngay khi đăng ký
-        auctionService.registerAutoBid("AUC-BOT-1", "bidder1", 1500.0);
+        // Đăng ký auto-bid cho bidder1 với maxBid = 1500.0 và increment = 100.0
+        auctionService.registerAutoBid("AUC-BOT-1", "bidder1", 1500.0, 100.0);
 
         // Kiểm tra xem bidder1 đã ở trong danh sách chưa
         List<AutoBidRequest> list = auctionService.getAutoBids("AUC-BOT-1");
@@ -110,11 +113,11 @@ class AutoBidManagerTest {
         when(auctionRepository.findById("AUC-WAR")).thenReturn(auction);
         when(auctionRepository.save(any(Auction.class))).thenReturn(auction);
 
-        // Đăng ký Bot A: max 1500.0 -> tự động bid 1100.0
-        auctionService.registerAutoBid("AUC-WAR", "botA", 1500.0);
+        // Đăng ký Bot A: max 1500.0, increment 100.0
+        auctionService.registerAutoBid("AUC-WAR", "botA", 1500.0, 100.0);
 
-        // Đăng ký Bot B: max 1800.0 -> tự động bid 1200.0 -> Bot A bid 1300.0 -> Bot B bid 1400.0 -> Bot A bid 1500.0 -> Bot B bid 1600.0
-        auctionService.registerAutoBid("AUC-WAR", "botB", 1800.0);
+        // Đăng ký Bot B: max 1800.0, increment 100.0
+        auctionService.registerAutoBid("AUC-WAR", "botB", 1800.0, 100.0);
 
         // Cả 2 bot tự động đấu giá đẩy giá lên 1600.0
         assertEquals(1600.0, auction.getCurrentPrice());
@@ -135,7 +138,7 @@ class AutoBidManagerTest {
 
         // Bot A: max 1500.0 nhưng không có tiền (số dư = 0)
         when(authService.getBalance("poorBot")).thenReturn(0.0);
-        auctionService.registerAutoBid("AUC-NO-MONEY", "poorBot", 1500.0);
+        auctionService.registerAutoBid("AUC-NO-MONEY", "poorBot", 1500.0, 100.0);
 
         // poorBot không đủ tiền nên giá khởi điểm vẫn là 1000.0, chưa có ai trả giá cao nhất
         assertEquals(1000.0, auction.getCurrentPrice());

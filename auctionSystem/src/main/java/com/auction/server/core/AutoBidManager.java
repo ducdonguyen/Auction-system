@@ -18,12 +18,15 @@ public class AutoBidManager {
     private static final Logger logger = LoggerFactory.getLogger(AutoBidManager.class);
     private final Map<String, PriorityQueue<AutoBidRequest>> auctionAutoBids = new ConcurrentHashMap<>();
 
-    public synchronized void registerAutoBid(String auctionId, String bidderUsername, double maxBid) {
+    public synchronized void registerAutoBid(String auctionId, String bidderUsername, double maxBid, double increment) {
         PriorityQueue<AutoBidRequest> queue = auctionAutoBids.computeIfAbsent(auctionId, k -> new PriorityQueue<>());
         queue.removeIf(req -> req.getBidderUsername().equals(bidderUsername));
-        queue.offer(new AutoBidRequest(bidderUsername, maxBid));
-        logger.info("[AutoBidManager] Đã bật Auto-bid cho user {} tại phòng {} với giá trần {}",
-                bidderUsername, auctionId, maxBid);
+
+        // Nhồi increment vào Hàng đợi ưu tiên
+        queue.offer(new AutoBidRequest(bidderUsername, maxBid, increment));
+
+        logger.info("[AutoBidManager] Đã bật Auto-bid cho user {} tại phòng {}. Giá trần: {}, Bước nhảy: {}",
+                bidderUsername, auctionId, maxBid, increment);
     }
 
     public synchronized void removeAutoBid(String auctionId, String bidderUsername) {
@@ -42,7 +45,6 @@ public class AutoBidManager {
             return null;
         }
 
-        double nextBidPrice = auction.getCurrentPrice() + auction.getStepPrice();
         Bidder highestBidder = auction.getHighestBidder();
         String highestBidderUsername = (highestBidder != null) ? highestBidder.getUsername() : null;
 
@@ -51,10 +53,16 @@ public class AutoBidManager {
 
         for (AutoBidRequest req : sortedRequests) {
             if (req.getBidderUsername().equals(highestBidderUsername)) {
-                continue;
+                continue; // Bỏ qua nếu người này đang dẫn đầu rồi
             }
+
+            // Tính giá thầu tiếp theo dựa trên increment của CÁ NHÂN người dùng này.
+            // Math.max để phòng hờ trường hợp Client hack gửi increment < bước giá tối thiểu của phòng
+            double actualIncrement = Math.max(req.getIncrement(), auction.getStepPrice());
+            double nextBidPrice = auction.getCurrentPrice() + actualIncrement;
+
             if (nextBidPrice <= req.getMaxBid()) {
-                return req;
+                return req; // Tìn thấy người đủ điều kiện
             }
         }
         return null;

@@ -116,21 +116,7 @@ public class AuctionRoomController {
             double stepPrice = parseCurrency(stepPriceLabel != null ? stepPriceLabel.getText() : "0");
             minimumBidLabel.setText(String.format("%,.0f VNĐ", currentPrice + stepPrice));
 
-            // --- AUTO BID LOGIC ---
-            if (autoBidToggle != null && autoBidToggle.isSelected() && autoBidConfig != null) {
-              String myUsername = SessionContext.getCurrentUser().getUsername();
-              if (!bidTransaction.bidder().getUsername().equals(myUsername)) {
-                double nextBid = currentPrice + autoBidConfig.increment();
-                if (nextBid <= autoBidConfig.maxBid()) {
-                  performAutoBid(nextBid);
-                } else {
-                  autoBidToggle.setSelected(false);
-                  handleAutoBidToggle();
-                  messageLabel.setText("Đã đạt tới giá trần Auto-Bid!");
-                  messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-                }
-              }
-            }
+            // ĐÃ XÓA SẠCH ĐOẠN AUTO-BID LOGIC Ở ĐÂY VÌ SERVER SẼ TỰ LÀM VIỆC ĐÓ
 
           } catch (Exception e) {
             logger.error("Lỗi cập nhật giá thầu mới lên giao diện", e);
@@ -226,31 +212,44 @@ public class AuctionRoomController {
   @FXML
   private void handleAutoBidToggle() {
     if (autoBidToggle == null) return;
-    
+
     if (autoBidToggle.isSelected()) {
+      // 1. NGƯỜI DÙNG BẬT AUTO-BID
       try {
         double currentBalance = parseCurrency(balanceLabel != null ? balanceLabel.getText() : "0");
         double minIncrement = parseCurrency(stepPriceLabel != null ? stepPriceLabel.getText() : "0");
 
         AutoBidDialog dialog = new AutoBidDialog(currentBalance, minIncrement);
         dialog.showAndWait().ifPresentOrElse(config -> {
-          this.autoBidConfig = config;
-          autoBidToggle.setText("Auto-Bid: ON");
-          autoBidToggle.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8;");
-          if (autoBidStatusLabel != null) {
-            autoBidStatusLabel.setText(String.format("Hệ thống đang tự động đặt giá cho bạn tới mốc %,.0f VNĐ", config.maxBid()));
-            autoBidStatusLabel.setVisible(true);
-          }
 
-          double currentPrice = parseCurrency(currentPriceLabel != null ? currentPriceLabel.getText() : "0");
-          String myUsername = SessionContext.getCurrentUser().getUsername();
-          if (highestBidderLabel != null && !highestBidderLabel.getText().equals(myUsername) && !highestBidderLabel.getText().equals("Chưa có")) {
-            double nextBid = currentPrice + autoBidConfig.increment();
-            if (nextBid <= autoBidConfig.maxBid()) {
-              performAutoBid(nextBid);
-            }
-          }
+          // GỌI XUỐNG SERVICE BẰNG LUỒNG MẠNG (THREAD MỚI ĐỂ KHÔNG ĐƠ UI)
+          new Thread(() -> {
+            ServiceResult<Void> result = service.setupAutoBid(aid, config.maxBid(), config.increment());
+
+            // HỨNG KẾT QUẢ VÀ CẬP NHẬT GIAO DIỆN
+            Platform.runLater(() -> {
+              if (result.success()) {
+                this.autoBidConfig = config;
+                autoBidToggle.setText("Auto-Bid: ON");
+                autoBidToggle.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8;");
+                if (autoBidStatusLabel != null) {
+                  autoBidStatusLabel.setText(String.format("Hệ thống đang tự động đặt giá cho bạn tới mốc %,.0f VNĐ", config.maxBid()));
+                  autoBidStatusLabel.setVisible(true);
+                }
+                messageLabel.setStyle("-fx-text-fill: #166534;");
+                messageLabel.setText(result.message());
+              } else {
+                // Nếu Server từ chối, gạt nút Toggle về trạng thái tắt
+                autoBidToggle.setSelected(false);
+                resetAutoBidUI();
+                messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+                messageLabel.setText(result.message());
+              }
+            });
+          }).start();
+
         }, () -> {
+          // Người dùng bấm Hủy trên Dialog cài đặt
           autoBidToggle.setSelected(false);
           resetAutoBidUI();
         });
@@ -260,7 +259,21 @@ public class AuctionRoomController {
         resetAutoBidUI();
       }
     } else {
-      resetAutoBidUI();
+      // 2. NGƯỜI DÙNG CHỦ ĐỘNG TẮT AUTO-BID
+      new Thread(() -> {
+        ServiceResult<Void> result = service.cancelAutoBid(aid);
+
+        Platform.runLater(() -> {
+          resetAutoBidUI(); // Luôn tắt UI dù mạng có lỗi hay không để an toàn
+          if (result.success()) {
+            messageLabel.setStyle("-fx-text-fill: #0369a1;");
+            messageLabel.setText(result.message());
+          } else {
+            messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+            messageLabel.setText("Lỗi hủy Auto-bid: " + result.message());
+          }
+        });
+      }).start();
     }
   }
 
@@ -273,23 +286,6 @@ public class AuctionRoomController {
       autoBidStatusLabel.setVisible(false);
     }
     autoBidConfig = null;
-  }
-
-  private void performAutoBid(double amount) {
-    new Thread(() -> {
-      ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, String.valueOf(amount));
-      Platform.runLater(() -> {
-        if (result.success()) {
-          messageLabel.setStyle("-fx-text-fill: #166534;");
-        } else {
-          messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-        }
-        messageLabel.setText("Auto-bid: " + result.message());
-        if (result.data() != null) {
-          bind(result.data());
-        }
-      });
-    }).start();
   }
 
   @FXML

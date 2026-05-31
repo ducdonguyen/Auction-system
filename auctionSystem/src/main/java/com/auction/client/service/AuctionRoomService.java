@@ -6,6 +6,8 @@ import com.auction.shared.models.auction.Auction;
 import com.auction.shared.models.auth.UserAccount;
 import com.auction.shared.network.requests.BidRequest;
 import com.auction.shared.network.requests.JoinRoomRequest;
+import com.auction.shared.network.requests.SetAutoBidRequest;
+import com.auction.shared.network.requests.CancelAutoBidRequest;
 import com.auction.shared.network.responses.ServiceResult;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
@@ -87,6 +89,42 @@ public class AuctionRoomService {
 
       return new ServiceResult<>(false, "Phản hồi từ Server không hợp lệ", null);
 
+    } catch (Exception e) {
+      return new ServiceResult<>(false, "Lỗi kết nối mạng: " + e.getMessage(), null);
+    }
+  }
+
+  /**
+   * Gửi gói tin yêu cầu Server bật Auto-Bid.
+   */
+  public ServiceResult<Void> setupAutoBid(String auctionId, double maxBid, double increment) {
+    try {
+      SetAutoBidRequest request = new SetAutoBidRequest(auctionId, maxBid, increment);
+      SocketClient.getInstance().sendRequest(request);
+
+      Object rawResponse = SocketClient.getInstance().receiveResponse();
+      if (rawResponse instanceof ServiceResult<?> response) {
+        return new ServiceResult<>(response.success(), response.message(), null);
+      }
+      return new ServiceResult<>(false, "Phản hồi từ Server không hợp lệ", null);
+    } catch (Exception e) {
+      return new ServiceResult<>(false, "Lỗi kết nối mạng: " + e.getMessage(), null);
+    }
+  }
+
+  /**
+   * Gửi gói tin yêu cầu Server tắt Auto-Bid.
+   */
+  public ServiceResult<Void> cancelAutoBid(String auctionId) {
+    try {
+      CancelAutoBidRequest request = new CancelAutoBidRequest(auctionId);
+      SocketClient.getInstance().sendRequest(request);
+
+      Object rawResponse = SocketClient.getInstance().receiveResponse();
+      if (rawResponse instanceof ServiceResult<?> response) {
+        return new ServiceResult<>(response.success(), response.message(), null);
+      }
+      return new ServiceResult<>(false, "Phản hồi từ Server không hợp lệ", null);
     } catch (Exception e) {
       return new ServiceResult<>(false, "Lỗi kết nối mạng: " + e.getMessage(), null);
     }
