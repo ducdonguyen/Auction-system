@@ -160,11 +160,17 @@
 
                                 <VBox spacing="12.0" minHeight="-Infinity" VBox.vgrow="NEVER">
                                     <children>
-                                        <Label text="Đặt giá của bạn" textFill="#0f172a">
-                                            <font>
-                                                <Font name="System Bold" size="16.0"/>
-                                            </font>
-                                        </Label>
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                            <children>
+                                                <Label text="Đặt giá của bạn" textFill="#0f172a">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <ToggleButton fx:id="autoBidToggle" mnemonicParsing="false" onAction="#handleAutoBidToggle" style="-fx-background-radius: 8; -fx-cursor: hand;" text="Auto-Bid: OFF" />
+                                            </children>
+                                        </HBox>
                                         <HBox spacing="12.0">
                                             <children>
                                                 <TextField fx:id="bidAmountField" prefHeight="48.0" prefWidth="300.0"
@@ -176,6 +182,11 @@
                                                         text="ĐẶT GIÁ"/>
                                             </children>
                                         </HBox>
+                                        <Label fx:id="autoBidStatusLabel" text="" textFill="#16a34a" visible="false">
+                                            <font>
+                                                <Font name="System Italic" size="13.0" />
+                                            </font>
+                                        </Label>
                                         <Label fx:id="messageLabel" textFill="#0369a1"/>
                                     </children>
                                 </VBox>

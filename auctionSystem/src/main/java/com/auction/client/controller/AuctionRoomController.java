@@ -4,18 +4,23 @@ import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
 import com.auction.client.service.ServiceFactory;
+import com.auction.client.service.SessionContext;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
+import com.auction.client.view.AutoBidDialog;
 import com.auction.shared.models.auction.AuctionStatus;
 import com.auction.shared.models.auction.BidTransaction;
 import com.auction.shared.network.responses.ServiceResult;
 import java.io.IOException;
+import java.util.Locale;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +31,7 @@ public class AuctionRoomController {
   private static final Logger logger = LoggerFactory.getLogger(AuctionRoomController.class);
   private final AuctionRoomService service = ServiceFactory.getRoomService();
   private String aid;
+
   @FXML
   private Label auctionIdLabel;
   @FXML
@@ -53,12 +59,21 @@ public class AuctionRoomController {
   @FXML
   private ListView<String> bidHistoryList;
   @FXML
-  private Label itemTypeLabel;   // THÊM MỚI
+  private Label itemTypeLabel;
   @FXML
-  private Label extraInfoLabel;   // THÊM MỚI
-  // THÊM MỚI 2: Ánh xạ ô hiển thị Số dư màu xanh biển cạnh ID phiên đấu giá
+  private Label extraInfoLabel;
   @FXML
   private Label balanceLabel;
+  @FXML
+  private Button btnPlaceBid;
+
+  // --- AUTO BID COMPONENTS ---
+  @FXML
+  private ToggleButton autoBidToggle;
+  @FXML
+  private Label autoBidStatusLabel;
+
+  private AutoBidDialog.AutoBidConfig autoBidConfig;
 
   /**
    * Thiết lập ID của phiên đấu giá và render giao diện.
@@ -79,7 +94,7 @@ public class AuctionRoomController {
       @Override
       public void onNewBid(BidTransaction bidTransaction) {
         Platform.runLater(() -> {
-          try { // 2. Bọc try-catch để bảo vệ luồng UI
+          try {
             String displayName = bidTransaction.bidder().getFullName();
             if (displayName == null || displayName.trim().isEmpty()) {
               displayName = bidTransaction.bidder().getUsername();
@@ -88,7 +103,7 @@ public class AuctionRoomController {
             highestBidderLabel.setText(displayName);
 
             String historyLine = String.format(
-                    java.util.Locale.of("vi", "VN"),
+                    Locale.of("vi", "VN"),
                     "%1$s đặt %2$,.0f đ lúc %3$td/%3$tm/%3$tY %3$tH:%3$tM",
                     displayName,
                     bidTransaction.bidAmount(),
@@ -98,8 +113,24 @@ public class AuctionRoomController {
             bidHistoryList.getItems().add(0, historyLine);
 
             double currentPrice = bidTransaction.bidAmount();
-            double stepPrice = Double.parseDouble(stepPriceLabel.getText().replaceAll("[^0-9]", ""));
+            double stepPrice = parseCurrency(stepPriceLabel != null ? stepPriceLabel.getText() : "0");
             minimumBidLabel.setText(String.format("%,.0f VNĐ", currentPrice + stepPrice));
+
+            // --- AUTO BID LOGIC ---
+            if (autoBidToggle != null && autoBidToggle.isSelected() && autoBidConfig != null) {
+              String myUsername = SessionContext.getCurrentUser().getUsername();
+              if (!bidTransaction.bidder().getUsername().equals(myUsername)) {
+                double nextBid = currentPrice + autoBidConfig.increment();
+                if (nextBid <= autoBidConfig.maxBid()) {
+                  performAutoBid(nextBid);
+                } else {
+                  autoBidToggle.setSelected(false);
+                  handleAutoBidToggle();
+                  messageLabel.setText("Đã đạt tới giá trần Auto-Bid!");
+                  messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+                }
+              }
+            }
 
           } catch (Exception e) {
             logger.error("Lỗi cập nhật giá thầu mới lên giao diện", e);
@@ -116,6 +147,10 @@ public class AuctionRoomController {
             statusLabel.setText(status.name());
             if (status == AuctionStatus.FINISHED || status == AuctionStatus.CANCELED) {
               bidAmountField.setDisable(true);
+              if (autoBidToggle != null && autoBidToggle.isSelected()) {
+                autoBidToggle.setSelected(false);
+                handleAutoBidToggle();
+              }
               if (status == AuctionStatus.CANCELED) {
                 statusLabel.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-background-radius: 20; -fx-padding: 4 12;");
                 messageLabel.setText("Phiên đấu giá đã bị hủy bởi Admin!");
@@ -129,7 +164,6 @@ public class AuctionRoomController {
         });
       }
 
-      // THÊM MỚI 3: Override phương thức lắng nghe biến động ví tiền thời gian thực (Fix lỗi abstract anonymous class)
       @Override
       public void onBalanceUpdate(double newBalance, double amountChanged, String reason) {
         Platform.runLater(() -> {
@@ -137,11 +171,9 @@ public class AuctionRoomController {
             if (balanceLabel != null) {
               balanceLabel.setText(String.format("%,.0f đ", newBalance));
             }
-
-            if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-              com.auction.client.service.SessionContext.getCurrentUser().setBalance(newBalance);
+            if (SessionContext.getCurrentUser() != null) {
+              SessionContext.getCurrentUser().setBalance(newBalance);
             }
-
             if (messageLabel != null && reason != null) {
               messageLabel.setStyle("-fx-text-fill: #0369a1;");
               messageLabel.setText(reason);
@@ -154,10 +186,6 @@ public class AuctionRoomController {
     });
   }
 
-   /**
-   * Xử lý sự kiện đặt giá - Bỏ kiểm tra balance phía client vì không an toàn.
-   * FIX: Để server kiểm tra và chặn, client chỉ validate format
-   */
   @FXML
   private void handlePlaceBidAction() {
     String bidAmountStr = bidAmountField.getText().trim();
@@ -167,14 +195,15 @@ public class AuctionRoomController {
       return;
     }
 
-    // ✅ CHỈ VALIDATE FORMAT, KHÔNG VALIDATE BALANCE
     try {
-      double bidAmount = Double.parseDouble(bidAmountStr);
-
-      if (bidAmount <= 0) {
+      double bidAmount = Double.parseDouble(bidAmountStr.replaceAll("[^0-9.]", ""));
+      if (balanceLabel != null) {
+        double currentBalance = parseCurrency(balanceLabel.getText());
+        if (bidAmount > currentBalance) {
           messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-          messageLabel.setText("Số tiền phải lớn hơn 0!");
+          messageLabel.setText("Số dư ví không đủ. Vui lòng nạp thêm tiền!");
           return;
+        }
       }
     } catch (NumberFormatException e) {
       messageLabel.setStyle("-fx-text-fill: #b91c1c;");
@@ -182,20 +211,85 @@ public class AuctionRoomController {
       return;
     }
 
-    // Thực hiện ném lệnh đặt cược xuống tầng Service kết nối mạng Socket
     ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
-
-    // Nếu thất bại (Ví dụ: sai bước giá hoặc lỗi đồng bộ Server), chuyển màu chữ thông báo thành đỏ
     if (!result.success()) {
       messageLabel.setStyle("-fx-text-fill: #b91c1c;");
     } else {
-      messageLabel.setStyle("-fx-text-fill: #166534;"); // Đặt chữ màu xanh lá cây báo thành công
+      messageLabel.setStyle("-fx-text-fill: #166534;");
     }
-
     messageLabel.setText(result.message());
     if (result.data() != null) {
       bind(result.data());
     }
+  }
+
+  @FXML
+  private void handleAutoBidToggle() {
+    if (autoBidToggle == null) return;
+    
+    if (autoBidToggle.isSelected()) {
+      try {
+        double currentBalance = parseCurrency(balanceLabel != null ? balanceLabel.getText() : "0");
+        double minIncrement = parseCurrency(stepPriceLabel != null ? stepPriceLabel.getText() : "0");
+
+        AutoBidDialog dialog = new AutoBidDialog(currentBalance, minIncrement);
+        dialog.showAndWait().ifPresentOrElse(config -> {
+          this.autoBidConfig = config;
+          autoBidToggle.setText("Auto-Bid: ON");
+          autoBidToggle.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8;");
+          if (autoBidStatusLabel != null) {
+            autoBidStatusLabel.setText(String.format("Hệ thống đang tự động đặt giá cho bạn tới mốc %,.0f VNĐ", config.maxBid()));
+            autoBidStatusLabel.setVisible(true);
+          }
+
+          double currentPrice = parseCurrency(currentPriceLabel != null ? currentPriceLabel.getText() : "0");
+          String myUsername = SessionContext.getCurrentUser().getUsername();
+          if (highestBidderLabel != null && !highestBidderLabel.getText().equals(myUsername) && !highestBidderLabel.getText().equals("Chưa có")) {
+            double nextBid = currentPrice + autoBidConfig.increment();
+            if (nextBid <= autoBidConfig.maxBid()) {
+              performAutoBid(nextBid);
+            }
+          }
+        }, () -> {
+          autoBidToggle.setSelected(false);
+          resetAutoBidUI();
+        });
+      } catch (Exception e) {
+        logger.error("Lỗi khi mở dialog Auto-Bid", e);
+        autoBidToggle.setSelected(false);
+        resetAutoBidUI();
+      }
+    } else {
+      resetAutoBidUI();
+    }
+  }
+
+  private void resetAutoBidUI() {
+    if (autoBidToggle != null) {
+      autoBidToggle.setText("Auto-Bid: OFF");
+      autoBidToggle.setStyle("-fx-background-radius: 8;");
+    }
+    if (autoBidStatusLabel != null) {
+      autoBidStatusLabel.setVisible(false);
+    }
+    autoBidConfig = null;
+  }
+
+  private void performAutoBid(double amount) {
+    new Thread(() -> {
+      ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, String.valueOf(amount));
+      Platform.runLater(() -> {
+        if (result.success()) {
+          messageLabel.setStyle("-fx-text-fill: #166534;");
+        } else {
+          messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+        }
+        messageLabel.setText("Auto-bid: " + result.message());
+        if (result.data() != null) {
+          bind(result.data());
+        }
+      });
+    }).start();
   }
 
   @FXML
@@ -205,10 +299,8 @@ public class AuctionRoomController {
 
   private void render() {
     service.getAuctionRoom(aid).ifPresent(result -> bind(result.data()));
-
-    // ĐỒNG BỘ SỐ DƯ BAN ĐẦU: Lấy số dư tài khoản từ Session hệ thống đưa lên phòng khi vừa vào phòng
-    if (balanceLabel != null && com.auction.client.service.SessionContext.getCurrentUser() != null) {
-      double sessionBalance = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
+    if (balanceLabel != null && SessionContext.getCurrentUser() != null) {
+      double sessionBalance = SessionContext.getCurrentUser().getBalance();
       balanceLabel.setText(String.format("%,.0f đ", sessionBalance));
     }
   }
@@ -224,11 +316,8 @@ public class AuctionRoomController {
     highestBidderLabel.setText(viewModel.highestBidder());
     scheduleLabel.setText(viewModel.schedule());
     descriptionLabel.setText(viewModel.description());
-    itemTypeLabel.setText(viewModel.itemType());
-    extraInfoLabel.setText(viewModel.extraInfo());
     bidHistoryList.setItems(FXCollections.observableArrayList(viewModel.bidHistory()));
 
-    // THÊM MỚI 4: Đọc thông tin loại sản phẩm và thông tin phụ từ ViewModel ép lên giao diện Label
     if (itemTypeLabel != null && viewModel.itemType() != null) {
       itemTypeLabel.setText("Loại: " + viewModel.itemType());
     }
@@ -236,10 +325,18 @@ public class AuctionRoomController {
       extraInfoLabel.setText(viewModel.extraInfo());
     }
 
-    // Cấu hình đổi màu nhãn trạng thái trực quan nếu phiên đã bị Admin hủy
     if (viewModel.status() != null && (viewModel.status().equalsIgnoreCase("CANCELED") || viewModel.status().equalsIgnoreCase("ĐÃ HỦY"))) {
       statusLabel.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-background-radius: 20; -fx-padding: 4 12;");
       bidAmountField.setDisable(true);
+    }
+  }
+
+  private double parseCurrency(String text) {
+    if (text == null) return 0;
+    try {
+      return Double.parseDouble(text.replaceAll("[^0-9]", ""));
+    } catch (Exception e) {
+      return 0;
     }
   }
 }
