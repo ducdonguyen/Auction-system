@@ -1,5 +1,6 @@
 package com.auction.client.controller;
 
+import com.auction.client.service.SessionContext;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.network.requests.CreateAuctionRequest;
@@ -176,19 +177,19 @@ public class AuctionListController {
 
         result.ifPresent(amount -> {
             if (amount <= 0) {
-                showAlertDialog(Alert.AlertType.WARNING, "Cảnh báo", "Số tiền nạp phải lớn hơn 0 đ!");
+                showAlertDialog(Alert.AlertType.WARNING, "Cảnh báo", "Số tiền nạp không hợp lệ");
                 return;
             }
 
             try {
                 // Lấy thông tin định danh người dùng hiện tại từ Session hệ thống
-                String userId = "Chưa xác định";
+                String userName = "Chưa xác định";
                 if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-                    userId = com.auction.client.service.SessionContext.getCurrentUser().getUsername();
+                    userName = SessionContext.getCurrentUser().getUsername();
                 }
 
                 // Đóng gói request gửi bất đồng bộ lên Server qua đường truyền mạng Socket
-                TopUpRequest request = new TopUpRequest(userId, amount);
+                TopUpRequest request = new TopUpRequest(userName, amount);
                 SocketClient.getInstance().sendRequest(request);
 
             } catch (Exception e) {

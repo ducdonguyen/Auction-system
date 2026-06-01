@@ -108,7 +108,7 @@ public class AuthService {
             throw new IllegalArgumentException("Định danh tài khoản không hợp lệ.");
         }
         if (amount <= 0) {
-            throw new IllegalArgumentException("Số tiền nạp vào phải lớn hơn 0 đ.");
+            throw new IllegalArgumentException("Số tiền nạp không hợp lệ");
         }
 
         try {
