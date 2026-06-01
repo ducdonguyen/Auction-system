@@ -77,19 +77,12 @@ public class AuctionListController {
     /**
      * Exception tùy chỉnh dùng để ném ra khi dữ liệu nhập vào form không hợp lệ.
      */
-    private static class ValidationException extends Exception {
-        public ValidationException(String message) {
-            super(message);
-        }
-    }
+
 
     /**
      * Kỷ lục (Record) lưu trữ tham chiếu đến các trường nhập liệu của form.
      */
-    private record AuctionFormInputs(
-            TextField txtName, TextArea txtDescription, TextField txtStartingPrice,
-            TextField txtPriceStep, ComboBox<String> cbProductType, TextField txtExtraInfo
-    ) {}
+
 
     /**
      * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
@@ -211,181 +204,19 @@ public class AuctionListController {
 
     /**
      * Bắt sự kiện khi click vào nút "Tạo phiên đấu giá".
-     * Đã được refactor tuân thủ nguyên tắc SRP (Single Responsibility Principle).
+
      */
     @FXML
-    private void handleCreateAuctionAction(ActionEvent event) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Tạo phiên đấu giá mới");
-        dialog.setHeaderText("Nhập thông tin sản phẩm đấu giá");
-
-        ButtonType confirmButtonType = new ButtonType("Xác nhận", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
-
-        // 1. Khởi tạo giao diện và lấy về các tham chiếu trường nhập liệu
-        AuctionFormInputs formInputs = setupAuctionFormLayout(dialog);
-
-        final Button btnConfirm = (Button) dialog.getDialogPane().lookupButton(confirmButtonType);
-
-        // 2. Can thiệp sự kiện nút "Xác nhận"
-        btnConfirm.addEventFilter(ActionEvent.ACTION, ae -> {
-            try {
-                // Kiểm tra và đóng gói dữ liệu
-                CreateAuctionRequest request = validateAndBuildRequest(formInputs);
-
-                // Giữ Dialog mở chờ Server và khóa nút Xác nhận
-                ae.consume();
-                btnConfirm.setDisable(true);
-
-                // Ném Request vào luồng Background xử lý bất đồng bộ
-                submitCreateAuctionAsync(request, dialog, confirmButtonType, btnConfirm);
-
-            } catch (ValidationException e) {
-                showAlertDialog(Alert.AlertType.ERROR, "Lỗi nhập liệu", e.getMessage());
-                ae.consume(); // Giữ nguyên Dialog nếu có lỗi nhập liệu
-            } catch (Exception e) {
-                showAlertDialog(Alert.AlertType.ERROR, "Lỗi hệ thống", "Lỗi không xác định: " + e.getMessage());
-                ae.consume();
-            }
-        });
-
-        dialog.showAndWait();
+    private void handleCreateAuctionAction(ActionEvent event) throws IOException {
+        // Chuyển toàn bộ màn hình hiện tại sang màn hình nhập liệu tạo phiên
+        SceneNavigator.switchScene(createAuctionButton, Scene.CREATE_AUCTION, null);
     }
 
-    /**
-     * Helper 1: Xây dựng Layout bằng GridPane và khởi tạo các UI Controls.
-     */
-    private AuctionFormInputs setupAuctionFormLayout(Dialog<ButtonType> dialog) {
-        GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(12);
-        grid.setPadding(new Insets(20, 30, 10, 30));
-
-        TextField txtName = new TextField(); txtName.setPromptText("Tên sản phẩm"); txtName.setPrefWidth(260);
-        TextArea txtDescription = new TextArea(); txtDescription.setPromptText("Mô tả chi tiết..."); txtDescription.setPrefRowCount(3); txtDescription.setWrapText(true);
-        TextField txtStartingPrice = new TextField(); txtStartingPrice.setPromptText("Ví dụ: 200000");
-        TextField txtPriceStep = new TextField(); txtPriceStep.setPromptText("Ví dụ: 20000");
-        TextField txtExtraInfo = new TextField(); txtExtraInfo.setPromptText("Ví dụ: 12, 24");
-
-        Label lblExtraInfo = new Label("Bảo hành (tháng):");
-        lblExtraInfo.setWrapText(true); lblExtraInfo.setPrefWidth(120);
-        lblExtraInfo.setMinHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
-
-        ComboBox<String> cbProductType = new ComboBox<>();
-        cbProductType.getItems().addAll("Điện tử", "Tác phẩm nghệ thuật", "Xe cộ", "Thời trang", "Khác");
-        cbProductType.setValue("Điện tử");
-        cbProductType.setMaxWidth(Double.MAX_VALUE);
-
-        cbProductType.valueProperty().addListener((observable, oldValue, newValue) -> {
-            switch (newValue) {
-                case "Tác phẩm nghệ thuật", "Thời trang" -> { lblExtraInfo.setText("Tên tác giả:"); txtExtraInfo.setPromptText("Ví dụ: Picasso..."); }
-                case "Xe cộ" -> { lblExtraInfo.setText("Hãng xe:"); txtExtraInfo.setPromptText("Ví dụ: Toyota..."); }
-                case "Khác" -> { lblExtraInfo.setText("Chi tiết loại:"); txtExtraInfo.setPromptText("Ví dụ: Thú cưng..."); }
-                default -> { lblExtraInfo.setText("Bảo hành (tháng):"); txtExtraInfo.setPromptText("Ví dụ: 12, 24"); }
-            }
-        });
-
-        grid.add(new Label("Tên sản phẩm:"), 0, 0); grid.add(txtName, 1, 0);
-        grid.add(new Label("Mô tả:"), 0, 1);        grid.add(txtDescription, 1, 1);
-        grid.add(new Label("Giá khởi điểm:"), 0, 2); grid.add(txtStartingPrice, 1, 2);
-        grid.add(new Label("Bước giá:"), 0, 3);      grid.add(txtPriceStep, 1, 3);
-        grid.add(new Label("Loại sản phẩm:"), 0, 4); grid.add(cbProductType, 1, 4);
-        grid.add(lblExtraInfo, 0, 5);                grid.add(txtExtraInfo, 1, 5);
-
-        dialog.getDialogPane().setContent(grid);
-
-        return new AuctionFormInputs(txtName, txtDescription, txtStartingPrice, txtPriceStep, cbProductType, txtExtraInfo);
-    }
-
-    /**
-     * Helper 2: Xác thực dữ liệu và chuyển đổi thành đối tượng CreateAuctionRequest.
-     */
-    private CreateAuctionRequest validateAndBuildRequest(AuctionFormInputs inputs) throws ValidationException {
-        String name = inputs.txtName().getText().trim();
-        String desc = inputs.txtDescription().getText().trim();
-        String startPriceStr = inputs.txtStartingPrice().getText().trim();
-        String priceStepStr = inputs.txtPriceStep().getText().trim();
-        String type = inputs.cbProductType().getValue();
-        String extraInfo = inputs.txtExtraInfo().getText().trim();
-
-        if (name.isEmpty() || desc.isEmpty() || startPriceStr.isEmpty() || priceStepStr.isEmpty() || type == null) {
-            throw new ValidationException("Vui lòng nhập đầy đủ tất cả các trường dữ liệu bắt buộc!");
-        }
-        if (extraInfo.isEmpty()) {
-            throw new ValidationException("Vui lòng nhập thông tin Phụ (Tác giả / Hãng xe / Bảo hành)!");
-        }
-
-        double startingPrice;
-        double priceStep;
-        try {
-            startingPrice = Double.parseDouble(startPriceStr);
-            priceStep = Double.parseDouble(priceStepStr);
-            if (startingPrice <= 0 || priceStep <= 0) {
-                throw new ValidationException("Giá khởi điểm và Bước giá phải là số lớn hơn 0!");
-            }
-        } catch (NumberFormatException e) {
-            throw new ValidationException("Giá khởi điểm và Bước giá bắt buộc phải nhập ký tự số!");
-        }
-
-        String serverType = switch (type) {
-            case "Điện tử" -> "ELECTRONICS";
-            case "Xe cộ" -> "VEHICLE";
-            case "Tác phẩm nghệ thuật", "Thời trang" -> "ART";
-            default -> "OTHER";
-        };
-
-        if (serverType.equals("ELECTRONICS")) {
-            try {
-                Integer.parseInt(extraInfo);
-            } catch (NumberFormatException e) {
-                throw new ValidationException("Số tháng bảo hành của đồ Điện tử bắt buộc phải nhập con số!");
-            }
-        }
-
-        String sellerUsername = com.auction.client.service.SessionContext.getCurrentUser().getFullName();
-        java.time.LocalDateTime startTime = java.time.LocalDateTime.now();
-        java.time.LocalDateTime endTime = startTime.plusDays(3);
-
-        return new CreateAuctionRequest(name, desc, startingPrice, priceStep, serverType, extraInfo, sellerUsername, startTime, endTime);
-    }
-
-    /**
-     * Helper 3: Gửi yêu cầu qua Socket bất đồng bộ và xử lý phản hồi.
-     */
-    private void submitCreateAuctionAsync(CreateAuctionRequest request, Dialog<ButtonType> dialog,
-                                          ButtonType confirmButtonType, Button btnConfirm) {
-        javafx.concurrent.Task<ServiceResult<?>> task = new javafx.concurrent.Task<>() {
-            @Override
-            protected ServiceResult<?> call() throws Exception {
-                SocketClient.getInstance().sendRequest(request);
-                return (ServiceResult<?>) SocketClient.getInstance().receiveResponse();
-            }
-        };
-
-        task.setOnSucceeded(eventTask -> {
-            btnConfirm.setDisable(false);
-            ServiceResult<?> result = task.getValue();
-            if (result.success()) {
-                showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", result.message());
-                dialog.setResult(confirmButtonType);
-                dialog.close();
-            } else {
-                showAlertDialog(Alert.AlertType.ERROR, "Lỗi từ Server", result.message());
-            }
-        });
-
-        task.setOnFailed(eventTask -> {
-            btnConfirm.setDisable(false);
-            Throwable ex = task.getException();
-            showAlertDialog(Alert.AlertType.ERROR, "Lỗi kết nối", "Không thể giao tiếp với Server: " + ex.getMessage());
-        });
-
-        new Thread(task).start();
-    }
 
     /**
      * Hàm tiện ích hiển thị nhanh một hộp thoại Alert thông báo.
      */
-    private void showAlertDialog(Alert.AlertType type, String title, String content) {
+    public void showAlertDialog(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);

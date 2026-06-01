@@ -55,28 +55,10 @@ public class AuctionCatalogService {
   private List<Auction> fetchOnlineAuctions() {
     try {
       SocketClient.getInstance().sendRequest(new GetAllAuctionsRequest());
-      Object rawResponse = SocketClient.getInstance().receiveResponse();
 
-      if (!(rawResponse instanceof ServiceResult<?> response)) {
-        logger.warn("Kiểu dữ liệu phản hồi không hợp lệ: {}", rawResponse != null ? rawResponse.getClass().getName() : "null");
-        return AuctionDataStore.getAuctions();
-      }
+      ServiceResult<List<Auction>> response = (ServiceResult<List<Auction>>) SocketClient.getInstance().receiveResponse();
 
-      if (!response.success()) {
-        logger.warn("Lỗi từ Server: {}", response.message());
-        return AuctionDataStore.getAuctions();
-      }
-
-      if (!(response.data() instanceof List<?> rawList)) {
-        logger.warn("Dữ liệu trả về không phải là danh sách: {}", response.data() != null ? response.data().getClass().getName() : "null");
-        return AuctionDataStore.getAuctions();
-      }
-
-      // Ép kiểu an toàn từng phần tử bằng Stream
-      return rawList.stream()
-              .filter(item -> item instanceof Auction)
-              .map(item -> (Auction) item)
-              .toList();
+      return response.data();
 
     } catch (Exception e) {
       logger.error("Lỗi tải danh sách Sảnh", e);

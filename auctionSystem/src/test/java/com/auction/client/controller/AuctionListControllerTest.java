@@ -149,41 +149,6 @@ public class AuctionListControllerTest {
         }
     }
 
-    @Test
-    public void testValidateAndBuildRequest() throws Exception {
-        // Since record AuctionFormInputs is private, we might need to use reflection or just test the public method if possible.
-        // But handleCreateAuctionAction is public. However it opens a dialog.
-        // Let's try to test the validation logic by injecting mock fields and calling the private method.
-        
-        TextField txtName = new TextField("Product");
-        TextArea txtDescription = new TextArea("Description");
-        TextField txtStartingPrice = new TextField("1000");
-        TextField txtPriceStep = new TextField("100");
-        ComboBox<String> cbProductType = new ComboBox<>();
-        cbProductType.getItems().addAll("Điện tử");
-        cbProductType.setValue("Điện tử");
-        TextField txtExtraInfo = new TextField("12");
-
-        // We need to create an instance of the private record AuctionFormInputs
-        Class<?> recordClass = Class.forName("com.auction.client.controller.AuctionListController$AuctionFormInputs");
-        java.lang.reflect.Constructor<?> constructor = recordClass.getDeclaredConstructors()[0];
-        constructor.setAccessible(true);
-        Object formInputs = constructor.newInstance(txtName, txtDescription, txtStartingPrice, txtPriceStep, cbProductType, txtExtraInfo);
-
-        java.lang.reflect.Method method = AuctionListController.class.getDeclaredMethod("validateAndBuildRequest", recordClass);
-        method.setAccessible(true);
-        
-        // Mock SessionContext user
-        UserAccount mockUser = new UserAccount(1L, "user", "Full Name", "email", "token", "BIDDER", 0.0);
-        com.auction.client.service.SessionContext.setCurrentUser(mockUser);
-
-        Object request = method.invoke(controller, formInputs);
-        assertTrue(request instanceof CreateAuctionRequest);
-        CreateAuctionRequest req = (CreateAuctionRequest) request;
-        assertEquals("Product", req.getProductName());
-        assertEquals(1000.0, req.getStartingPrice());
-    }
-
     private void invokePrivateMethod(String methodName) throws Exception {
         java.lang.reflect.Method method = AuctionListController.class.getDeclaredMethod(methodName);
         method.setAccessible(true);

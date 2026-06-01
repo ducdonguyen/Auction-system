@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.CreateAuctionController">
+    <children>
+        <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+            </padding>
+            <children>
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Tạo Phiên Đấu Giá Mới" textFill="#1e293b">
+                            <font>
+                                <Font name="System Bold" size="24.0" />
+                            </font>
+                        </Label>
+                        <Label text="Vui lòng điền đầy đủ thông tin sản phẩm để đưa lên sàn đấu giá" textFill="#64748b" />
+                    </children>
+                </VBox>
+
+                <GridPane vgap="15.0" VBox.vgrow="ALWAYS">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="400.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <children>
+                        <Label text="Tên sản phẩm:" textFill="#334155" GridPane.rowIndex="0">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="nameField" promptText="Nhập tên sản phẩm đấu giá" style="-fx-padding: 8; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label text="Mô tả chi tiết:" textFill="#334155" GridPane.rowIndex="1">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextArea fx:id="descriptionField" prefRowCount="3" promptText="Mô tả tình trạng, xuất xứ, thông số kỹ thuật..." style="-fx-background-radius: 5;" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Giá khởi điểm:" textFill="#334155" GridPane.rowIndex="2">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="startingPriceField" promptText="Ví dụ: 500000" style="-fx-padding: 8; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Bước giá tối thiểu:" textFill="#334155" GridPane.rowIndex="3">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="priceStepField" promptText="Ví dụ: 50000" style="-fx-padding: 8; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label text="Loại sản phẩm:" textFill="#334155" GridPane.rowIndex="4">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="productTypeCombo" maxWidth="1.1797693134862315E308" style="-fx-padding: 4; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                        <Label text="Thông tin phụ:" textFill="#334155" GridPane.rowIndex="5">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="extraInfoField" promptText="Bảo hành (tháng) / Tên tác giả / Hãng xe..." style="-fx-padding: 8; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                    </children>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#handleCancelAction" style="-fx-background-color: #e2e8f0; -fx-text-fill: #475569; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;" text="Hủy bỏ">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Button>
+                        <Button fx:id="submitButton" mnemonicParsing="false" onAction="#handleCreateAction" style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-padding: 10 24; -fx-background-radius: 6; -fx-cursor: hand;" text="Đăng bán đấu giá">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

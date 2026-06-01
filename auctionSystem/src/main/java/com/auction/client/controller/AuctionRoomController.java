@@ -55,7 +55,7 @@ public class AuctionRoomController {
   private Label itemTypeLabel;   // THÊM MỚI
   @FXML
   private Label extraInfoLabel;   // THÊM MỚI
-  // THÊM MỚI 2: Ánh xạ ô hiển thị Số dư màu xanh biển cạnh ID phiên đấu giá
+
   @FXML
   private Label balanceLabel;
 
