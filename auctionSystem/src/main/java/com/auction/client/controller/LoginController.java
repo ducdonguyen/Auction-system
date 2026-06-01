@@ -5,6 +5,7 @@ import com.auction.client.util.SceneNavigator;
 import com.auction.server.service.AuthService;
 import com.auction.shared.models.auth.UserAccount;
 import com.auction.shared.network.requests.LoginRequest;
+import com.auction.client.service.SessionContext;
 import com.auction.shared.network.responses.ServiceResult;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,6 +40,7 @@ public class LoginController {
     if (result.success()) {
       UserAccount user = result.data();
       if (user != null) {
+        SessionContext.setCurrentUser(user);
         try {
           // Dùng Enum Scene để điều hướng
           Scene target = "ADMIN".equalsIgnoreCase(user.getRole())

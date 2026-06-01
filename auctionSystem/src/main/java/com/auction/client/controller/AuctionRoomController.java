@@ -157,45 +157,54 @@ public class AuctionRoomController {
    * Xử lý sự kiện đặt giá - Bỏ kiểm tra balance phía client vì không an toàn.
    * FIX: Để server kiểm tra và chặn, client chỉ validate format
    */
-  @FXML
-  private void handlePlaceBidAction() {
-    String bidAmountStr = bidAmountField.getText().trim();
-    if (bidAmountStr.isEmpty()) {
-      messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-      messageLabel.setText("Vui lòng nhập số tiền muốn đặt!");
-      return;
-    }
+   @FXML
+   private void handlePlaceBidAction() {
+     String bidAmountStr = bidAmountField.getText().trim();
+     if (bidAmountStr.isEmpty()) {
+       messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+       messageLabel.setText("Vui lòng nhập số tiền muốn đặt!");
+       return;
+     }
 
-    // ✅ CHỈ VALIDATE FORMAT, KHÔNG VALIDATE BALANCE
-    try {
-      double bidAmount = Double.parseDouble(bidAmountStr);
+     try {
+       double bidAmount = Double.parseDouble(bidAmountStr);
+       if (bidAmount <= 0) {
+         messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+         messageLabel.setText("Số tiền phải lớn hơn 0!");
+         return;
+       }
+     } catch (NumberFormatException e) {
+       messageLabel.setStyle("-fx-text-fill: #b91c1c;");
+       messageLabel.setText("Số tiền đặt thầu phải là ký tự số hợp lệ!");
+       return;
+     }
 
-      if (bidAmount <= 0) {
-          messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-          messageLabel.setText("Số tiền phải lớn hơn 0!");
-          return;
-      }
-    } catch (NumberFormatException e) {
-      messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-      messageLabel.setText("Số tiền đặt thầu phải là ký tự số hợp lệ!");
-      return;
-    }
+     // Thực hiện ném lệnh đặt cược xuống tầng Service kết nối mạng Socket
+     ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
 
-    // Thực hiện ném lệnh đặt cược xuống tầng Service kết nối mạng Socket
-    ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
+     messageLabel.setText(result.message());
 
-    // Nếu thất bại (Ví dụ: sai bước giá hoặc lỗi đồng bộ Server), chuyển màu chữ thông báo thành đỏ
-    if (!result.success()) {
-      messageLabel.setStyle("-fx-text-fill: #b91c1c;");
-    } else {
-      messageLabel.setStyle("-fx-text-fill: #166534;"); // Đặt chữ màu xanh lá cây báo thành công
-    }
+     if (result.success()) {
+       messageLabel.setStyle("-fx-text-fill: #166534;"); // Chữ xanh lá cây báo thành công
 
-    messageLabel.setText(result.message());
-    if (result.data() != null) {
-      bind(result.data());
-    }
-  }
+       // Ép giao diện trừ tiền trực tiếp để người dùng thấy số dư mới ngay lập tức
+       if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
+         double currentMoney = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
+         double bidAmount = Double.parseDouble(bidAmountStr);
+         double newMoney = currentMoney - bidAmount;
+
+         // Cập nhật ví lưu trong RAM của Client
+         com.auction.client.service.SessionContext.getCurrentUser().setBalance(newMoney);
+
+         // Đẩy con số mới lên nhãn hiển thị số dư
+         if (balanceLabel != null) {
+           balanceLabel.setText(String.format("%,.0f đ", newMoney));
+         }
+       }
+     } else {
+       messageLabel.setStyle("-fx-text-fill: #b91c1c;"); // Chữ đỏ báo thất bại
+     }
+   }
 
   @FXML
   private void handleBackAction() throws IOException {

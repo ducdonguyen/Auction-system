@@ -132,74 +132,78 @@ public class AuctionService {
                 return false;
             }
 
+            // Lấy thông tin người giữ giá cũ trước khi vào Lock
             Bidder previousBidderObj = auction.getHighestBidder();
             String previousBidderUsername = (previousBidderObj != null) ? previousBidderObj.getUsername() : null;
             double previousPrice = auction.getCurrentPrice();
 
-            String fullName = authService.getFullName(bidderUsername);
+            // Khởi tạo đối tượng Bidder mới trực tiếp bằng Username
             Bidder bidder = new Bidder(bidderUsername, "", 0);
-            bidder.setFullName(fullName);
+            bidder.setFullName(bidderUsername); // Fallback dùng tạm Username làm tên hiển thị
 
-            // ✅ CONTAINER để lưu các giá trị cần trả về từ trong lock
+            // CONTAINER hứng dữ liệu từ trong Lock mang ra ngoài gửi mạng
             double[] newBalanceRef = {0};
             double[] previousBidderNewBalanceRef = {0};
             boolean[] hasRefundPreviousBidder = {false};
 
             lockManager.lockAndRun(auction.getAuctionId(), () -> {
-                // ✅ VALIDATE GIÁ ĐẤU NGAY TRONG LOCK
+                // 1. KIỂM TRA LUẬT ĐẤU GIÁ
                 auction.validateBid(amount);
 
-                // ✅ KIỂM TRA VÀ TRỪ TIỀN NGAY TRONG LOCK - CHỈ 1 LẦN
-                boolean froze = authService.freezeBalance(bidderUsername, amount);
-                if (!froze) {
+                // Log balance before attempting to freeze
+                double balanceBefore = authService.getBalance(bidderUsername);
+                logger.info("[DEBUG] Balance before freeze for {}: {}", bidderUsername, balanceBefore);
+
+                // 2. TRỪ TIỀN NGƯỜI MỚI (ĐÓNG BĂNG VÍ)
+                boolean freezeResult = authService.freezeBalance(bidderUsername, amount);
+                if (!freezeResult) {
+                    logger.warn("[WARN] Freeze balance failed for {}: insufficient funds or DB error", bidderUsername);
                     throw new IllegalArgumentException("Số dư không đủ. Vui lòng nạp thêm tiền!");
+                } else {
+                    logger.info("[INFO] Freeze balance succeeded for {}: deducted {}", bidderUsername, amount);
                 }
+                // Retrieve balance after successful freeze
+                double balanceAfterFreeze = authService.getBalance(bidderUsername);
+                logger.info("[INFO] Balance after freeze for {}: {} (deducted {})", bidderUsername, balanceAfterFreeze, amount);
+                newBalanceRef[0] = balanceAfterFreeze;
 
-                // ✅ LẤY SỐ DƯ MỚI NGAY TRONG LOCK
-                newBalanceRef[0] = authService.getBalance(bidderUsername);
-
-                // ✅ CẬP NHẬT AUCTION TRONG LOCK
+                // 3. CẬP NHẬT TRẠNG THÁI PHÒNG ĐẤU GIÁ
                 BidTransaction transaction = new BidTransaction("TX-" + System.currentTimeMillis(), bidder, amount, LocalDateTime.now());
                 auction.updateAuctionState(bidder, amount, transaction);
                 auctionRepository.save(auction);
 
-                // ✅ HOÀN TIỀN NGƯỜI CŨ NGAY TRONG LOCK - CHỈ 1 LẦN
+                // 4. HOÀN TIỀN CHO NGƯỜI CŨ (NẾU CÓ)
                 if (previousBidderUsername != null && !previousBidderUsername.equals(bidderUsername)) {
                     authService.refundBalance(previousBidderUsername, previousPrice);
-                    // Lấy số dư mới của người cũ ngay trong lock
                     previousBidderNewBalanceRef[0] = authService.getBalance(previousBidderUsername);
                     hasRefundPreviousBidder[0] = true;
                 }
             });
 
-            // ✅ GỬI EVENT BÊN NGOÀI LOCK SỬ DỤNG DỮ LIỆU LẤY TRONG LOCK
-            BalanceUpdatedEvent deductEvent = new BalanceUpdatedEvent(
-                    newBalanceRef[0],  // ✅ DỮ LIỆU CHÍNH XÁC LẤY TRONG LOCK
-                    -amount,
-                    null
-            );
-            com.auction.server.concurrency.ClientHandler.sendToUser(bidderUsername, deductEvent);
+            // --- BÊN NGOÀI KHỐI LOCK: PHÁT SỰ KIỆN QUA MẠNG SOCKET ---
 
-            // ✅ GỬI EVENT HOÀN TIỀN CHỈ 1 LẦN, KHÔNG TRÙNG LẶP
+            // Bắn tin trừ tiền cho người mới
+            com.auction.server.concurrency.ClientHandler.sendToUser(bidderUsername,
+                    new BalanceUpdatedEvent(newBalanceRef[0], -amount, null));
+
+            // Bắn tin hoàn tiền cho người cũ bị vượt giá
             if (hasRefundPreviousBidder[0]) {
-                BalanceUpdatedEvent refundEvent = new BalanceUpdatedEvent(
-                        previousBidderNewBalanceRef[0],  // ✅ DỮ LIỆU CHÍNH XÁC LẤY TRONG LOCK
-                        previousPrice,
-                        "Bạn đã bị vượt giá! " + previousPrice + "đ đã hoàn về ví."
-                );
-                com.auction.server.concurrency.ClientHandler.sendToUser(previousBidderUsername, refundEvent);
+                com.auction.server.concurrency.ClientHandler.sendToUser(previousBidderUsername,
+                        new BalanceUpdatedEvent(previousBidderNewBalanceRef[0], previousPrice,
+                                "Bạn đã bị vượt giá! " + previousPrice + "đ đã hoàn về ví."));
             }
 
+            // Cập nhật bảng điện tử cho tất cả mọi người trong phòng
             AuctionManager.getInstance().notifyObservers(auctionId,
                     auction.getBidHistory().get(auction.getBidHistory().size() - 1));
 
-            // Kích hoạt đặt giá tự động (Auto-bid)
+            // Kích hoạt bot đặt giá tự động (nếu có cài đặt)
             triggerAutoBids(auctionId);
 
             return true;
 
         } catch (IllegalArgumentException e) {
-            throw e;  // Ném exception để RequestRouter xử lý
+            throw e; // Đẩy lên RequestRouter hiển thị thông báo Alert cho Client
         } catch (Exception e) {
             logger.warn("[FAILED] Bid rejected: {}", e.getMessage());
             return false;

@@ -163,6 +163,8 @@ public class AuctionListController {
 
     @FXML
     private void handleLogoutAction() throws IOException {
+        // Clear session user on logout
+        com.auction.client.service.SessionContext.setCurrentUser(null);
         SceneNavigator.switchScene(openAuctionButton, Scene.LOGIN, null);
     }
 

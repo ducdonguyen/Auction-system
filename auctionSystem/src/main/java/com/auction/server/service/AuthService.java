@@ -5,10 +5,29 @@ import com.auction.server.util.PasswordUtil;
 import com.auction.shared.models.auth.UserAccount;
 import com.auction.shared.network.requests.LoginRequest;
 import com.auction.shared.network.requests.RegistrationRequest;
+
 import com.auction.shared.network.responses.ServiceResult;
+
 import java.sql.SQLException;
 
+
+
 public class AuthService {
+    /**
+     * Retrieves the full name of a user by username.
+     * @param username the user's username
+     * @return the full name or null if user not found or on error
+     */
+    public String getFullName(String username) {
+        try {
+            UserAccount user = userDao.findByUsername(username);
+            return user != null ? user.getFullName() : null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private UserDao userDao = new UserDao();
 
     public AuthService() {
@@ -84,17 +103,6 @@ public class AuthService {
             return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu khi đăng ký.", null);
         }
     }
-
-    public String getFullName(String username) {
-        try {
-            UserAccount user = userDao.findByUsername(username);
-            // Trả về tên thật, nếu lỗi hoặc không có thì fallback dùng lại username
-            return (user != null && user.getFullName() != null) ? user.getFullName() : username;
-        } catch (SQLException e) {
-            return username;
-        }
-    }
-
     /**
      * HÀM MỚI THÊM VÀO: Xử lý cộng dồn số tiền nạp vào tài khoản người dùng trong DB.
      * * @param username Định danh tài khoản cần nạp tiền.
