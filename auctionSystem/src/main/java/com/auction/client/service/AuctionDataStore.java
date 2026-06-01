@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Kho lưu trữ dữ liệu giả lập cho các phiên đấu giá tại Client.
+ * Kho lưu trữ dự phòng phiên đấu giá tại Client.
  */
 public class AuctionDataStore {
   private AuctionDataStore() {
