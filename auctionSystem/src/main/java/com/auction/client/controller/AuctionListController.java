@@ -75,16 +75,6 @@ public class AuctionListController {
     private TableColumn<AuctionRow, String> statusColumn;
 
     /**
-     * Exception tùy chỉnh dùng để ném ra khi dữ liệu nhập vào form không hợp lệ.
-     */
-
-
-    /**
-     * Kỷ lục (Record) lưu trữ tham chiếu đến các trường nhập liệu của form.
-     */
-
-
-    /**
      * Khởi tạo controller, thiết lập các cột cho bảng và tải dữ liệu.
      */
     @FXML
