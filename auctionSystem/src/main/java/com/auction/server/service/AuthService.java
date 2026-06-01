@@ -9,8 +9,16 @@ import com.auction.shared.network.responses.ServiceResult;
 import java.sql.SQLException;
 
 public class AuthService {
-    private final UserDao userDao = new UserDao();
+    private UserDao userDao = new UserDao();
 
+    public AuthService() {
+        this.userDao = new UserDao();
+    }
+
+
+    public AuthService(UserDao userDao) {
+        this.userDao = userDao;
+    }
     public ServiceResult<UserAccount> login(LoginRequest request) {
         // Kiểm tra dữ liệu đầu vào cơ bản
         if (request.username() == null || request.username().isBlank() ||
@@ -55,10 +63,13 @@ public class AuthService {
             }
 
             UserAccount newUser = new UserAccount(
+                    null,
                     request.fullName(),
                     request.username(),
                     request.email(),
-                    PasswordUtil.hashPassword(request.password())
+                    PasswordUtil.hashPassword(request.password()),
+                    "USER",
+                    0.0
             );
 
             // Lưu xuống DB

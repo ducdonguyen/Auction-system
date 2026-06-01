@@ -174,7 +174,7 @@ public class AuctionListControllerTest {
         method.setAccessible(true);
         
         // Mock SessionContext user
-        UserAccount mockUser = new UserAccount("user", "Full Name", "email", "token", "BIDDER");
+        UserAccount mockUser = new UserAccount(1L, "user", "Full Name", "email", "token", "BIDDER", 0.0);
         com.auction.client.service.SessionContext.setCurrentUser(mockUser);
 
         Object request = method.invoke(controller, formInputs);

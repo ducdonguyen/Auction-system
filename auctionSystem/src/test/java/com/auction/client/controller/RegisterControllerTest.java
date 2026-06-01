@@ -1,6 +1,6 @@
 package com.auction.client.controller;
 
-import com.auction.client.service.AuthService;
+import com.auction.server.service.AuthService;
 import com.auction.shared.network.requests.RegistrationRequest;
 import com.auction.shared.network.responses.ServiceResult;
 import javafx.application.Platform;

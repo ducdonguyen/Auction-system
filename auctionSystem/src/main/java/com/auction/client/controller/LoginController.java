@@ -1,9 +1,8 @@
 package com.auction.client.controller;
 
-import com.auction.client.service.AuthService;
-import com.auction.client.service.ServiceFactory;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
+import com.auction.server.service.AuthService;
 import com.auction.shared.models.auth.UserAccount;
 import com.auction.shared.network.requests.LoginRequest;
 import com.auction.shared.network.responses.ServiceResult;
@@ -18,7 +17,7 @@ import javafx.scene.control.TextField;
  */
 public class LoginController {
   // Lấy service từ Factory thay vì khởi tạo cứng
-  private final AuthService authService = ServiceFactory.getAuthService();
+  private final AuthService authService = new AuthService();
 
   @FXML
   private TextField usernameField;

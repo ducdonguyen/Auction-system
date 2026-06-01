@@ -54,8 +54,7 @@ public class RequestRouterTest {
     @Test
     public void testRouteLoginRequest_Success() throws Exception {
         LoginRequest request = new LoginRequest("user1", "pass1");
-        // Sử dụng Constructor 4 tham số thực tế của AuthUser
-        UserAccount mockUser = new UserAccount("User One", "user1", "user1@gmail.com", "hashed_pass");
+        UserAccount mockUser = new UserAccount(1L, "User One", "user1", "user1@gmail.com", "hashed_pass", "BIDDER", 0.0);
         ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Login success", mockUser);
 
         when(authService.login(request)).thenReturn(mockResult);

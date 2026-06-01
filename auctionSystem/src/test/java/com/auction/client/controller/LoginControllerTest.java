@@ -1,7 +1,7 @@
 package com.auction.client.controller;
 
 import com.auction.client.network.SocketClient;
-import com.auction.client.service.AuthService;
+import com.auction.server.service.AuthService;
 import com.auction.shared.models.auth.UserAccount;
 import com.auction.shared.network.requests.LoginRequest;
 import com.auction.shared.network.responses.ServiceResult;
@@ -89,7 +89,7 @@ public class LoginControllerTest {
         usernameField.setText("testuser");
         passwordField.setText("password");
 
-        UserAccount userAccount = new UserAccount("Full Name", "testuser", "test@example.com", "TOKEN", "BIDDER");
+        UserAccount userAccount = new UserAccount(1L, "Full Name", "testuser", "test@example.com", "TOKEN", "BIDDER", 0.0);
         ServiceResult<UserAccount> successResult = new ServiceResult<>(true, "Login successful", userAccount);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);
@@ -120,7 +120,7 @@ public class LoginControllerTest {
         usernameField.setText("admin");
         passwordField.setText("adminpass");
 
-        UserAccount userAccount = new UserAccount("Admin User", "admin", "admin@example.com", "TOKEN", "ADMIN");
+        UserAccount userAccount = new UserAccount(1L, "Admin User", "admin", "admin@example.com", "TOKEN", "ADMIN", 0.0);
         ServiceResult<UserAccount> successResult = new ServiceResult<>(true, "Login successful", userAccount);
         
         when(authService.login(any(LoginRequest.class))).thenReturn(successResult);

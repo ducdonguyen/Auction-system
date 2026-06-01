@@ -1,8 +1,8 @@
 package com.auction.client.controller;
 
-import com.auction.client.service.AuthService;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
+import com.auction.server.service.AuthService;
 import com.auction.shared.models.auth.UserAccount;
 import com.auction.shared.network.requests.RegistrationRequest;
 import com.auction.shared.network.responses.ServiceResult;

@@ -69,7 +69,7 @@ class UserDaoTest {
     @Test
     @DisplayName("Nên gọi executeUpdate khi đăng ký")
     void testRegister() throws SQLException {
-        UserAccount user = new UserAccount("Full Name", "user", "email", "hash", "USER");
+        UserAccount user = new UserAccount(1L, "Full Name", "user", "email", "hash", "USER", 0.0);
         userDao.register(user);
 
         verify(mockPreparedStatement).setString(1, "Full Name");
@@ -116,7 +116,7 @@ class UserDaoTest {
     @DisplayName("Nên ném ngoại lệ SQLException trong register")
     void testRegister_SQLException() throws SQLException {
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException("DB Error"));
-        UserAccount user = new UserAccount("Full Name", "user", "email", "hash", "USER");
+        UserAccount user = new UserAccount(1L, "Full Name", "user", "email", "hash", "USER", 0.0);
         assertThrows(SQLException.class, () -> userDao.register(user));
     }
 

@@ -1,6 +1,5 @@
 package com.auction.client.controller;
 
-import com.auction.client.service.ServiceFactory;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.network.requests.CreateAuctionRequest;
@@ -37,7 +36,7 @@ import javafx.scene.layout.GridPane;
  * Controller cho màn hình danh sách các phiên đấu giá
  */
 public class AuctionListController {
-    private final AuctionCatalogService service = ServiceFactory.getCatalogService();
+    private final AuctionCatalogService service = new AuctionCatalogService();
     private final ObservableList<AuctionRow> data = FXCollections.observableArrayList();
 
     // BIẾN LƯU TRỮ TRẠNG THÁI SỐ DƯ MỚI THÊM

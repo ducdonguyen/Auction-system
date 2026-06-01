@@ -11,7 +11,7 @@ class SessionContextTest {
     @Test
     @DisplayName("Kiểm thử SessionContext")
     void testSessionContext() {
-        UserAccount user = new UserAccount("Name", "user", "email", "hash", "USER");
+        UserAccount user = new UserAccount(1L, "Name", "user", "email", "hash", "USER", 0.0);
         SessionContext.setCurrentUser(user);
         assertEquals(user, SessionContext.getCurrentUser());
         

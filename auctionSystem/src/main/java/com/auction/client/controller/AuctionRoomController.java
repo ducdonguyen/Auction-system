@@ -3,7 +3,6 @@ package com.auction.client.controller;
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
-import com.auction.client.service.ServiceFactory;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.auction.AuctionStatus;
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AuctionRoomController {
   private static final Logger logger = LoggerFactory.getLogger(AuctionRoomController.class);
-  private final AuctionRoomService service = ServiceFactory.getRoomService();
+  private final AuctionRoomService service = new AuctionRoomService();
   private String aid;
   @FXML
   private Label auctionIdLabel;
