@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 
-@ExtendWith(MockitoExtension.class)
 class AuctionManagerTest {
 
     private AuctionManager auctionManager;

@@ -23,13 +23,20 @@ import org.slf4j.LoggerFactory;
  * Lớp Client để kết nối và giao tiếp với Server qua Socket.
  */
 public class SocketClient {
-  private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
-  private static volatile SocketClient instance;
-  private Socket socket;
-  private ObjectOutputStream out;
-  private ObjectInputStream in;
+  private static final Logger logger = LoggerFactory.getLogger(SocketClient.class); // Bộ ghi log để theo dõi trạng thái mạng hệ thống.
+  private static volatile SocketClient instance; // Biến lưu trữ instance duy nhất (mô hình Singleton), từ khóa volatile đảm bảo đồng bộ luồng.
+
+  private Socket socket; // Đối tượng kết nối mạng TCP thuần túy.
+  private ObjectOutputStream out; // Luồng dữ liệu đầu ra để gửi Object Java lên Server.
+  private ObjectInputStream in;   // Luồng dữ liệu đầu vào để đọc Object Java từ Server gửi về.
+
+  // Hàng đợi chặn luồng: Lưu trữ tạm thời các gói tin phản hồi mang tính đồng bộ (Request-Response).
   private final BlockingQueue<Object> responseQueue = new LinkedBlockingQueue<>();
+
+  // Tham chiếu nguyên tử lưu trữ bộ lắng nghe real-time (dành cho phòng đấu giá) để tránh xung đột đa luồng.
   private final AtomicReference<RealtimeListener> realtimeListener = new AtomicReference<>();
+
+  // Bảng băm an toàn đa luồng: Dùng để đăng ký các hàm xử lý phản hồi (Handler) dựa trên lớp dữ liệu (Class).
   private final ConcurrentHashMap<Class<?>, Consumer<Object>> handlers = new ConcurrentHashMap<>();
 
   /**

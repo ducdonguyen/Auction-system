@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class AuctionSchedulerTest {
 
     @Mock

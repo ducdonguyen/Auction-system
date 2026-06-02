@@ -120,7 +120,7 @@ public class UserDao {
     public boolean freezeBalance(String username, double amount) throws SQLException {
         String sql = "UPDATE users SET balance = balance - ? WHERE username = ? AND balance >= ?";
         try (Connection conn = DatabaseConfig.getConnection()) {
-            conn.setAutoCommit(false);  // ✅ BẬT TRANSACTION
+            conn.setAutoCommit(false);  // BẬT TRANSACTION
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setDouble(1, amount);
                 ps.setString(2, username);
@@ -128,14 +128,14 @@ public class UserDao {
                 int updated = ps.executeUpdate();
 
                 if (updated == 1) {
-                    conn.commit();  // ✅ COMMIT NẾU THÀNH CÔNG
+                    conn.commit();  // COMMIT NẾU THÀNH CÔNG
                     return true;
                 } else {
-                    conn.rollback();  // ✅ ROLLBACK NẾU KHÔNG CẬP NHẬT
+                    conn.rollback();  // ROLLBACK NẾU KHÔNG CẬP NHẬT
                     return false;
                 }
             } catch (SQLException e) {
-                conn.rollback();  // ✅ ROLLBACK NGAY NẾU CÓ EXCEPTION
+                conn.rollback();  // ROLLBACK NGAY NẾU CÓ EXCEPTION
                 throw e;
             }
         }
@@ -148,14 +148,14 @@ public class UserDao {
     public void refundBalance(String username, double amount) throws SQLException {
         String sql = "UPDATE users SET balance = balance + ? WHERE username = ?";
         try (Connection conn = DatabaseConfig.getConnection()) {
-            conn.setAutoCommit(false);  // ✅ BẬT TRANSACTION
+            conn.setAutoCommit(false);  // BẬT TRANSACTION
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setDouble(1, amount);
                 ps.setString(2, username);
                 ps.executeUpdate();
-                conn.commit();  // ✅ COMMIT THÀNH CÔNG
+                conn.commit();  // COMMIT THÀNH CÔNG
             } catch (SQLException e) {
-                conn.rollback();  // ✅ ROLLBACK NẾU CÓ EXCEPTION
+                conn.rollback();  // ROLLBACK NẾU CÓ EXCEPTION
                 throw e;
             }
         }
