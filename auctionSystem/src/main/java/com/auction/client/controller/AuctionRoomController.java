@@ -245,7 +245,7 @@ public class AuctionRoomController {
     }
 
     // Cấu hình đổi màu nhãn trạng thái trực quan nếu phiên đã bị Admin hủy
-    if (viewModel.status() != null && (viewModel.status().equalsIgnoreCase("CANCELED") || viewModel.status().equalsIgnoreCase("ĐÃ HỦY"))) {
+    if (viewModel.status() != null && (viewModel.status().equalsIgnoreCase("CANCELED") )) {
       statusLabel.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-background-radius: 20; -fx-padding: 4 12;");
       bidAmountField.setDisable(true);
     }

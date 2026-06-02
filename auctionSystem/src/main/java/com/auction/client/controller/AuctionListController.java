@@ -94,8 +94,8 @@ public class AuctionListController {
         auctionTable.setItems(data);
 
         // 1. Cập nhật số dư hiển thị ban đầu lên nút xanh
-        if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-            this.currentBalance = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
+        if (SessionContext.getCurrentUser() != null) {
+            this.currentBalance = SessionContext.getCurrentUser().getBalance();
         }
         updateBalanceUI(currentBalance);
 
@@ -109,11 +109,7 @@ public class AuctionListController {
                     if (res.isSuccess()) {
                         this.currentBalance = res.getNewBalance();
                         updateBalanceUI(this.currentBalance); // Thay đổi con số trên màn hình ngay lập tức
-
-                        if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-                            com.auction.client.service.SessionContext.getCurrentUser().setBalance(res.getNewBalance());
-                        }
-
+                        SessionContext.getCurrentUser().setBalance(res.getNewBalance());
                         showAlertDialog(Alert.AlertType.INFORMATION, "Thành công", "Nạp tiền thành công: " + res.getMessage());
                     } else {
                         showAlertDialog(Alert.AlertType.ERROR, "Thất bại", "Nạp tiền thất bại: " + res.getMessage());
@@ -147,7 +143,7 @@ public class AuctionListController {
     @FXML
     private void handleLogoutAction() throws IOException {
         // Clear session user on logout
-        com.auction.client.service.SessionContext.setCurrentUser(null);
+        SessionContext.setCurrentUser(null);
         SceneNavigator.switchScene(openAuctionButton, Scene.LOGIN, null);
     }
 
@@ -169,7 +165,7 @@ public class AuctionListController {
             try {
                 // Lấy thông tin định danh người dùng hiện tại từ Session hệ thống
                 String userName = "Chưa xác định";
-                if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
+                if (SessionContext.getCurrentUser() != null) {
                     userName = SessionContext.getCurrentUser().getUsername();
                 }
 

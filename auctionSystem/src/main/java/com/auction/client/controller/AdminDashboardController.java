@@ -86,10 +86,11 @@ public class AdminDashboardController {
 
   @FXML
   public void initialize() {
+    // Lấy danh sách các trạng thái có sẵn từ service và nạp vào ComboBox, mặc định chọn "Tất cả"
     statusFilter.setItems(FXCollections.observableArrayList(service.getAvailableStatuses()));
     statusFilter.setValue("Tất cả");
 
-    // Table "Tất cả"
+    // Chỉ định bảng "Tất cả" sẽ lấy thuộc tính nào từ đối tượng AuctionRow để hiển thị lên từng cột
     idColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
     itemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
     sellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
@@ -99,7 +100,7 @@ public class AdminDashboardController {
     statusColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().status()));
     summaryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().summary()));
 
-    // Table "Chờ duyệt" (Không có cột Người dẫn đầu)
+    // Chỉ định tương tự cho bảng "Chờ duyệt" (Bảng này không cần cột Người dẫn đầu)
     pIdColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().auctionId()));
     pItemColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().itemName()));
     pSellerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().sellerName()));
