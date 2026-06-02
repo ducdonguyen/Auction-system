@@ -3,6 +3,7 @@ package com.auction.client.controller;
 import com.auction.client.model.AuctionRoomViewModel;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.AuctionRoomService;
+import com.auction.client.service.SessionContext;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.shared.models.auction.AuctionStatus;
@@ -137,8 +138,8 @@ public class AuctionRoomController {
               balanceLabel.setText(String.format("%,.0f đ", newBalance));
             }
 
-            if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-              com.auction.client.service.SessionContext.getCurrentUser().setBalance(newBalance);
+            if (SessionContext.getCurrentUser() != null) {
+              SessionContext.getCurrentUser().setBalance(newBalance);
             }
 
             if (messageLabel != null && reason != null) {
@@ -188,13 +189,12 @@ public class AuctionRoomController {
        messageLabel.setStyle("-fx-text-fill: #166534;"); // Chữ xanh lá cây báo thành công
 
        // Ép giao diện trừ tiền trực tiếp để người dùng thấy số dư mới ngay lập tức
-       if (com.auction.client.service.SessionContext.getCurrentUser() != null) {
-         double currentMoney = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
+       if (SessionContext.getCurrentUser() != null) {
+         double currentMoney = SessionContext.getCurrentUser().getBalance();
          double bidAmount = Double.parseDouble(bidAmountStr);
          double newMoney = currentMoney - bidAmount;
 
-         // Cập nhật ví lưu trong RAM của Client
-         com.auction.client.service.SessionContext.getCurrentUser().setBalance(newMoney);
+         SessionContext.getCurrentUser().setBalance(newMoney);
 
          // Đẩy con số mới lên nhãn hiển thị số dư
          if (balanceLabel != null) {
@@ -215,8 +215,8 @@ public class AuctionRoomController {
     service.getAuctionRoom(aid).ifPresent(result -> bind(result.data()));
 
     // ĐỒNG BỘ SỐ DƯ BAN ĐẦU: Lấy số dư tài khoản từ Session hệ thống đưa lên phòng khi vừa vào phòng
-    if (balanceLabel != null && com.auction.client.service.SessionContext.getCurrentUser() != null) {
-      double sessionBalance = com.auction.client.service.SessionContext.getCurrentUser().getBalance();
+    if (balanceLabel != null && SessionContext.getCurrentUser() != null) {
+      double sessionBalance = SessionContext.getCurrentUser().getBalance();
       balanceLabel.setText(String.format("%,.0f đ", sessionBalance));
     }
   }
