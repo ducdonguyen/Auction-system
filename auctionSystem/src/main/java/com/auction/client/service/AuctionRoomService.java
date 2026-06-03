@@ -129,6 +129,13 @@ public class AuctionRoomService {
       default -> "Chi tiết loại sản phẩm: " + rawExtra;
     };
 
+    String formattedSchedule = "--/--/---- --:--";
+    long endTimeMillis = 0;
+    if (auction.getStartTime() != null && auction.getEndTime() != null) {
+      formattedSchedule = "Lịch: " + df.format(auction.getStartTime()) + " - " + df.format(auction.getEndTime());
+      endTimeMillis = auction.getEndTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
     return new AuctionRoomViewModel(
             auction.getAuctionId(),
             auction.getItem().getName(),
@@ -139,11 +146,11 @@ public class AuctionRoomService {
             cf.format(auction.getCurrentPrice() + auction.getStepPrice()),
             auction.getHighestBidder() == null ? "Chưa có" : auction.getHighestBidder().getUsername(),
             auction.getItem().getDescription(),
-            "Lịch: " + df.format(auction.getStartTime()) + " - " + df.format(auction.getEndTime()),
+            formattedSchedule,
             history,
             vietnameseType,
             formattedExtra,
-            auction.getEndTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            endTimeMillis
     );
   }
 }
