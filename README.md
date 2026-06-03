@@ -72,3 +72,11 @@ mvn javafx:run
 - [x] Xem danh sách các phiên đấu giá (đang diễn ra, sắp diễn ra...).
 - [x] Tham gia phòng đấu giá thời gian thực (Real-time Auction Room).
 - [x] Thực hiện trả giá (Bidding) theo thời gian thực (Đồng bộ đa luồng, chặn Race condition đảm bảo chỉ một người đặt giá tại một thời điểm).
+
+
+## 7. Link video demo 
+https://www.youtube.com/watch?v=EnWNMg96IBo 
+
+## 8. PDF Báo cáo 
+https://drive.google.com/file/d/171C0laz_FpaemEMx3ctIk8WvRgEwo3P7/view?usp=sharing
+
