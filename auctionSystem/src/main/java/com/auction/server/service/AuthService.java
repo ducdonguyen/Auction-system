@@ -42,7 +42,7 @@ public class AuthService {
         // Kiểm tra dữ liệu đầu vào cơ bản
         if (request.username() == null || request.username().isBlank() ||
                 request.password() == null || request.password().isBlank()) {
-            return new ServiceResult<>(false, "Vui lòng nhập đủ thông tin.", null);
+            return new ServiceResult<>(false, "Vui lòng nhập đủ thông tin.", null, System.currentTimeMillis());
         }
 
         try {
@@ -50,20 +50,20 @@ public class AuthService {
             UserAccount user = userDao.findByUsername(request.username());
 
             if (user == null) {
-                return new ServiceResult<>(false, "Tài khoản không tồn tại.", null);
+                return new ServiceResult<>(false, "Tài khoản không tồn tại.", null, System.currentTimeMillis());
             }
 
             if (PasswordUtil.matches(request.password(), user.getPasswordHash())) {
                 user.setPasswordHash(null);
 
-                return new ServiceResult<>(true, "Đăng nhập thành công!", user);
+                return new ServiceResult<>(true, "Đăng nhập thành công!", user, System.currentTimeMillis());
             } else {
-                return new ServiceResult<>(false, "Mật khẩu không chính xác.", null);
+                return new ServiceResult<>(false, "Mật khẩu không chính xác.", null, System.currentTimeMillis());
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu trên Server.", null);
+            return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu trên Server.", null, System.currentTimeMillis());
         }
     }
 
@@ -72,13 +72,13 @@ public class AuthService {
         if (request.username() == null || request.username().isBlank() ||
                 request.password() == null || request.password().isBlank() ||
                 request.email() == null || request.email().isBlank()) {
-            return new ServiceResult<>(false, "Vui lòng nhập đầy đủ thông tin đăng ký.", null);
+            return new ServiceResult<>(false, "Vui lòng nhập đầy đủ thông tin đăng ký.", null, System.currentTimeMillis());
         }
 
         try {
             // Kiểm tra trùng lặp
             if (userDao.existsByUsernameOrEmail(request.username(), request.email())) {
-                return new ServiceResult<>(false, "Tên đăng nhập hoặc Email đã tồn tại.", null);
+                return new ServiceResult<>(false, "Tên đăng nhập hoặc Email đã tồn tại.", null, System.currentTimeMillis());
             }
 
             UserAccount newUser = new UserAccount(
@@ -96,11 +96,11 @@ public class AuthService {
 
             // Xóa mật khẩu trước khi trả về
             newUser.setPasswordHash(null);
-            return new ServiceResult<>(true, "Đăng ký tài khoản thành công!", newUser);
+            return new ServiceResult<>(true, "Đăng ký tài khoản thành công!", newUser, System.currentTimeMillis());
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu khi đăng ký.", null);
+            return new ServiceResult<>(false, "Lỗi kết nối cơ sở dữ liệu khi đăng ký.", null, System.currentTimeMillis());
         }
     }
     /**

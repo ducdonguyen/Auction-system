@@ -39,7 +39,8 @@ public class AuctionRoomService {
             // 4. Kiểm tra và ép kiểu
             if (rawResponse instanceof ServiceResult<?> response) {
                 if (response.success() && response.data() instanceof Auction latestAuction) {
-                    return Optional.of(new ServiceResult<>(true, response.message(), convert(latestAuction)));
+                    AuctionRoomViewModel vm = convert(latestAuction, response.serverTimeMillis());
+                    return Optional.of(new ServiceResult<>(true, response.message(), vm, response.serverTimeMillis()));
                 }
             }
         } catch (Exception e) {
@@ -48,7 +49,7 @@ public class AuctionRoomService {
 
         // Fallback: Nếu rớt mạng hoặc có lỗi
         return AuctionDataStore.findById(auctionId).map(auction ->
-                new ServiceResult<>(false, "Đang xem offline (Lỗi mạng)", convert(auction)));
+                new ServiceResult<>(false, "Đang xem offline (Lỗi mạng)", convert(auction, System.currentTimeMillis()), System.currentTimeMillis()));
     }
 
     /**
@@ -59,16 +60,16 @@ public class AuctionRoomService {
             // 1. Làm sạch chuỗi và kiểm tra định dạng số ngay tại Client
             String cleanAmount = amountStr.replaceAll("\\D", "");
             if (cleanAmount.isEmpty()) {
-                return new ServiceResult<>(false, "Vui lòng nhập số tiền hợp lệ!", null);
+                return new ServiceResult<>(false, "Vui lòng nhập số tiền hợp lệ!", null, System.currentTimeMillis());
             }
             double amount = Double.parseDouble(cleanAmount);
             if (amount <= 0) {
-                return new ServiceResult<>(false, "Số tiền đặt giá phải lớn hơn 0!", null);
+                return new ServiceResult<>(false, "Số tiền đặt giá phải lớn hơn 0!", null, System.currentTimeMillis());
             }
 
             UserAccount currentUser = SessionContext.getCurrentUser();
             if (currentUser == null) {
-                return new ServiceResult<>(false, "Bạn cần đăng nhập để đặt giá.", null);
+                return new ServiceResult<>(false, "Bạn cần đăng nhập để đặt giá.", null, System.currentTimeMillis());
             }
 
             // 2. Tạo gói tin đặt giá
@@ -82,22 +83,23 @@ public class AuctionRoomService {
 
             // 5. Trả về đúng trạng thái và thông điệp thực tế của Server
             if (rawResponse instanceof ServiceResult<?> response) {
+                long serverTimeMillis = response.serverTimeMillis();
                 Object data = response.data();
                 if (data instanceof com.auction.shared.models.auction.Auction updatedAuction) {
-                    AuctionRoomViewModel vm = convert(updatedAuction);
-                    return new ServiceResult<>(response.success(), response.message(), vm);
+                    AuctionRoomViewModel vm = convert(updatedAuction, serverTimeMillis);
+                    return new ServiceResult<>(response.success(), response.message(), vm, serverTimeMillis);
                 }
-                return new ServiceResult<>(response.success(), response.message(), null);
+                return new ServiceResult<>(response.success(), response.message(), null, serverTimeMillis);
             }
 
-            return new ServiceResult<>(false, "Phản hồi từ Server không hợp lệ", null);
+            return new ServiceResult<>(false, "Phản hồi từ Server không hợp lệ", null, System.currentTimeMillis());
 
         } catch (Exception e) {
-            return new ServiceResult<>(false, "Lỗi kết nối mạng: " + e.getMessage(), null);
+            return new ServiceResult<>(false, "Lỗi kết nối mạng: " + e.getMessage(), null, System.currentTimeMillis());
         }
     }
 
-    private AuctionRoomViewModel convert(Auction auction) {
+    private AuctionRoomViewModel convert(Auction auction, long serverTimeMillis) {
         // Chuyển đổi và định dạng danh sách lịch sử đặt giá từ DB
         java.util.List<String> history = new java.util.ArrayList<>(auction.getBidHistory().stream()
                 .map(tx -> {
@@ -138,7 +140,13 @@ public class AuctionRoomService {
         long endTimeMillis = 0;
         if (auction.getStartTime() != null && auction.getEndTime() != null) {
             formattedSchedule = "Lịch: " + df.format(auction.getStartTime()) + " - " + df.format(auction.getEndTime());
-            endTimeMillis = auction.getEndTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long endTimeMillisServer = auction.getEndTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+            
+            // Điều chỉnh bằng chênh lệch client-server: 
+            // endTimeMillis = endTimeServer + (clientNow - serverNow)
+            long clientNow = System.currentTimeMillis();
+            long delta = clientNow - serverTimeMillis;
+            endTimeMillis = endTimeMillisServer + delta;
         }
 
         return new AuctionRoomViewModel(

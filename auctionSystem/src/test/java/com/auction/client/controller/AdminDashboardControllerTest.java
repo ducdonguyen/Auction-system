@@ -132,7 +132,7 @@ public class AdminDashboardControllerTest {
         pendingTable.setItems(FXCollections.observableArrayList(selected));
         pendingTable.getSelectionModel().select(selected);
 
-        when(auctionCatalogService.approveAuction("AUC-001")).thenReturn(new ServiceResult<>(true, "Success", null));
+        when(auctionCatalogService.approveAuction("AUC-001")).thenReturn(new ServiceResult<>(true, "Success", null, System.currentTimeMillis()));
 
         invokePrivateMethod("handleApproveAction");
 
@@ -174,7 +174,7 @@ public class AdminDashboardControllerTest {
         pendingTable.setItems(FXCollections.observableArrayList(selected));
         pendingTable.getSelectionModel().select(selected);
 
-        when(auctionCatalogService.cancelAuction("AUC-001")).thenReturn(new ServiceResult<>(true, "Rejected", null));
+        when(auctionCatalogService.cancelAuction("AUC-001")).thenReturn(new ServiceResult<>(true, "Rejected", null, System.currentTimeMillis()));
 
         invokePrivateMethod("handleRejectAction");
 

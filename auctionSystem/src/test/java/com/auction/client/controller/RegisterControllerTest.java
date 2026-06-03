@@ -136,7 +136,8 @@ public class RegisterControllerTest {
                             new ServiceResult<>(
                                     true,
                                     "Registration successful",
-                                    null
+                                    null,
+                                    System.currentTimeMillis()
                             )
                     );
 
@@ -180,7 +181,8 @@ public class RegisterControllerTest {
                             new ServiceResult<>(
                                     false,
                                     "Username already exists",
-                                    null
+                                    null,
+                                    System.currentTimeMillis()
                             )
                     );
 

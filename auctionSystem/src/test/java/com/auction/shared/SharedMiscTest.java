@@ -34,7 +34,7 @@ class SharedMiscTest {
         assertEquals("e", rr.email());
         assertEquals("p", rr.password());
 
-        ServiceResult<String> sr = new ServiceResult<>(true, "msg", "data");
+        ServiceResult<String> sr = new ServiceResult<>(true, "msg", "data", System.currentTimeMillis());
         assertTrue(sr.success());
         assertEquals("msg", sr.message());
         assertEquals("data", sr.data());

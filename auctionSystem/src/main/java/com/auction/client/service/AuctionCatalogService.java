@@ -109,9 +109,10 @@ public class AuctionCatalogService {
   public ServiceResult<Void> approveAuction(String auctionId) {
     try {
       SocketClient.getInstance().sendRequest(new ApproveAuctionRequest(auctionId));
-      return (ServiceResult<Void>) SocketClient.getInstance().receiveResponse();
+      ServiceResult<Void> response = (ServiceResult<Void>) SocketClient.getInstance().receiveResponse();
+      return response != null ? response : new ServiceResult<>(false, "Phản hồi trống", null, System.currentTimeMillis());
     } catch (Exception e) {
-      return new ServiceResult<>(false, "Lỗi kết nối khi duyệt: " + e.getMessage(), null);
+      return new ServiceResult<>(false, "Lỗi kết nối khi duyệt: " + e.getMessage(), null, System.currentTimeMillis());
     }
   }
 
@@ -127,7 +128,7 @@ public class AuctionCatalogService {
       SocketClient.getInstance().sendRequest(new CancelAuctionRequest(auctionId));
       return (ServiceResult<Void>) SocketClient.getInstance().receiveResponse();
     } catch (Exception e) {
-      return new ServiceResult<>(false, "Lỗi kết nối khi hủy: " + e.getMessage(), null);
+      return new ServiceResult<>(false, "Lỗi kết nối khi hủy: " + e.getMessage(), null, System.currentTimeMillis());
     }
   }
 

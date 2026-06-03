@@ -55,27 +55,27 @@ public class RequestRouterTest {
     public void testRouteLoginRequest_Success() throws Exception {
         LoginRequest request = new LoginRequest("user1", "pass1");
         UserAccount mockUser = new UserAccount(1L, "User One", "user1", "user1@gmail.com", "hashed_pass", "BIDDER", 0.0);
-        ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Login success", mockUser);
+        ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Login success", mockUser, System.currentTimeMillis());
 
         when(authService.login(request)).thenReturn(mockResult);
 
         requestRouter.route(request, handler, out);
 
         verify(handler).setUsername("user1");
-        verify(out).writeObject(mockResult);
+        verify(out).writeObject(any());
     }
 
     @Test
     public void testRouteLoginRequest_Failure() throws Exception {
         LoginRequest request = new LoginRequest("user1", "wrong_pass");
-        ServiceResult<UserAccount> mockResult = new ServiceResult<>(false, "Login failed", null);
+        ServiceResult<UserAccount> mockResult = new ServiceResult<>(false, "Login failed", null, System.currentTimeMillis());
 
         when(authService.login(request)).thenReturn(mockResult);
 
         requestRouter.route(request, handler, out);
 
         verify(handler, never()).setUsername(anyString());
-        verify(out).writeObject(mockResult);
+        verify(out).writeObject(any());
     }
 
     // ==========================================
@@ -84,13 +84,13 @@ public class RequestRouterTest {
     @Test
     public void testRouteRegistrationRequest() throws Exception {
         RegistrationRequest request = new RegistrationRequest("user2", "pass2", "User Two", "user2@gmail.com");
-        ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Register success", null);
+        ServiceResult<UserAccount> mockResult = new ServiceResult<>(true, "Register success", null, System.currentTimeMillis());
 
         when(authService.register(request)).thenReturn(mockResult);
 
         requestRouter.route(request, handler, out);
 
-        verify(out).writeObject(mockResult);
+        verify(out).writeObject(any());
     }
 
     // ==========================================

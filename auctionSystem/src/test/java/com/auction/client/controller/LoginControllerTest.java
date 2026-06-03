@@ -112,7 +112,8 @@ public class LoginControllerTest {
                 new ServiceResult<>(
                         true,
                         "Login successful",
-                        user
+                        user,
+                        System.currentTimeMillis()
                 );
 
         try (MockedStatic<SocketClient> socketMock =
@@ -167,7 +168,8 @@ public class LoginControllerTest {
                 new ServiceResult<>(
                         true,
                         "Login successful",
-                        user
+                        user,
+                        System.currentTimeMillis()
                 );
 
         try (MockedStatic<SocketClient> socketMock =
@@ -209,7 +211,8 @@ public class LoginControllerTest {
                 new ServiceResult<>(
                         false,
                         "Sai tài khoản hoặc mật khẩu",
-                        null
+                        null,
+                        System.currentTimeMillis()
                 );
 
         try (MockedStatic<SocketClient> mocked =

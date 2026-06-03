@@ -150,8 +150,8 @@ public class ClientHandler implements Runnable, AuctionObserver {
   @Override
   public void receiveSystemMessage(String message) {
     try {
-      // Đóng gói thành ServiceResult báo thành công và mang theo message
-      out.writeObject(new ServiceResult<>(true, message, null));
+      // Đóng gói thành ServiceResult báo thành công và mang theo message + server time
+      out.writeObject(new ServiceResult<>(true, message, null, System.currentTimeMillis()));
       out.flush();
     } catch (java.io.IOException e) {
       logger.error("Lỗi khi gửi tin nhắn hệ thống tới client: {}", e.getMessage(), e);

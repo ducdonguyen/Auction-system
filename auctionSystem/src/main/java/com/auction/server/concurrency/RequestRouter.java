@@ -81,198 +81,202 @@ public class RequestRouter {
         }
     }
 
-    private void handleLogin(LoginRequest request, ClientHandler handler, ObjectOutputStream out)
-            throws IOException {
-        ServiceResult<UserAccount> result = authService.login(request);
+     private void handleLogin(LoginRequest request, ClientHandler handler, ObjectOutputStream out)
+             throws IOException {
+         ServiceResult<UserAccount> result = authService.login(request);
+         // Thêm thời gian server vào response
+         if (result.success()) {
+             // Ghi danh user vào hệ thống để có thể nhận tin nhắn hoàn tiền
+             handler.setUsername(request.username());
 
-        if (result.success()) {
-            // Ghi danh user vào hệ thống để có thể nhận tin nhắn hoàn tiền
-            handler.setUsername(request.username());
+             AuctionManager.getInstance().addGlobalObserver(handler);
+             logger.info("[RequestRouter] User {} đã đăng nhập và được thêm vào Global Observers", request.username());
+             result = new ServiceResult<>(result.success(), result.message(), result.data(), System.currentTimeMillis());
+         } else {
+             result = new ServiceResult<>(result.success(), result.message(), result.data(), System.currentTimeMillis());
+         }
 
-            AuctionManager.getInstance().addGlobalObserver(handler);
-            logger.info("[RequestRouter] User {} đã đăng nhập và được thêm vào Global Observers", request.username());
-        }
+         sendResponse(out, result);
+     }
 
-        sendResponse(out, result);
-    }
+     private void handleRegister(RegistrationRequest request, ObjectOutputStream out)
+             throws IOException {
+         ServiceResult<UserAccount> result = authService.register(request);
+         result = new ServiceResult<>(result.success(), result.message(), result.data(), System.currentTimeMillis());
+         sendResponse(out, result);
+     }
 
-    private void handleRegister(RegistrationRequest request, ObjectOutputStream out)
-            throws IOException {
-        ServiceResult<UserAccount> result = authService.register(request);
-        sendResponse(out, result);
-    }
+     private void handleJoinRoom(JoinRoomRequest request, ClientHandler handler,
+                                 ObjectOutputStream out)
+             throws IOException {
+         String auctionId = request.getAuctionId();
+         String oldAuctionId = handler.getCurrentWatchingAuctionId();
+         if (oldAuctionId != null) {
+             AuctionManager.getInstance().unsubscribe(oldAuctionId, handler);
+         }
+         handler.setCurrentWatchingAuctionId(auctionId);
+         AuctionManager.getInstance().subscribe(auctionId, handler);
+         Auction currentAuction = auctionService.getAuctionById(auctionId);
 
-    private void handleJoinRoom(JoinRoomRequest request, ClientHandler handler,
-                                ObjectOutputStream out)
-            throws IOException {
-        String auctionId = request.getAuctionId();
-        String oldAuctionId = handler.getCurrentWatchingAuctionId();
-        if (oldAuctionId != null) {
-            AuctionManager.getInstance().unsubscribe(oldAuctionId, handler);
-        }
-        handler.setCurrentWatchingAuctionId(auctionId);
-        AuctionManager.getInstance().subscribe(auctionId, handler);
-        Auction currentAuction = auctionService.getAuctionById(auctionId);
+         if (currentAuction != null && currentAuction.getBidHistory() != null) {
+             for (BidTransaction tx : currentAuction.getBidHistory()) {
+                 if (tx.bidder() != null) {
+                     tx.bidder().setFullName(authService.getFullName(tx.bidder().getUsername()));
+                 }
+             }
+             if (currentAuction.getHighestBidder() != null) {
+                 currentAuction.getHighestBidder().setFullName(authService.getFullName(currentAuction.getHighestBidder().getUsername()));
+             }
+         }
 
-        if (currentAuction != null && currentAuction.getBidHistory() != null) {
-            for (BidTransaction tx : currentAuction.getBidHistory()) {
-                if (tx.bidder() != null) {
-                    tx.bidder().setFullName(authService.getFullName(tx.bidder().getUsername()));
-                }
-            }
-            if (currentAuction.getHighestBidder() != null) {
-                currentAuction.getHighestBidder().setFullName(authService.getFullName(currentAuction.getHighestBidder().getUsername()));
-            }
-        }
+         sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction, System.currentTimeMillis()));
+     }
 
-        sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction));
-    }
+     private void handleBid(BidRequest request, ObjectOutputStream out) throws IOException {
+         ServiceResult<Auction> result;
+         try {
+             boolean success = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
+             if (success) {
+                 Auction updatedAuction = auctionService.getAuctionById(request.getAuctionId());
+                 if (updatedAuction != null && updatedAuction.getHighestBidder() != null) {
+                     updatedAuction.getHighestBidder().setFullName(authService.getFullName(updatedAuction.getHighestBidder().getUsername()));
+                 }
+                 result = new ServiceResult<>(true, "Đặt giá thầu thành công!", updatedAuction, System.currentTimeMillis());
+             } else {
+                 result = new ServiceResult<>(false, "Không thể đặt giá thầu.", null, System.currentTimeMillis());
+             }
+         } catch (IllegalArgumentException e) {
+             result = new ServiceResult<>(false, e.getMessage(), null, System.currentTimeMillis());
+         } catch (Exception e) {
+             result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null, System.currentTimeMillis());
+         }
+         sendResponse(out, result);
+     }
 
-    private void handleBid(BidRequest request, ObjectOutputStream out) throws IOException {
-        ServiceResult<Auction> result;
-        try {
-            boolean success = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
-            if (success) {
-                Auction updatedAuction = auctionService.getAuctionById(request.getAuctionId());
-                if (updatedAuction != null && updatedAuction.getHighestBidder() != null) {
-                    updatedAuction.getHighestBidder().setFullName(authService.getFullName(updatedAuction.getHighestBidder().getUsername()));
-                }
-                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", updatedAuction);
-            } else {
-                result = new ServiceResult<>(false, "Không thể đặt giá thầu.", null);
-            }
-        } catch (IllegalArgumentException e) {
-            result = new ServiceResult<>(false, e.getMessage(), null);
-        } catch (Exception e) {
-            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null);
-        }
-        sendResponse(out, result);
-    }
+     private void handleGetAllAuctions(ObjectOutputStream out) throws IOException {
+         java.util.List<Auction> allAuctions = auctionService.getAllAuctions();
+         sendResponse(out, new ServiceResult<>(true, "Lấy danh sách thành công", allAuctions, System.currentTimeMillis()));
+     }
 
-    private void handleGetAllAuctions(ObjectOutputStream out) throws IOException {
-        java.util.List<Auction> allAuctions = auctionService.getAllAuctions();
-        sendResponse(out, new ServiceResult<>(true, "Lấy danh sách thành công", allAuctions));
-    }
+     private void handleCancelAuction(CancelAuctionRequest request, ObjectOutputStream out) throws IOException {
+         ServiceResult<Void> result;
+         try {
+             auctionService.cancelAuction(request.auctionId());
+             result = new ServiceResult<>(true, "Đã hủy phiên đấu giá thành công", null, System.currentTimeMillis());
+         } catch (Exception e) {
+             result = new ServiceResult<>(false, "Lỗi hủy phiên: " + e.getMessage(), null, System.currentTimeMillis());
+         }
+         sendResponse(out, result);
+     }
 
-    private void handleCancelAuction(CancelAuctionRequest request, ObjectOutputStream out) throws IOException {
-        ServiceResult<Void> result;
-        try {
-            auctionService.cancelAuction(request.auctionId());
-            result = new ServiceResult<>(true, "Đã hủy phiên đấu giá thành công", null);
-        } catch (Exception e) {
-            result = new ServiceResult<>(false, "Lỗi hủy phiên: " + e.getMessage(), null);
-        }
-        sendResponse(out, result);
-    }
+     /**
+      * Xử lý yêu cầu tạo phiên đấu giá từ Client đưa xuống Service.
+      */
+     private void handleCreateAuction(CreateAuctionRequest request, ClientHandler handler,
+                                      ObjectOutputStream out) throws IOException {
+         ServiceResult<Void> result;
+         try {
+             String sellerUsername = request.getSellerUsername();
+             if (sellerUsername == null || sellerUsername.isBlank()) {
+                 sellerUsername = "Người bán ẩn danh";
+             }
 
-    /**
-     * Xử lý yêu cầu tạo phiên đấu giá từ Client đưa xuống Service.
-     */
-    private void handleCreateAuction(CreateAuctionRequest request, ClientHandler handler,
-                                     ObjectOutputStream out) throws IOException {
-        ServiceResult<Void> result;
-        try {
-            String sellerUsername = request.getSellerUsername();
-            if (sellerUsername == null || sellerUsername.isBlank()) {
-                sellerUsername = "Người bán ẩn danh";
-            }
+             Item item = ItemFactory.createItem(
+                     request.getProductType(),
+                     request.getProductName(),
+                     request.getDescription(),
+                     request.getStartingPrice(),
+                     request.getExtraInfo()
+             );
 
-            Item item = ItemFactory.createItem(
-                    request.getProductType(),
-                    request.getProductName(),
-                    request.getDescription(),
-                    request.getStartingPrice(),
-                    request.getExtraInfo()
-            );
+             Seller seller = new Seller(sellerUsername, "");
 
-            Seller seller = new Seller(sellerUsername, "");
+             // Tính startTime/endTime server-side nếu client gửi duration
+             LocalDateTime startTime;
+             LocalDateTime endTime;
 
-            // Tính startTime/endTime server-side nếu client gửi duration
-            LocalDateTime startTime;
-            LocalDateTime endTime;
+             if (request.getDurationValue() != null && request.getDurationValue() > 0 && request.getDurationUnit() != null) {
+                 startTime = LocalDateTime.now(); // dùng thời gian server để tránh bị gian lận
+                 String unit = request.getDurationUnit();
+                 long val = request.getDurationValue();
 
-            if (request.getDurationValue() != null && request.getDurationValue() > 0 && request.getDurationUnit() != null) {
-                startTime = LocalDateTime.now(); // dùng thời gian server để tránh bị gian lận
-                String unit = request.getDurationUnit();
-                long val = request.getDurationValue();
+                 // ĐÃ SỬA: Chuyển chuỗi sang chữ thường ngay trong biểu thức switch
+                 switch (unit.toLowerCase()) {
+                     case "giờ":
+                     case "hours":
+                     case "hour":
+                     case "h":
+                         endTime = startTime.plusHours(val);
+                         break;
+                     case "phút":
+                     case "minutes":
+                     case "minute":
+                     case "m":
+                         endTime = startTime.plusMinutes(val);
+                         break;
+                     default: // "ngày" hoặc "days"
+                         endTime = startTime.plusDays(val);
+                         break;
+                 }
+             } else {
+                 // fallback: dùng thời gian client gửi (còn giữ hành vi cũ)
+                 startTime = request.getStartTime() != null ? request.getStartTime() : LocalDateTime.now();
+                 endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusDays(3);
+             }
 
-                // ĐÃ SỬA: Chuyển chuỗi sang chữ thường ngay trong biểu thức switch
-                switch (unit.toLowerCase()) {
-                    case "giờ":
-                    case "hours":
-                    case "hour":
-                    case "h":
-                        endTime = startTime.plusHours(val);
-                        break;
-                    case "phút":
-                    case "minutes":
-                    case "minute":
-                    case "m":
-                        endTime = startTime.plusMinutes(val);
-                        break;
-                    default: // "ngày" hoặc "days"
-                        endTime = startTime.plusDays(val);
-                        break;
-                }
-            } else {
-                // fallback: dùng thời gian client gửi (còn giữ hành vi cũ)
-                startTime = request.getStartTime() != null ? request.getStartTime() : LocalDateTime.now();
-                endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusDays(3);
-            }
+             Auction newAuction = auctionService.createAuction(
+                     item, seller, request.getStartingPrice(), request.getPriceStep(),
+                     startTime, endTime
+             );
 
-            Auction newAuction = auctionService.createAuction(
-                    item, seller, request.getStartingPrice(), request.getPriceStep(),
-                    startTime, endTime
-            );
+             if (newAuction != null) {
+                 result = new ServiceResult<>(true, "Đã tiếp nhận yêu cầu tạo phòng đấu giá, vui lòng chờ duyệt.", null, System.currentTimeMillis());
+                 logger.info("[RequestRouter] Xử lý thành công CreateAuctionRequest cho sản phẩm: {}", request.getProductName());
+             } else {
+                 result = new ServiceResult<>(false, "Hệ thống không thể khởi tạo phiên đấu giá vào lúc này.", null, System.currentTimeMillis());
+             }
+         } catch (Exception e) {
+             result = new ServiceResult<>(false, "Lỗi Server: " + e.getMessage(), null, System.currentTimeMillis());
+             logger.error("[RequestRouter] Lỗi khi xử lý CreateAuctionRequest", e);
+         }
 
-            if (newAuction != null) {
-                result = new ServiceResult<>(true, "Đã tiếp nhận yêu cầu tạo phòng đấu giá, vui lòng chờ duyệt.", null);
-                logger.info("[RequestRouter] Xử lý thành công CreateAuctionRequest cho sản phẩm: {}", request.getProductName());
-            } else {
-                result = new ServiceResult<>(false, "Hệ thống không thể khởi tạo phiên đấu giá vào lúc này.", null);
-            }
-        } catch (Exception e) {
-            result = new ServiceResult<>(false, "Lỗi Server: " + e.getMessage(), null);
-            logger.error("[RequestRouter] Lỗi khi xử lý CreateAuctionRequest", e);
-        }
+         sendResponse(out, result);
+     }
 
-        sendResponse(out, result);
-    }
+     /**
+      * Xử lý yêu cầu lấy danh sách phiên đấu giá chờ duyệt (Dành cho Admin)
+      */
+     private void handleGetPendingAuctions(ObjectOutputStream out) throws IOException {
+         try {
+             java.util.List<Auction> pendingList = auctionService.getPendingAuctions();
+             sendResponse(out, new ServiceResult<>(true, "Lấy danh sách chờ duyệt thành công", pendingList, System.currentTimeMillis()));
+         } catch (Exception e) {
+             sendResponse(out, new ServiceResult<>(false, "Lỗi lấy danh sách: " + e.getMessage(), null, System.currentTimeMillis()));
+         }
+     }
 
-    /**
-     * Xử lý yêu cầu lấy danh sách phiên đấu giá chờ duyệt (Dành cho Admin)
-     */
-    private void handleGetPendingAuctions(ObjectOutputStream out) throws IOException {
-        try {
-            java.util.List<Auction> pendingList = auctionService.getPendingAuctions();
-            sendResponse(out, new ServiceResult<>(true, "Lấy danh sách chờ duyệt thành công", pendingList));
-        } catch (Exception e) {
-            sendResponse(out, new ServiceResult<>(false, "Lỗi lấy danh sách: " + e.getMessage(), null));
-        }
-    }
+     /**
+      * Xử lý yêu cầu phê duyệt phiên đấu giá (Dành cho Admin)
+      */
+     private void handleApproveAuction(ApproveAuctionRequest req, ObjectOutputStream out) throws IOException {
+         try {
+             Auction auction = auctionService.getAuctionById(req.getAuctionId());
+             if (auction == null) {
+                 sendResponse(out, new ServiceResult<>(false, "Không tìm thấy ID phiên đấu giá", null, System.currentTimeMillis()));
+                 return;
+             }
 
-    /**
-     * Xử lý yêu cầu phê duyệt phiên đấu giá (Dành cho Admin)
-     */
-    private void handleApproveAuction(ApproveAuctionRequest req, ObjectOutputStream out) throws IOException {
-        try {
-            Auction auction = auctionService.getAuctionById(req.getAuctionId());
-            if (auction == null) {
-                sendResponse(out, new ServiceResult<>(false, "Không tìm thấy ID phiên đấu giá", null));
-                return;
-            }
+             boolean success = auctionService.updateAuctionStatus(auction, AuctionStatus.OPEN);
 
-            boolean success = auctionService.updateAuctionStatus(auction, AuctionStatus.OPEN);
-
-            if (success) {
-                sendResponse(out, new ServiceResult<>(true, "Đã duyệt thành công! Phiên đấu giá đã hiện trên Sảnh.", null));
-            } else {
-                sendResponse(out, new ServiceResult<>(false, "Trạng thái hiện tại không cho phép duyệt.", null));
-            }
-        } catch (Exception e) {
-            sendResponse(out, new ServiceResult<>(false, "Lỗi duyệt phiên: " + e.getMessage(), null));
-        }
-    }
+             if (success) {
+                 sendResponse(out, new ServiceResult<>(true, "Đã duyệt thành công! Phiên đấu giá đã hiện trên Sảnh.", null, System.currentTimeMillis()));
+             } else {
+                 sendResponse(out, new ServiceResult<>(false, "Trạng thái hiện tại không cho phép duyệt.", null, System.currentTimeMillis()));
+             }
+         } catch (Exception e) {
+             sendResponse(out, new ServiceResult<>(false, "Lỗi duyệt phiên: " + e.getMessage(), null, System.currentTimeMillis()));
+         }
+     }
 
     /**
      * HÀM MỚI THÊM VÀO: Tiếp nhận và điều hướng xử lý cộng tiền từ TopUpRequest

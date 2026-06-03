@@ -211,7 +211,8 @@ public class AuctionRoomControllerTest {
                             new ServiceResult<>(
                                     true,
                                     "Bid placed",
-                                    null
+                                    null,
+                                    System.currentTimeMillis()
                             )
                     );
 

@@ -36,7 +36,7 @@ class MiscTest {
         JoinRoomRequest jrr = new JoinRoomRequest("A1");
         assertEquals("A1", jrr.getAuctionId());
 
-        ServiceResult<String> sr = new ServiceResult<>(true, "OK", "Data");
+        ServiceResult<String> sr = new ServiceResult<>(true, "OK", "Data", System.currentTimeMillis());
         assertTrue(sr.success());
         assertEquals("OK", sr.message());
         assertEquals("Data", sr.data());
