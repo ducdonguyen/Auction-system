@@ -15,12 +15,15 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.time.Duration;
 
 /**
  * Dịch vụ xử lý các nghiệp vụ liên quan đến đấu giá
  */
 public class AuctionService {
     private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
+    private static final long ANTI_SNIPE_WINDOW_SECONDS = 30;     // cửa sổ phát hiện sniping (ví dụ 30s)
+    private static final long ANTI_SNIPE_EXTENSION_SECONDS = 60;  // gia hạn thêm (ví dụ +60s)
     private AuctionLockManager lockManager;
     private AuctionRepository auctionRepository;
     private final AuthService authService = new AuthService();
@@ -170,6 +173,29 @@ public class AuctionService {
                 // 3. CẬP NHẬT TRẠNG THÁI PHÒNG ĐẤU GIÁ
                 BidTransaction transaction = new BidTransaction("TX-" + System.currentTimeMillis(), bidder, amount, LocalDateTime.now());
                 auction.updateAuctionState(bidder, amount, transaction);
+
+                // === ANTI-SNIPE MECHANISM ===
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime end = auction.getEndTime();
+                logger.info("[DEBUG] === ANTI-SNIPE CHECK === auctionId={}, now={}, endTime={}",
+                        auction.getAuctionId(), now, end);
+                if (end != null) {
+                    long secondsLeft = Duration.between(now, end).getSeconds();
+                    logger.info("[DEBUG] Anti-snipe: secondsLeft={}s (threshold={}s)",
+                            secondsLeft, ANTI_SNIPE_WINDOW_SECONDS);
+                    if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
+                        LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
+                        auction.setEndTime(newEnd);
+                        logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
+                                auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
+                    } else if (secondsLeft <= 0) {
+                        logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: Auction {} already ended ({}s ago)",
+                                auction.getAuctionId(), Math.abs(secondsLeft));
+                    }
+                } else {
+                    logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: endTime is null for auction {}",
+                            auction.getAuctionId());
+                }
                 auctionRepository.save(auction);
 
                 // 4. HOÀN TIỀN CHO NGƯỜI CŨ (NẾU CÓ)
@@ -215,11 +241,44 @@ public class AuctionService {
      */
     public boolean placeBid(Auction auction, Bidder bidder, double amount) {
         try {
-            lockManager.lockAndRun(auction.getAuctionId(), () -> performPlaceBid(auction, bidder, amount));
-            auctionRepository.save(auction);
+            lockManager.lockAndRun(auction.getAuctionId(), () -> {
+                // 1. Thực hiện các bước đặt giá và kiểm tra luật (Ví dụ: trừ tiền, update trạng thái...)
+                performPlaceBid(auction, bidder, amount);
+
+                // 2. === ANTI-SNIPE MECHANISM (Phải đặt TRONG khối Lock) ===
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime end = auction.getEndTime();
+
+                logger.info("[DEBUG] === ANTI-SNIPE CHECK === auctionId={}, now={}, endTime={}",
+                        auction.getAuctionId(), now, end);
+
+                if (end != null) {
+                    long secondsLeft = Duration.between(now, end).getSeconds();
+                    logger.info("[DEBUG] Anti-snipe: secondsLeft={}s (threshold={}s)",
+                            secondsLeft, ANTI_SNIPE_WINDOW_SECONDS);
+
+                    // CHỈ gia hạn khi phiên đấu giá ĐANG CHẠY và nằm trong khung giờ nhạy cảm
+                    if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
+                        LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
+                        auction.setEndTime(newEnd);
+                        logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
+                                auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
+                    } else if (secondsLeft <= 0) {
+                        logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: Auction {} already ended ({}s ago)",
+                                auction.getAuctionId(), Math.abs(secondsLeft));
+                    }
+                } else {
+                    logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: endTime is null for auction {}",
+                            auction.getAuctionId());
+                }
+
+                // 3. Lưu vào Repository NGAY TRONG LOCK để tránh bị luồng khác đọc ghi đè dữ liệu cũ
+                auctionRepository.save(auction);
+            });
+
             return true;
         } catch (Exception e) {
-            logger.warn("[FAILED] {}", e.getMessage());
+            logger.warn("[FAILED] Bid rejected: {}", e.getMessage());
             return false;
         }
     }

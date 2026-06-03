@@ -128,22 +128,23 @@ public class RequestRouter {
         sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction));
     }
 
-    private void handleBid(BidRequest request, ObjectOutputStream out)
-            throws IOException {
-        ServiceResult<Void> result;
+    private void handleBid(BidRequest request, ObjectOutputStream out) throws IOException {
+        ServiceResult<Auction> result;
         try {
-            // SỬA LẠI: Bắt biến boolean để xem đặt giá thành công không
             boolean success = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
             if (success) {
-                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null);
+                Auction updatedAuction = auctionService.getAuctionById(request.getAuctionId());
+                if (updatedAuction != null && updatedAuction.getHighestBidder() != null) {
+                    updatedAuction.getHighestBidder().setFullName(authService.getFullName(updatedAuction.getHighestBidder().getUsername()));
+                }
+                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", updatedAuction);
             } else {
                 result = new ServiceResult<>(false, "Không thể đặt giá thầu.", null);
             }
         } catch (IllegalArgumentException e) {
-            // NẾU SỐ DƯ KHÔNG ĐỦ, LỖI SẼ ĐƯỢC BẮT Ở ĐÂY VÀ GỬI CHỮ ĐỎ VỀ CLIENT
             result = new ServiceResult<>(false, e.getMessage(), null);
         } catch (Exception e) {
-            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: Bid too low", null);
+            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null);
         }
         sendResponse(out, result);
     }
