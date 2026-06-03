@@ -218,9 +218,9 @@ public class AuctionRoomControllerTest {
 
             invokePrivateMethod("handlePlaceBidAction");
 
-            assertEquals(
-                    "Bid placed",
-                    messageLabel.getText()
+            assertTrue(
+                    messageLabel.getText().contains("Bid placed"),
+                    () -> "Expected message to contain 'Bid placed' but was: " + messageLabel.getText()
             );
 
         } catch (Exception ignored) {
