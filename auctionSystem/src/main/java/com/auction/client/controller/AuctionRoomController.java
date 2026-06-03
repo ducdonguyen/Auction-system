@@ -10,9 +10,16 @@ import com.auction.shared.models.auction.AuctionStatus;
 import com.auction.shared.models.auction.BidTransaction;
 import com.auction.shared.network.responses.ServiceResult;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -60,6 +67,10 @@ public class AuctionRoomController {
   @FXML
   private Label balanceLabel;
 
+  @FXML
+  private LineChart<String, Number> priceChart;
+  private XYChart.Series<String, Number> priceSeries;
+
   /**
    * Thiết lập ID của phiên đấu giá và render giao diện.
    *
@@ -75,6 +86,14 @@ public class AuctionRoomController {
    */
   @FXML
   public void initialize() {
+    // Khởi tạo biểu đồ
+    priceSeries = new XYChart.Series<>();
+    priceSeries.setName("Diễn biến giá");
+    if (priceChart != null) {
+      priceChart.getData().add(priceSeries);
+      priceChart.setAnimated(true);
+    }
+
     SocketClient.getInstance().setRealtimeListener(new SocketClient.RealtimeListener() {
       @Override
       public void onNewBid(BidTransaction bidTransaction) {
@@ -96,6 +115,10 @@ public class AuctionRoomController {
             );
 
             bidHistoryList.getItems().add(0, historyLine);
+
+            // Cập nhật biểu đồ
+            String timeLabel = String.format("%tH:%tM:%tS", bidTransaction.timestamp(), bidTransaction.timestamp(), bidTransaction.timestamp());
+            priceSeries.getData().add(new XYChart.Data<>(timeLabel, bidTransaction.bidAmount()));
 
             double currentPrice = bidTransaction.bidAmount();
             double stepPrice = Double.parseDouble(stepPriceLabel.getText().replaceAll("[^0-9]", ""));
@@ -235,6 +258,30 @@ public class AuctionRoomController {
     itemTypeLabel.setText(viewModel.itemType());
     extraInfoLabel.setText(viewModel.extraInfo());
     bidHistoryList.setItems(FXCollections.observableArrayList(viewModel.bidHistory()));
+
+    // Nạp dữ liệu lịch sử vào biểu đồ
+    if (priceSeries != null && viewModel.bidHistory() != null) {
+      priceSeries.getData().clear();
+      List<String> history = new ArrayList<>(viewModel.bidHistory());
+      Collections.reverse(history); // Đảo ngược để vẽ từ cũ đến mới
+
+      Pattern pattern = Pattern.compile(".* đặt ([\\d.,]+) đ lúc (.*)");
+      for (String line : history) {
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.find()) {
+          try {
+            String priceStr = matcher.group(1).replace(".", "").replace(",", "");
+            double price = Double.parseDouble(priceStr);
+            String fullTime = matcher.group(2); // dd/MM/yyyy HH:mm
+            String timeOnly = fullTime.substring(fullTime.indexOf(" ") + 1); // Lấy HH:mm
+
+            priceSeries.getData().add(new XYChart.Data<>(timeOnly, price));
+          } catch (Exception e) {
+            logger.warn("Không thể parse dòng lịch sử cho biểu đồ: {}", line);
+          }
+        }
+      }
+    }
 
     // THÊM MỚI 4: Đọc thông tin loại sản phẩm và thông tin phụ từ ViewModel ép lên giao diện Label
     if (itemTypeLabel != null && viewModel.itemType() != null) {

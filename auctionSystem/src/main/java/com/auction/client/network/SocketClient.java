@@ -126,7 +126,7 @@ public class SocketClient {
    */
   public synchronized void connect() throws IOException {
     if (socket == null || socket.isClosed()) {
-      socket = new Socket("0.tcp.ap.ngrok.io", 15759);
+      socket = new Socket("0.tcp.ap.ngrok.io", 14344);
       out = new ObjectOutputStream(socket.getOutputStream());
       in = new ObjectInputStream(socket.getInputStream());
       logger.info("[Client] Connected to Server.");
