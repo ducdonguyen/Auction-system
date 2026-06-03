@@ -132,26 +132,22 @@ public class RequestRouter {
          sendResponse(out, new ServiceResult<>(true, "Joined room " + auctionId, currentAuction, System.currentTimeMillis()));
      }
 
-     private void handleBid(BidRequest request, ObjectOutputStream out) throws IOException {
-         ServiceResult<Auction> result;
-         try {
-             boolean success = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
-             if (success) {
-                 Auction updatedAuction = auctionService.getAuctionById(request.getAuctionId());
-                 if (updatedAuction != null && updatedAuction.getHighestBidder() != null) {
-                     updatedAuction.getHighestBidder().setFullName(authService.getFullName(updatedAuction.getHighestBidder().getUsername()));
-                 }
-                 result = new ServiceResult<>(true, "Đặt giá thầu thành công!", updatedAuction, System.currentTimeMillis());
-             } else {
-                 result = new ServiceResult<>(false, "Không thể đặt giá thầu.", null, System.currentTimeMillis());
-             }
-         } catch (IllegalArgumentException e) {
-             result = new ServiceResult<>(false, e.getMessage(), null, System.currentTimeMillis());
-         } catch (Exception e) {
-             result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null, System.currentTimeMillis());
-         }
-         sendResponse(out, result);
-     }
+    private void handleBid(BidRequest request, ObjectOutputStream out) throws IOException {
+        ServiceResult<Void> result;
+        try {
+            boolean success = auctionService.placeBid(request.getAuctionId(), request.getBidderName(), request.getAmount());
+            if (success) {
+                result = new ServiceResult<>(true, "Đặt giá thầu thành công!", null, System.currentTimeMillis());
+            } else {
+                result = new ServiceResult<>(false, "Không thể đặt giá thầu.", null, System.currentTimeMillis());
+            }
+        } catch (IllegalArgumentException e) {
+            result = new ServiceResult<>(false, e.getMessage(), null, System.currentTimeMillis());
+        } catch (Exception e) {
+            result = new ServiceResult<>(false, "Lỗi xử lý hệ thống: " + e.getMessage(), null, System.currentTimeMillis());
+        }
+        sendResponse(out, result);
+    }
 
      private void handleGetAllAuctions(ObjectOutputStream out) throws IOException {
          java.util.List<Auction> allAuctions = auctionService.getAllAuctions();

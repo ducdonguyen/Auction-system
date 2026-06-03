@@ -210,23 +210,19 @@ public class AuctionRoomController {
     });
   }
 
-   @FXML
-   private void handlePlaceBidAction() {
-     String bidAmountStr = bidAmountField.getText().trim();
-     if (bidAmountStr.isEmpty()) return;
+  @FXML
+  private void handlePlaceBidAction() {
+    String bidAmountStr = bidAmountField.getText().trim();
+    if (bidAmountStr.isEmpty()) return;
 
-       ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
-       messageLabel.setText((result.success() ? "✓ " : "✗ ") + result.message());
-       if (result.success()) {
-           bidAmountField.clear();
-           if (result.data() != null) {
-               bind(result.data()); // cập nhật UI + timer
-           } else {
-               // optional fallback: refetch
-               service.getAuctionRoom(aid).ifPresent(r -> Platform.runLater(() -> bind(r.data())));
-           }
-       }
-   }
+    ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
+    messageLabel.setText((result.success() ? "✓ " : "✗ ") + result.message());
+    if (result.success()) {
+      bidAmountField.clear();
+      // ✓ SỬA: Không gọi bind() hay getAuctionRoom()
+      // Client sẽ nhận realtime BidTransaction event từ server → onNewBid -> cập nhật UI
+    }
+  }
 
   @FXML
   private void handleBackAction() throws IOException {
