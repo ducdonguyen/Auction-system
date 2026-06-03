@@ -111,7 +111,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
   }
 
   // =========================================================
-  // ĐÂY LÀ TRÁI TIM CỦA OBSERVER PATTERN TRÊN MẠNG
+  // OBSERVER PATTERN TRÊN MẠNG
   // =========================================================
   @Override
   public void updateNewBid(String auctionId, BidTransaction newBid) {

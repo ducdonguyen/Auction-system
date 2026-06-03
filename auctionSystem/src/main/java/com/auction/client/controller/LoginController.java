@@ -46,7 +46,7 @@ public class LoginController {
     // 2. GÓI DỮ LIỆU: Đóng gói thông tin vào LoginRequest
     LoginRequest loginRequest = new LoginRequest(username, password);
 
-    // 3. ĐÃ SỬA: TRUYỀN GÓI TIN ĐĂNG NHẬP QUA SOCKET LÊN SERVER (QUA NGROK)
+    // 3. TRUYỀN GÓI TIN ĐĂNG NHẬP QUA SOCKET LÊN SERVER (QUA NGROK)
     try {
       // Gửi gói tin lên Server của em
       SocketClient.getInstance().sendRequest(loginRequest);
