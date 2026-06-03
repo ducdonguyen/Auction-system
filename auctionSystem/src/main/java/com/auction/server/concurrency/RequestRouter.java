@@ -215,7 +215,7 @@ public class RequestRouter {
                          break;
                  }
              } else {
-                 // fallback: dùng thời gian client gửi (còn giữ hành vi cũ)
+                 // dùng thời gian client gửi
                  startTime = request.getStartTime() != null ? request.getStartTime() : LocalDateTime.now();
                  endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusDays(3);
              }

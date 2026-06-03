@@ -95,7 +95,7 @@ public class AuctionService {
             // 1. Cộng lại tiền vào ví
             authService.refundBalance(highestBidderUsername, amountToRefund);
 
-            // 2. ❌ ĐỌC SỐ DƯ NGOÀI LOCK - CÓ THỂ STALE
+            // 2. ĐỌC SỐ DƯ NGOÀI LOCK
             BalanceUpdatedEvent refundEvent = new BalanceUpdatedEvent(
                     authService.getBalance(highestBidderUsername),  // Số dư đã cũ!
                     amountToRefund,

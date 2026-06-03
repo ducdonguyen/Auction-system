@@ -24,7 +24,7 @@ public class CreateAuctionController {
     @FXML private TextField extraInfoField;
     @FXML private Button submitButton;
 
-    // MỚI: controls cho thời lượng phiên
+    // controls cho thời lượng phiên
     @FXML private TextField durationField;           // số nguyên, ví dụ "3"
     @FXML private ComboBox<String> durationUnitCombo; // "Ngày", "Giờ", "Phút"
 
