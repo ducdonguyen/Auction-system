@@ -7,12 +7,13 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
-<AnchorPane prefHeight="780.0" prefWidth="1180.0" style="-fx-background-color: #f1f5f9;"
+
+<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="780.0" prefWidth="1180.0"
+            style="-fx-background-color: #f1f5f9; -fx-background: #f1f5f9;"
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.auction.client.controller.AuctionRoomController">
-    <children>
-        <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="0.0">
+    <content>
+        <VBox spacing="20.0">
             <padding>
                 <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
             </padding>
@@ -33,21 +34,21 @@
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
                         <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #10b981; -fx-background-radius: 8;">
-                           <children>
-                              <Label text="Số dư:" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="13.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="balanceLabel" text="0 VNĐ" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                           <padding>
-                              <Insets left="15.0" right="15.0" top="5.0" bottom="5.0" />
-                           </padding>
+                            <children>
+                                <Label text="Số dư:" textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold" size="13.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="balanceLabel" text="0 VNĐ" textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                            <padding>
+                                <Insets left="15.0" right="15.0" top="5.0" bottom="5.0" />
+                            </padding>
                         </HBox>
                         <Label fx:id="auctionIdLabel" text="#ID" textFill="#64748b">
                             <font>
@@ -56,9 +57,9 @@
                         </Label>
                     </children>
                 </HBox>
+
                 <HBox spacing="24.0" VBox.vgrow="ALWAYS">
                     <children>
-
                         <VBox prefWidth="700.0" spacing="15.0"
                               style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);"
                               HBox.hgrow="ALWAYS">
@@ -157,14 +158,7 @@
                                     </children>
                                 </GridPane>
 
-                                <LineChart fx:id="priceChart"
-                                           minHeight="150.0"
-                                           prefHeight="200.0"
-                                           maxHeight="250.0"
-                                           title="Biến động giá"
-                                           createSymbols="true"
-                                           animated="true"
-                                           VBox.vgrow="ALWAYS">
+                                <LineChart fx:id="priceChart" minHeight="180.0" prefHeight="220.0" maxHeight="300.0" title="Biến động giá" createSymbols="true" animated="true" VBox.vgrow="ALWAYS">
                                     <xAxis>
                                         <CategoryAxis label="Thời gian" side="BOTTOM" />
                                     </xAxis>
@@ -173,7 +167,7 @@
                                     </yAxis>
                                 </LineChart>
 
-                                <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+                                <VBox spacing="8.0">
                                     <children>
                                         <Label text="Mô tả sản phẩm" textFill="#64748b">
                                             <font>
@@ -223,7 +217,7 @@
                                         <Font name="System Bold" size="18.0"/>
                                     </font>
                                 </Label>
-                                <ListView fx:id="bidHistoryList" prefHeight="200.0" prefWidth="200.0"
+                                <ListView fx:id="bidHistoryList" minHeight="200.0" prefHeight="400.0"
                                           style="-fx-background-radius: 12; -fx-border-radius: 12;"
                                           VBox.vgrow="ALWAYS"/>
                             </children>
@@ -233,5 +227,5 @@
                 </HBox>
             </children>
         </VBox>
-    </children>
-</AnchorPane>
+    </content>
+</ScrollPane>
