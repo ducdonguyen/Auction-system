@@ -210,23 +210,20 @@ public class AuctionRoomController {
     });
   }
 
-   @FXML
-   private void handlePlaceBidAction() {
-     String bidAmountStr = bidAmountField.getText().trim();
-     if (bidAmountStr.isEmpty()) return;
+  @FXML
+  private void handlePlaceBidAction() {
+    String bidAmountStr = bidAmountField.getText().trim();
+    if (bidAmountStr.isEmpty()) return;
 
-       ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
-       messageLabel.setText((result.success() ? "✓ " : "✗ ") + result.message());
-       if (result.success()) {
-           bidAmountField.clear();
-           if (result.data() != null) {
-               bind(result.data()); // cập nhật UI + timer
-           } else {
-               // optional fallback: refetch
-               service.getAuctionRoom(aid).ifPresent(r -> Platform.runLater(() -> bind(r.data())));
-           }
-       }
-   }
+    ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
+    messageLabel.setText((result.success() ? "✓ " : "✗ ") + result.message());
+
+    if (result.success()) {
+      bidAmountField.clear(); // Chỉ cần xóa trống ô nhập liệu để người dùng sẵn sàng gõ lượt tiếp theo
+      // KHÔNG gọi bind(result.data()) ở đây nữa.
+      // Hãy để sự kiện Socket 'onNewBid' tự động đẩy dòng lịch sử chuẩn vào màn hình cho bạn!
+    }
+  }
 
   @FXML
   private void handleBackAction() throws IOException {
@@ -253,7 +250,7 @@ public class AuctionRoomController {
 
   private void bind(AuctionRoomViewModel viewModel) {
     if (viewModel == null) return;
-    
+
     auctionIdLabel.setText(viewModel.auctionId());
     itemNameLabel.setText(viewModel.itemName());
     sellerLabel.setText(viewModel.sellerName());
