@@ -157,7 +157,14 @@
                                     </children>
                                 </GridPane>
 
-                                <LineChart fx:id="priceChart" prefHeight="250.0" title="Biến động giá" createSymbols="true" animated="true">
+                                <LineChart fx:id="priceChart"
+                                           minHeight="150.0"
+                                           prefHeight="200.0"
+                                           maxHeight="250.0"
+                                           title="Biến động giá"
+                                           createSymbols="true"
+                                           animated="true"
+                                           VBox.vgrow="ALWAYS">
                                     <xAxis>
                                         <CategoryAxis label="Thời gian" side="BOTTOM" />
                                     </xAxis>
