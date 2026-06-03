@@ -217,11 +217,10 @@ public class AuctionRoomController {
 
     ServiceResult<AuctionRoomViewModel> result = service.placeBid(aid, bidAmountStr);
     messageLabel.setText((result.success() ? "✓ " : "✗ ") + result.message());
-
     if (result.success()) {
-      bidAmountField.clear(); // Chỉ cần xóa trống ô nhập liệu để người dùng sẵn sàng gõ lượt tiếp theo
-      // KHÔNG gọi bind(result.data()) ở đây nữa.
-      // Hãy để sự kiện Socket 'onNewBid' tự động đẩy dòng lịch sử chuẩn vào màn hình cho bạn!
+      bidAmountField.clear();
+      // ✓ SỬA: Không gọi bind() hay getAuctionRoom()
+      // Client sẽ nhận realtime BidTransaction event từ server → onNewBid -> cập nhật UI
     }
   }
 
@@ -250,7 +249,7 @@ public class AuctionRoomController {
 
   private void bind(AuctionRoomViewModel viewModel) {
     if (viewModel == null) return;
-
+    
     auctionIdLabel.setText(viewModel.auctionId());
     itemNameLabel.setText(viewModel.itemName());
     sellerLabel.setText(viewModel.sellerName());
