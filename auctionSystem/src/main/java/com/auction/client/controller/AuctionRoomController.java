@@ -205,9 +205,21 @@ public class AuctionRoomController {
   }
 
   private void render() {
-    service.getAuctionRoom(aid).ifPresent(result -> {
-        Platform.runLater(() -> bind(result.data()));
-    });
+    try {
+        service.getAuctionRoom(aid).ifPresent(result -> {
+            Platform.runLater(() -> {
+                try {
+                    bind(result.data());
+                } catch (Exception e) {
+                    logger.error("Lỗi khi bind dữ liệu", e);
+                    messageLabel.setText("Lỗi hiển thị dữ liệu phòng!");
+                }
+            });
+        });
+    } catch (Exception e) {
+        logger.error("Lỗi khi tải phòng đấu giá", e);
+        Platform.runLater(() -> messageLabel.setText("Không thể kết nối đến phòng đấu giá!"));
+    }
   }
 
   private void bind(AuctionRoomViewModel viewModel) {
