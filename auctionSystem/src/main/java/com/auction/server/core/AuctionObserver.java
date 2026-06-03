@@ -11,4 +11,6 @@ public interface AuctionObserver {
     void updateStatus(String auctionId, AuctionStatus newStatus);
 
     void receiveSystemMessage(String message);
+
+    void updateTime(String auctionId, long newEndMillis);
 }

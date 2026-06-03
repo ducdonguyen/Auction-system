@@ -2,6 +2,7 @@ package com.auction.client.network;
 
 import com.auction.shared.models.auction.AuctionStatus;
 import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.network.events.AuctionTimeUpdatedEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -48,6 +49,8 @@ public class SocketClient {
     void onStatusUpdate(AuctionStatus s);
 
     void onBalanceUpdate(double newBalance, double amountChanged, String reason);
+
+    void onTimeUpdate(long newEndMillis);
   }
 
   private SocketClient() {
@@ -115,6 +118,11 @@ public class SocketClient {
       RealtimeListener l = realtimeListener.get();
       if (l != null) {
         Platform.runLater(() -> l.onBalanceUpdate(b.getNewBalance(), b.getAmountChanged(), b.getReason()));
+      }
+    } else if (m instanceof AuctionTimeUpdatedEvent e) {
+      RealtimeListener l = realtimeListener.get();
+      if (l != null) {
+        Platform.runLater(() -> l.onTimeUpdate(e.getNewEndMillis()));
       }
     } else {
       Consumer<Object> handler = handlers.get(m.getClass());

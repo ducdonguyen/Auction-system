@@ -196,6 +196,17 @@ public class AuctionRoomController {
           if (SessionContext.getCurrentUser() != null) SessionContext.getCurrentUser().setBalance(newBalance);
         });
       }
+
+      @Override
+      public void onTimeUpdate(long newEndMillis) {
+        Platform.runLater(() -> {
+          try {
+            startCountdown(newEndMillis);
+          } catch (Exception e) {
+            logger.error("Lỗi cập nhật thời gian phiên từ server", e);
+          }
+        });
+      }
     });
   }
 

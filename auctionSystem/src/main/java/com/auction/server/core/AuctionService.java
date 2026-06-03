@@ -190,6 +190,8 @@ public class AuctionService {
                     if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
                         LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
                         auction.setEndTime(newEnd);
+                        long newEndMillis = newEnd.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+                        AuctionManager.getInstance().notifyTimeUpdate(auction.getAuctionId(), newEndMillis);
                         logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
                                 auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
                     } else if (secondsLeft <= 0) {
@@ -265,6 +267,8 @@ public class AuctionService {
                     if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
                         LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
                         auction.setEndTime(newEnd);
+                        long newEndMillis = newEnd.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+                        AuctionManager.getInstance().notifyTimeUpdate(auction.getAuctionId(), newEndMillis);
                         logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
                                 auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
                     } else if (secondsLeft <= 0) {

@@ -5,6 +5,7 @@ import com.auction.server.core.AuctionObserver;
 import com.auction.server.service.AuthService;
 import com.auction.shared.models.auction.AuctionStatus;
 import com.auction.shared.models.auction.BidTransaction;
+import com.auction.shared.network.events.AuctionTimeUpdatedEvent;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -116,9 +117,9 @@ public class ClientHandler implements Runnable, AuctionObserver {
   public void updateNewBid(String auctionId, BidTransaction newBid) {
     try {
       if (out != null) {
-        // Cập nhật fullName cho Bidder trước khi gửi
         if (newBid.bidder() != null) {
-          String fullName = authService.getFullName(newBid.bidder().getUsername());
+          String username = newBid.bidder().getUsername();
+          String fullName = new com.auction.server.service.AuthService().getFullName(username);
           if (fullName != null && !fullName.trim().isEmpty()) {
             newBid.bidder().setFullName(fullName);
           }
@@ -144,6 +145,20 @@ public class ClientHandler implements Runnable, AuctionObserver {
       }
     } catch (IOException e) {
       logger.error("[ClientHandler] Lỗi khi gửi thông báo trạng thái: {}", e.getMessage());
+    }
+  }
+
+  @Override
+  public void updateTime(String auctionId, long newEndMillis) {
+    try {
+      if (out != null) {
+        AuctionTimeUpdatedEvent ev = new AuctionTimeUpdatedEvent(auctionId, newEndMillis);
+        out.writeObject(ev);
+        out.flush();
+        logger.info("[ClientHandler] Đã gửi thông báo cập nhật thời gian cho client: {} -> {}", auctionId, newEndMillis);
+      }
+    } catch (IOException e) {
+      logger.error("[ClientHandler] Lỗi khi gửi updateTime: {}", e.getMessage());
     }
   }
 

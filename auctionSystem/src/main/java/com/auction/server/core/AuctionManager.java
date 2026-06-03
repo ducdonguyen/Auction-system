@@ -93,8 +93,13 @@ public class AuctionManager {
    * @param o   Người quan sát.
    */
   public void subscribe(String aid, AuctionObserver o) {
-    observersMap.computeIfAbsent(aid, k -> new CopyOnWriteArrayList<>()).add(o);
-    logger.info("Subscribed to: {}", aid);
+    var list = observersMap.computeIfAbsent(aid, k -> new CopyOnWriteArrayList<>());
+    if (!list.contains(o)) {
+      list.add(o);
+      logger.info("Subscribed to: {}", aid);
+    } else {
+      logger.debug("Already subscribed to: {}", aid);
+    }
   }
 
   /**
@@ -134,6 +139,13 @@ public class AuctionManager {
     List<AuctionObserver> obs = observersMap.get(aid);
     if (obs != null) {
       obs.forEach(o -> o.updateStatus(aid, s));
+    }
+  }
+
+  public void notifyTimeUpdate(String aid, long newEndMillis) {
+    List<AuctionObserver> obs = observersMap.get(aid);
+    if (obs != null) {
+      obs.forEach(o -> o.updateTime(aid, newEndMillis));
     }
   }
 }
