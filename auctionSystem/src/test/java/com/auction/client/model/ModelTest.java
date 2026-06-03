@@ -9,7 +9,7 @@ public class ModelTest {
     public void testAuctionRoomViewModel() {
         AuctionRoomViewModel vm = new AuctionRoomViewModel(
                 "AUC001", "Item", "Seller", "OPEN", "100", "10", "110", "None", "Desc", "Schedule",
-                Collections.emptyList(), "ELECTRONICS", "None"
+                Collections.emptyList(), "ELECTRONICS", "None", 22
         );
         assertEquals("AUC001", vm.auctionId());
         assertEquals("Item", vm.itemName());

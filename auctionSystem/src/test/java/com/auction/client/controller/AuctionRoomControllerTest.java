@@ -111,7 +111,7 @@ public class AuctionRoomControllerTest {
                 "AUC001", "Item", "Seller", "OPEN", "100", "10", "110", "None", "Desc", "Schedule",
                 java.util.Collections.<String>emptyList(),
                 "Khác",
-                "Không có thông tin"
+                "Không có thông tin", 22
         );
         when(service.getAuctionRoom("AUC001")).thenReturn(Optional.of(new ServiceResult<>(true, "", vm)));
 
