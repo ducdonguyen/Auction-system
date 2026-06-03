@@ -176,31 +176,7 @@ public class AuctionService {
                 BidTransaction transaction = new BidTransaction("TX-" + System.currentTimeMillis(), bidder, amount, LocalDateTime.now());
                 auction.updateAuctionState(bidder, amount, transaction);
 
-                // === ANTI-SNIPE MECHANISM ===
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime end = auction.getEndTime();
-                logger.info("[DEBUG] === ANTI-SNIPE CHECK === auctionId={}, now={}, endTime={}",
-                        auction.getAuctionId(), now, end);
-                if (end != null) {
-                    long secondsLeft = Duration.between(now, end).getSeconds();
-                    logger.info("[DEBUG] Anti-snipe: secondsLeft={}s (threshold={}s)",
-                            secondsLeft, ANTI_SNIPE_WINDOW_SECONDS);
-                    if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
-                        LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
-                        auction.setEndTime(newEnd);
-                        long newEndMillis = newEnd.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
-                        AuctionManager.getInstance().notifyTimeUpdate(auction.getAuctionId(), newEndMillis);
-                        logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
-                                auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
-                    } else if (secondsLeft <= 0) {
-                        logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: Auction {} already ended ({}s ago)",
-                                auction.getAuctionId(), Math.abs(secondsLeft));
-                    }
-                } else {
-                    logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: endTime is null for auction {}",
-                            auction.getAuctionId());
-                }
-                auctionRepository.save(auction);
+                applyAntiSnipe(auction);
 
                 // 4. HOÀN TIỀN CHO NGƯỜI CŨ (NẾU CÓ)
                 if (previousBidderUsername != null && !previousBidderUsername.equals(bidderUsername)) {
@@ -247,37 +223,7 @@ public class AuctionService {
                 // 1. Thực hiện các bước đặt giá và kiểm tra luật (Ví dụ: trừ tiền, update trạng thái...)
                 performPlaceBid(auction, bidder, amount);
 
-                // 2. === ANTI-SNIPE MECHANISM (Nằm trong khối Lock để an toàn đồng thời) ===
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime end = auction.getEndTime();
-
-                logger.info("[DEBUG] === ANTI-SNIPE CHECK === auctionId={}, now={}, endTime={}",
-                        auction.getAuctionId(), now, end);
-
-                if (end != null) {
-                    long secondsLeft = Duration.between(now, end).getSeconds();
-                    logger.info("[DEBUG] Anti-snipe: secondsLeft={}s (threshold={}s)",
-                            secondsLeft, ANTI_SNIPE_WINDOW_SECONDS);
-
-                    // CHỈ gia hạn khi phiên đấu giá ĐANG CHẠY và nằm trong khung giờ nhạy cảm
-                    if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
-                        LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
-                        auction.setEndTime(newEnd);
-                        long newEndMillis = newEnd.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
-                        AuctionManager.getInstance().notifyTimeUpdate(auction.getAuctionId(), newEndMillis);
-                        logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
-                                auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
-                    } else if (secondsLeft <= 0) {
-                        logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: Auction {} already ended ({}s ago)",
-                                auction.getAuctionId(), Math.abs(secondsLeft));
-                    }
-                } else {
-                    logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: endTime is null for auction {}",
-                            auction.getAuctionId());
-                }
-
-                // 3. Lưu trạng thái mới (gồm cả endTime mới) vào DB trước khi nhả Lock
-                auctionRepository.save(auction);
+                applyAntiSnipe(auction);
             });
 
             // ====================================================================
@@ -306,6 +252,37 @@ public class AuctionService {
                 bidder, amount, LocalDateTime.now());
         auction.updateAuctionState(bidder, amount, transaction);
         logger.info("[SUCCESS] {} bid: {}", bidder.getUsername(), amount);
+    }
+
+    private void applyAntiSnipe(Auction auction) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = auction.getEndTime();
+
+        logger.info("[DEBUG] === ANTI-SNIPE CHECK === auctionId={}, now={}, endTime={}",
+                auction.getAuctionId(), now, end);
+
+        if (end != null) {
+            long secondsLeft = Duration.between(now, end).getSeconds();
+            logger.info("[DEBUG] Anti-snipe: secondsLeft={}s (threshold={}s)",
+                    secondsLeft, ANTI_SNIPE_WINDOW_SECONDS);
+
+            if (secondsLeft > 0 && secondsLeft <= ANTI_SNIPE_WINDOW_SECONDS) {
+                LocalDateTime newEnd = end.plusSeconds(ANTI_SNIPE_EXTENSION_SECONDS);
+                auction.setEndTime(newEnd);
+                long newEndMillis = newEnd.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+                AuctionManager.getInstance().notifyTimeUpdate(auction.getAuctionId(), newEndMillis);
+                logger.info("[ANTI-SNIPE] ✓ Auction {} EXTENDED by {}s | new end: {}",
+                        auction.getAuctionId(), ANTI_SNIPE_EXTENSION_SECONDS, newEnd);
+            } else if (secondsLeft <= 0) {
+                logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: Auction {} already ended ({}s ago)",
+                        auction.getAuctionId(), Math.abs(secondsLeft));
+            }
+        } else {
+            logger.warn("[ANTI-SNIPE] ⚠ Cannot extend: endTime is null for auction {}",
+                    auction.getAuctionId());
+        }
+
+        auctionRepository.save(auction);
     }
 
     /**
