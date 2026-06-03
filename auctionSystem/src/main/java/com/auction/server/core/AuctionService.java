@@ -251,7 +251,7 @@ public class AuctionService {
                 // 1. Thực hiện các bước đặt giá và kiểm tra luật (Ví dụ: trừ tiền, update trạng thái...)
                 performPlaceBid(auction, bidder, amount);
 
-                // 2. === ANTI-SNIPE MECHANISM (Phải đặt TRONG khối Lock) ===
+                // 2. === ANTI-SNIPE MECHANISM (Nằm trong khối Lock để an toàn đồng thời) ===
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime end = auction.getEndTime();
 
@@ -280,11 +280,27 @@ public class AuctionService {
                             auction.getAuctionId());
                 }
 
-                // 3. Lưu vào Repository NGAY TRONG LOCK để tránh bị luồng khác đọc ghi đè dữ liệu cũ
+                // 3. Lưu trạng thái mới (gồm cả endTime mới) vào DB trước khi nhả Lock
                 auctionRepository.save(auction);
             });
 
+            // ====================================================================
+            // 4. --- BÊN NGOÀI KHỐI LOCK: PHÁT SỰ KIỆN QUA MẠNG SOCKET ---
+            // ====================================================================
+
+            // Cập nhật bảng điện tử và thời gian đếm ngược mới cho TẤT CẢ mọi người trong phòng
+            if (auction.getBidHistory() != null && !auction.getBidHistory().isEmpty()) {
+                AuctionManager.getInstance().notifyObservers(
+                        auction.getAuctionId(),
+                        auction.getBidHistory().get(auction.getBidHistory().size() - 1)
+                );
+            }
+
+            // Kích hoạt bot đặt giá tự động (nếu hệ thống của bạn có logic này)
+            triggerAutoBids(auction.getAuctionId());
+
             return true;
+
         } catch (Exception e) {
             logger.warn("[FAILED] Bid rejected: {}", e.getMessage());
             return false;
