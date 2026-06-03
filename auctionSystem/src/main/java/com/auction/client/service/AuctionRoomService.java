@@ -142,7 +142,8 @@ public class AuctionRoomService {
             "Lịch: " + df.format(auction.getStartTime()) + " - " + df.format(auction.getEndTime()),
             history,
             vietnameseType,
-            formattedExtra
+            formattedExtra,
+            auction.getEndTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
     );
   }
 }
