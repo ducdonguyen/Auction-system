@@ -27,8 +27,6 @@ public class AuctionService {
     private AuctionLockManager lockManager;
     private AuctionRepository auctionRepository;
     private final AuthService authService = new AuthService();
-    private final AutoBidManager autoBidManager = new AutoBidManager();
-    private final ThreadLocal<Boolean> isTriggering = ThreadLocal.withInitial(() -> false);
 
     public AuctionService() {
     }
@@ -229,8 +227,6 @@ public class AuctionService {
             AuctionManager.getInstance().notifyObservers(auctionId,
                     auction.getBidHistory().get(auction.getBidHistory().size() - 1));
 
-            // Kích hoạt bot đặt giá tự động (nếu có cài đặt)
-            triggerAutoBids(auctionId);
 
             return true;
 
@@ -296,9 +292,6 @@ public class AuctionService {
                 );
             }
 
-            // Kích hoạt bot đặt giá tự động (nếu hệ thống của bạn có logic này)
-            triggerAutoBids(auction.getAuctionId());
-
             return true;
 
         } catch (Exception e) {
@@ -344,64 +337,5 @@ public class AuctionService {
             case FINISHED -> (next == AuctionStatus.PAID || next == AuctionStatus.CANCELED);
             default -> false;
         };
-    }
-
-    // --- BẮT ĐẦU: LOGIC AUTO-BID ---
-
-    public void registerAutoBid(String auctionId, String bidderUsername, double maxBid) {
-        autoBidManager.registerAutoBid(auctionId, bidderUsername, maxBid);
-        triggerAutoBids(auctionId);
-    }
-
-    public void removeAutoBid(String auctionId, String bidderUsername) {
-        autoBidManager.removeAutoBid(auctionId, bidderUsername);
-    }
-
-    public List<AutoBidRequest> getAutoBids(String auctionId) {
-        return autoBidManager.getAutoBids(auctionId);
-    }
-
-    public void triggerAutoBids(String auctionId) {
-        if (isTriggering.get()) {
-            return;
-        }
-        isTriggering.set(true);
-        try {
-            while (true) {
-                Auction auction = getAuctionById(auctionId);
-                if (auction == null || auction.getStatus() != AuctionStatus.RUNNING) {
-                    break;
-                }
-
-                AutoBidRequest eligible = autoBidManager.findEligibleAutoBidder(auctionId, auction);
-                if (eligible == null) {
-                    break;
-                }
-
-                double nextBidPrice = auction.getCurrentPrice() + auction.getStepPrice();
-
-                double balance = authService.getBalance(eligible.getBidderUsername());
-                if (balance < nextBidPrice) {
-                    logger.warn("[AutoBid] User {} không đủ số dư để tự động đặt giá {} (Số dư: {}). Hủy Auto-bid.",
-                            eligible.getBidderUsername(), nextBidPrice, balance);
-                    autoBidManager.removeAutoBid(auctionId, eligible.getBidderUsername());
-                    continue;
-                }
-
-                boolean success = false;
-                try {
-                    success = placeBid(auctionId, eligible.getBidderUsername(), nextBidPrice);
-                } catch (Exception e) {
-                    logger.warn("[AutoBid] Đặt giá tự động ném lỗi cho {} tại phòng {}: {}",
-                            eligible.getBidderUsername(), auctionId, e.getMessage());
-                }
-
-                if (!success) {
-                    autoBidManager.removeAutoBid(auctionId, eligible.getBidderUsername());
-                }
-            }
-        } finally {
-            isTriggering.set(false);
-        }
     }
 }
