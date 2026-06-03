@@ -143,15 +143,6 @@
                                     </children>
                                 </GridPane>
 
-                                <LineChart fx:id="priceChart" prefHeight="250.0" title="Biến động giá" createSymbols="true" animated="true">
-                                    <xAxis>
-                                        <CategoryAxis label="Thời gian" side="BOTTOM" />
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis label="Giá (VNĐ)" side="LEFT" forceZeroInRange="false" />
-                                    </yAxis>
-                                </LineChart>
-
                                 <VBox spacing="8.0" VBox.vgrow="ALWAYS">
                                     <children>
                                         <Label text="Mô tả sản phẩm" textFill="#64748b">
