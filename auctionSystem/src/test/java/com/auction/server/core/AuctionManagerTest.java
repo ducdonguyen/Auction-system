@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
-
+@ExtendWith(MockitoExtension.class)
 class AuctionManagerTest {
 
     private AuctionManager auctionManager;
@@ -29,34 +29,89 @@ class AuctionManagerTest {
     @BeforeEach
     void setUp() {
         auctionManager = AuctionManager.getInstance();
-        Art item = new Art("Art", "Desc", 100.0, "Artist");
-        Seller seller = new Seller("seller", "pass");
-        auction = new Auction("TEST-AUC-1", item, seller, 100.0, 10.0, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+
+        Art item = new Art(
+                "Art",
+                "Desc",
+                100.0,
+                "Artist"
+        );
+
+        Seller seller = new Seller(
+                "seller",
+                "pass"
+        );
+
+        auction = new Auction(
+                "TEST-AUC-1",
+                item,
+                seller,
+                100.0,
+                10.0,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1)
+        );
     }
 
     @Test
     void testAddAuctionSuccess() throws AuthenticationException {
-        auctionManager.addAuction(auction, "ADMIN_SECRET_TOKEN");
-        // Kiểm tra việc add thành công (không ném exception)
+        auctionManager.addAuction(
+                auction,
+                "ADMIN_SECRET_TOKEN"
+        );
     }
 
     @Test
     void testAddAuctionUnauthorized() {
-        assertThrows(AuthenticationException.class, () -> auctionManager.addAuction(auction, "WRONG_TOKEN"));
+        assertThrows(
+                AuthenticationException.class,
+                () -> auctionManager.addAuction(
+                        auction,
+                        "WRONG_TOKEN"
+                )
+        );
     }
 
     @Test
     void testNotifyObservers() {
-        auctionManager.subscribe("TEST-AUC-1", observer);
 
-        BidTransaction bid = new BidTransaction("TX1", null, 150.0, LocalDateTime.now());
-        auctionManager.notifyObservers("TEST-AUC-1", bid);
+        auctionManager.subscribe(
+                "TEST-AUC-1",
+                observer
+        );
 
-        verify(observer).updateNewBid("TEST-AUC-1", bid);
+        BidTransaction bid = new BidTransaction(
+                "TX1",
+                null,
+                150.0,
+                LocalDateTime.now()
+        );
 
-        auctionManager.notifyStatusUpdate("TEST-AUC-1", AuctionStatus.RUNNING);
-        verify(observer).updateStatus("TEST-AUC-1", AuctionStatus.RUNNING);
+        auctionManager.notifyObservers(
+                "TEST-AUC-1",
+                bid
+        );
 
-        auctionManager.unsubscribe("TEST-AUC-1", observer);
+        verify(observer)
+                .updateNewBid(
+                        "TEST-AUC-1",
+                        bid
+                );
+
+        auctionManager.notifyStatusUpdate(
+                "TEST-AUC-1",
+                AuctionStatus.RUNNING
+        );
+
+        verify(observer)
+                .updateStatus(
+                        "TEST-AUC-1",
+                        AuctionStatus.RUNNING
+                );
+
+        auctionManager.unsubscribe(
+                "TEST-AUC-1",
+                observer
+        );
     }
 }

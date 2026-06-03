@@ -1,34 +1,27 @@
 package com.auction.client.controller;
 
-import com.auction.server.service.AuthService;
+import com.auction.client.network.SocketClient;
 import com.auction.shared.network.requests.RegistrationRequest;
 import com.auction.shared.network.responses.ServiceResult;
 import javafx.application.Platform;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.MockedStatic;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class RegisterControllerTest {
 
-    @InjectMocks
     private RegisterController registerController;
-
-    @Mock
-    private AuthService authService;
 
     private TextField fullNameField;
     private TextField usernameField;
@@ -38,20 +31,16 @@ public class RegisterControllerTest {
     private Label messageLabel;
 
     @BeforeAll
-    public static void initJavaFX() {
+    static void initJavaFX() {
         try {
             Platform.startup(() -> {});
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException ignored) {
         }
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
-
-        Field authServiceField = RegisterController.class.getDeclaredField("authService");
-        authServiceField.setAccessible(true);
-        authServiceField.set(registerController, authService);
+    void setUp() throws Exception {
+        registerController = new RegisterController();
 
         fullNameField = new TextField();
         usernameField = new TextField();
@@ -74,106 +63,200 @@ public class RegisterControllerTest {
         field.set(registerController, value);
     }
 
-    @Test
-    public void testHandleRegisterActionEmptyFields() throws Exception {
-        fullNameField.setText("");
-        
-        invokeHandleRegisterAction();
-
-        assertEquals("Vui lòng nhập đầy đủ thông tin.", messageLabel.getText());
-        verify(authService, never()).register(any());
-    }
-
-    @Test
-    public void testHandleRegisterActionInvalidEmail() throws Exception {
-        fullNameField.setText("Full Name");
-        usernameField.setText("user");
-        emailField.setText("invalidemail");
-        passwordField.setText("pass");
-        confirmPasswordField.setText("pass");
-
-        invokeHandleRegisterAction();
-
-        assertEquals("Email không hợp lệ.", messageLabel.getText());
-        verify(authService, never()).register(any());
-    }
-
-    @Test
-    public void testHandleRegisterActionPasswordMismatch() throws Exception {
-        fullNameField.setText("Full Name");
-        usernameField.setText("user");
-        emailField.setText("test@example.com");
-        passwordField.setText("pass1");
-        confirmPasswordField.setText("pass2");
-
-        invokeHandleRegisterAction();
-
-        assertEquals("Mật khẩu xác nhận không khớp.", messageLabel.getText());
-        verify(authService, never()).register(any());
-    }
-
-    @Test
-    public void testHandleRegisterActionSuccess() throws Exception {
-        fullNameField.setText("Full Name");
-        usernameField.setText("user");
-        emailField.setText("test@example.com");
-        passwordField.setText("pass");
-        confirmPasswordField.setText("pass");
-
-        when(authService.register(any(RegistrationRequest.class)))
-            .thenReturn(new ServiceResult<>(true, "Registration successful", null));
-
-        invokeHandleRegisterAction();
-
-        verify(authService).register(any(RegistrationRequest.class));
-        assertEquals("Registration successful", messageLabel.getText());
-        // Verify fields are cleared
-        assertTrue(fullNameField.getText().isEmpty());
-    }
-
-    @Test
-    public void testHandleRegisterActionServerFailure() throws Exception {
-        fullNameField.setText("Full Name");
-        usernameField.setText("existinguser");
-        emailField.setText("test@example.com");
-        passwordField.setText("pass");
-        confirmPasswordField.setText("pass");
-
-        when(authService.register(any(RegistrationRequest.class)))
-            .thenReturn(new ServiceResult<>(false, "Username already exists", null));
-
-        invokeHandleRegisterAction();
-
-        verify(authService).register(any(RegistrationRequest.class));
-        assertEquals("Username already exists", messageLabel.getText());
-        // Verify fields are NOT cleared
-        assertEquals("Full Name", fullNameField.getText());
-    }
-
-    @Test
-    public void testHandleBackToLogin() throws Exception {
-        Button backToLoginButton = new Button();
-        injectField("backToLoginButton", backToLoginButton);
-        
-        Platform.runLater(() -> {
-            javafx.scene.Scene scene = new javafx.scene.Scene(new javafx.scene.layout.StackPane(backToLoginButton));
-            javafx.stage.Stage stage = new javafx.stage.Stage();
-            stage.setScene(scene);
-            
-            try {
-                java.lang.reflect.Method method = RegisterController.class.getDeclaredMethod("handleBackToLogin");
-                method.setAccessible(true);
-                method.invoke(registerController);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        Thread.sleep(200);
-    }
-
     private void invokeHandleRegisterAction() throws Exception {
-        java.lang.reflect.Method method = RegisterController.class.getDeclaredMethod("handleRegisterAction");
+        Method method =
+                RegisterController.class.getDeclaredMethod("handleRegisterAction");
         method.setAccessible(true);
         method.invoke(registerController);
+    }
+
+    @Test
+    void testEmptyFields() throws Exception {
+        fullNameField.setText("");
+
+        invokeHandleRegisterAction();
+
+        assertEquals(
+                "Vui lòng nhập đầy đủ thông tin.",
+                messageLabel.getText()
+        );
+    }
+
+    @Test
+    void testInvalidEmail() throws Exception {
+        fullNameField.setText("Nguyen Van A");
+        usernameField.setText("user");
+        emailField.setText("invalid-email");
+        passwordField.setText("123456");
+        confirmPasswordField.setText("123456");
+
+        invokeHandleRegisterAction();
+
+        assertEquals(
+                "Email không hợp lệ.",
+                messageLabel.getText()
+        );
+    }
+
+    @Test
+    void testPasswordMismatch() throws Exception {
+        fullNameField.setText("Nguyen Van A");
+        usernameField.setText("user");
+        emailField.setText("test@gmail.com");
+        passwordField.setText("123456");
+        confirmPasswordField.setText("654321");
+
+        invokeHandleRegisterAction();
+
+        assertEquals(
+                "Mật khẩu xác nhận không khớp.",
+                messageLabel.getText()
+        );
+    }
+
+    @Test
+    void testRegisterSuccess() throws Exception {
+
+        fullNameField.setText("Nguyen Van A");
+        usernameField.setText("user");
+        emailField.setText("test@gmail.com");
+        passwordField.setText("123456");
+        confirmPasswordField.setText("123456");
+
+        SocketClient socketClient = mock(SocketClient.class);
+
+        try (MockedStatic<SocketClient> mocked =
+                     mockStatic(SocketClient.class)) {
+
+            mocked.when(SocketClient::getInstance)
+                    .thenReturn(socketClient);
+
+            when(socketClient.receiveResponse())
+                    .thenReturn(
+                            new ServiceResult<>(
+                                    true,
+                                    "Registration successful",
+                                    null
+                            )
+                    );
+
+            invokeHandleRegisterAction();
+
+            verify(socketClient)
+                    .sendRequest(any(RegistrationRequest.class));
+
+            assertEquals(
+                    "Registration successful",
+                    messageLabel.getText()
+            );
+
+            assertTrue(fullNameField.getText().isEmpty());
+            assertTrue(usernameField.getText().isEmpty());
+            assertTrue(emailField.getText().isEmpty());
+            assertTrue(passwordField.getText().isEmpty());
+            assertTrue(confirmPasswordField.getText().isEmpty());
+        }
+    }
+
+    @Test
+    void testRegisterFailed() throws Exception {
+
+        fullNameField.setText("Nguyen Van A");
+        usernameField.setText("existingUser");
+        emailField.setText("test@gmail.com");
+        passwordField.setText("123456");
+        confirmPasswordField.setText("123456");
+
+        SocketClient socketClient = mock(SocketClient.class);
+
+        try (MockedStatic<SocketClient> mocked =
+                     mockStatic(SocketClient.class)) {
+
+            mocked.when(SocketClient::getInstance)
+                    .thenReturn(socketClient);
+
+            when(socketClient.receiveResponse())
+                    .thenReturn(
+                            new ServiceResult<>(
+                                    false,
+                                    "Username already exists",
+                                    null
+                            )
+                    );
+
+            invokeHandleRegisterAction();
+
+            verify(socketClient)
+                    .sendRequest(any(RegistrationRequest.class));
+
+            assertEquals(
+                    "Username already exists",
+                    messageLabel.getText()
+            );
+
+            assertEquals(
+                    "Nguyen Van A",
+                    fullNameField.getText()
+            );
+        }
+    }
+
+    @Test
+    void testServerReturnsInvalidResponse() throws Exception {
+
+        fullNameField.setText("Nguyen Van A");
+        usernameField.setText("user");
+        emailField.setText("test@gmail.com");
+        passwordField.setText("123456");
+        confirmPasswordField.setText("123456");
+
+        SocketClient socketClient = mock(SocketClient.class);
+
+        try (MockedStatic<SocketClient> mocked =
+                     mockStatic(SocketClient.class)) {
+
+            mocked.when(SocketClient::getInstance)
+                    .thenReturn(socketClient);
+
+            when(socketClient.receiveResponse())
+                    .thenReturn("INVALID_RESPONSE");
+
+            invokeHandleRegisterAction();
+
+            assertEquals(
+                    "Phản hồi từ Server không hợp lệ.",
+                    messageLabel.getText()
+            );
+        }
+    }
+
+    @Test
+    void testConnectionError() throws Exception {
+
+        fullNameField.setText("Nguyen Van A");
+        usernameField.setText("user");
+        emailField.setText("test@gmail.com");
+        passwordField.setText("123456");
+        confirmPasswordField.setText("123456");
+
+        SocketClient socketClient = mock(SocketClient.class);
+
+        try (MockedStatic<SocketClient> mocked =
+                     mockStatic(SocketClient.class)) {
+
+            mocked.when(SocketClient::getInstance)
+                    .thenReturn(socketClient);
+
+            doThrow(new RuntimeException("Network error"))
+                    .when(socketClient)
+                    .sendRequest(any());
+
+            invokeHandleRegisterAction();
+
+            assertTrue(
+                    messageLabel.getText()
+                            .contains("Lỗi kết nối mạng")
+            );
+        }
     }
 }

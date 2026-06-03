@@ -19,12 +19,15 @@ import java.util.concurrent.TimeUnit;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class AuctionSchedulerTest {
 
     @Mock
     private AuctionRepository repository;
+
     @Mock
     private AuctionService auctionService;
+
     @Mock
     private ScheduledExecutorService scheduler;
 
@@ -32,36 +35,79 @@ class AuctionSchedulerTest {
 
     @BeforeEach
     void setUp() {
-        auctionScheduler = new AuctionScheduler(repository, auctionService, scheduler);
+        auctionScheduler =
+                new AuctionScheduler(
+                        repository,
+                        auctionService,
+                        scheduler
+                );
     }
 
     @Test
     @DisplayName("Kiểm thử bắt đầu lập lịch")
     void testStartScheduling() {
+
         auctionScheduler.startScheduling();
-        verify(scheduler).scheduleAtFixedRate(any(Runnable.class), eq(0L), eq(10L), eq(TimeUnit.SECONDS));
+
+        verify(scheduler).scheduleAtFixedRate(
+                any(Runnable.class),
+                eq(0L),
+                eq(10L),
+                eq(TimeUnit.SECONDS)
+        );
     }
 
     @Test
     @DisplayName("Kiểm thử logic autoUpdateAuctions - Mở và Đóng phiên")
     void testAutoUpdateAuctions() {
-        ArgumentCaptor<Runnable> runnableCaptor = ArgumentCaptor.forClass(Runnable.class);
+
+        ArgumentCaptor<Runnable> runnableCaptor =
+                ArgumentCaptor.forClass(Runnable.class);
+
         auctionScheduler.startScheduling();
-        verify(scheduler).scheduleAtFixedRate(runnableCaptor.capture(), anyLong(), anyLong(), any(TimeUnit.class));
+
+        verify(scheduler).scheduleAtFixedRate(
+                runnableCaptor.capture(),
+                anyLong(),
+                anyLong(),
+                any(TimeUnit.class)
+        );
 
         Runnable capturedTask = runnableCaptor.getValue();
 
         Auction auctionToStart = mock(Auction.class);
         Auction auctionToFinish = mock(Auction.class);
 
-        when(repository.findByStatusAndStartTimeBefore(eq(AuctionStatus.OPEN), any(LocalDateTime.class)))
-                .thenReturn(Collections.singletonList(auctionToStart));
-        when(repository.findByStatusAndEndTimeBefore(eq(AuctionStatus.RUNNING), any(LocalDateTime.class)))
-                .thenReturn(Collections.singletonList(auctionToFinish));
+        when(
+                repository.findByStatusAndStartTimeBefore(
+                        eq(AuctionStatus.OPEN),
+                        any(LocalDateTime.class)
+                )
+        ).thenReturn(
+                Collections.singletonList(auctionToStart)
+        );
+
+        when(
+                repository.findByStatusAndEndTimeBefore(
+                        eq(AuctionStatus.RUNNING),
+                        any(LocalDateTime.class)
+                )
+        ).thenReturn(
+                Collections.singletonList(auctionToFinish)
+        );
 
         capturedTask.run();
 
-        verify(auctionService).updateAuctionStatus(auctionToStart, AuctionStatus.RUNNING);
-        verify(auctionService).updateAuctionStatus(auctionToFinish, AuctionStatus.FINISHED);
+        verify(auctionService)
+                .updateAuctionStatus(
+                        auctionToStart,
+                        AuctionStatus.RUNNING
+                );
+
+        verify(auctionService)
+                .updateAuctionStatus(
+                        auctionToFinish,
+                        AuctionStatus.FINISHED
+                );
     }
 }
