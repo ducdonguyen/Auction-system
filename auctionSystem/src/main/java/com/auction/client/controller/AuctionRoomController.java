@@ -122,6 +122,15 @@ public class AuctionRoomController {
    */
   @FXML
   public void initialize() {
+      // Hiển thị số dư ban đầu nếu có user trong session
+      if (balanceLabel != null) {
+          var user = SessionContext.getCurrentUser();
+          if (user != null) {
+              balanceLabel.setText(String.format("%,.0f đ", user.getBalance()));
+          } else {
+              balanceLabel.setText("0 đ"); // tùy UX, có thể là "Chưa đăng nhập"
+          }
+      }
     // Khởi tạo series cho biểu đồ
     priceSeries = new XYChart.Series<>();
     priceSeries.setName("Diễn biến giá");
@@ -262,5 +271,14 @@ public class AuctionRoomController {
         }
       }
     }
+      // Cập nhật số dư hiển thị khi bind viewModel (đảm bảo hiển thị đúng ngay khi vào phòng)
+      if (balanceLabel != null) {
+          var user = SessionContext.getCurrentUser();
+          if (user != null) {
+              balanceLabel.setText(String.format("%,.0f đ", user.getBalance()));
+          } else {
+              balanceLabel.setText("0 đ");
+          }
+      }
   }
 }
