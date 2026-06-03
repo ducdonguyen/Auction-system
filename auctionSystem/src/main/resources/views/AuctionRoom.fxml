@@ -8,28 +8,28 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="780.0" prefWidth="1180.0"
-            style="-fx-background-color: #f1f5f9; -fx-background: #f1f5f9;"
+<AnchorPane prefHeight="760.0" prefWidth="1180.0" style="-fx-background-color: #f1f5f9;"
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.auction.client.controller.AuctionRoomController">
-    <content>
-        <VBox spacing="20.0">
+    <children>
+        <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <padding>
-                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
+                <Insets bottom="16.0" left="20.0" right="20.0" top="16.0"/>
             </padding>
             <children>
-                <HBox alignment="CENTER_LEFT" spacing="20.0">
+
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
                     <children>
                         <Button mnemonicParsing="false" onAction="#handleBackAction"
                                 style="-fx-background-color: #e2e8f0; -fx-text-fill: #0f172a; -fx-background-radius: 8;"
                                 text="← Quay lại">
                             <padding>
-                                <Insets bottom="8.0" left="16.0" right="16.0" top="8.0"/>
+                                <Insets bottom="6.0" left="12.0" right="12.0" top="6.0"/>
                             </padding>
                         </Button>
                         <Label text="Chi tiết phiên đấu giá">
                             <font>
-                                <Font name="System Bold" size="20.0"/>
+                                <Font name="System Bold" size="18.0"/>
                             </font>
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
@@ -37,56 +37,57 @@
                             <children>
                                 <Label text="Số dư:" textFill="WHITE">
                                     <font>
-                                        <Font name="System Bold" size="13.0" />
+                                        <Font name="System Bold" size="12.0" />
                                     </font>
                                 </Label>
                                 <Label fx:id="balanceLabel" text="0 VNĐ" textFill="WHITE">
                                     <font>
-                                        <Font name="System Bold" size="14.0" />
+                                        <Font name="System Bold" size="13.0" />
                                     </font>
                                 </Label>
                             </children>
                             <padding>
-                                <Insets left="15.0" right="15.0" top="5.0" bottom="5.0" />
+                                <Insets left="12.0" right="12.0" top="4.0" bottom="4.0" />
                             </padding>
                         </HBox>
                         <Label fx:id="auctionIdLabel" text="#ID" textFill="#64748b">
                             <font>
-                                <Font size="14.0"/>
+                                <Font size="13.0"/>
                             </font>
                         </Label>
                     </children>
                 </HBox>
 
-                <HBox spacing="24.0" VBox.vgrow="ALWAYS">
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
                     <children>
-                        <VBox prefWidth="700.0" spacing="15.0"
-                              style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);"
-                              HBox.hgrow="ALWAYS">
+
+                        <VBox prefWidth="700.0" spacing="12.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 8, 0, 0, 2);"
+                              HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                             <padding>
-                                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
+                                <Insets bottom="16.0" left="20.0" right="20.0" top="16.0"/>
                             </padding>
                             <children>
                                 <Label fx:id="itemNameLabel" text="Tên sản phẩm" wrapText="true" minHeight="-Infinity">
                                     <font>
-                                        <Font name="System Bold" size="28.0"/>
+                                        <Font name="System Bold" size="24.0"/>
                                     </font>
                                 </Label>
 
-                                <Label fx:id="sellerLabel" style="-fx-text-fill: #64748b;" text="Người bán: Admin"/>
+                                <Label fx:id="sellerLabel" style="-fx-text-fill: #64748b; -fx-font-size: 13px;" text="Người bán: Admin"/>
 
                                 <HBox spacing="12.0" alignment="CENTER_LEFT">
                                     <children>
                                         <Label fx:id="statusLabel"
-                                               style="-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-background-radius: 20; -fx-padding: 4 12;"
+                                               style="-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-background-radius: 20; -fx-padding: 3 10; -fx-font-size: 11px;"
                                                text="ĐANG DIỄN RA"/>
                                         <Region HBox.hgrow="ALWAYS" />
-                                        <HBox spacing="8.0" alignment="CENTER" style="-fx-background-color: #fee2e2; -fx-background-radius: 8; -fx-padding: 4 12;">
+                                        <HBox spacing="8.0" alignment="CENTER" style="-fx-background-color: #fee2e2; -fx-background-radius: 6; -fx-padding: 3 10;">
                                             <children>
-                                                <Label text="Còn lại:" textFill="#991b1b" style="-fx-font-weight: bold;"/>
+                                                <Label text="Còn lại:" textFill="#991b1b" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
                                                 <Label fx:id="countdownTimerLabel" text="00:00:00" textFill="#b91c1c">
                                                     <font>
-                                                        <Font name="System Bold" size="16.0"/>
+                                                        <Font name="System Bold" size="14.0"/>
                                                     </font>
                                                 </Label>
                                             </children>
@@ -94,18 +95,18 @@
                                     </children>
                                 </HBox>
 
-                                <VBox spacing="8.0">
+                                <VBox spacing="4.0">
                                     <children>
                                         <Label fx:id="itemTypeLabel"
-                                               style="-fx-background-color: #e0f2fe; -fx-text-fill: #0369a1; -fx-background-radius: 20; -fx-padding: 4 12;"
+                                               style="-fx-background-color: #e0f2fe; -fx-text-fill: #0369a1; -fx-background-radius: 20; -fx-padding: 3 10; -fx-font-size: 11px;"
                                                text="Loại: Điện tử"/>
-                                        <Label fx:id="extraInfoLabel" style="-fx-text-fill: #475569; -fx-font-weight: bold; -fx-font-size: 13px; -fx-padding: 2 0;"
+                                        <Label fx:id="extraInfoLabel" style="-fx-text-fill: #475569; -fx-font-weight: bold; -fx-font-size: 12px;"
                                                text="Bảo hành: 12 tháng"/>
                                     </children>
                                 </VBox>
-                                <Separator prefWidth="200.0"/>
+                                <Separator />
 
-                                <GridPane hgap="20.0" vgap="12.0">
+                                <GridPane hgap="15.0" vgap="8.0">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="320.0"/>
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0"/>
@@ -114,51 +115,50 @@
                                         <RowConstraints minHeight="-Infinity" valignment="TOP" vgrow="SOMETIMES"/>
                                         <RowConstraints minHeight="-Infinity" valignment="TOP" vgrow="SOMETIMES"/>
                                         <RowConstraints minHeight="-Infinity" valignment="TOP" vgrow="SOMETIMES"/>
-                                        <RowConstraints minHeight="-Infinity" valignment="TOP" vgrow="SOMETIMES"/>
                                     </rowConstraints>
                                     <children>
-                                        <VBox spacing="4.0">
+                                        <VBox spacing="2.0">
                                             <children>
-                                                <Label text="Giá hiện tại" textFill="#64748b"/>
+                                                <Label text="Giá hiện tại" textFill="#64748b" style="-fx-font-size: 12px;"/>
                                                 <Label fx:id="currentPriceLabel" text="0 VNĐ" textFill="#0f766e" wrapText="true" minHeight="-Infinity">
                                                     <font>
-                                                        <Font name="System Bold" size="24.0"/>
+                                                        <Font name="System Bold" size="20.0"/>
                                                     </font>
                                                 </Label>
                                             </children>
                                         </VBox>
-                                        <VBox spacing="4.0" GridPane.columnIndex="1">
+                                        <VBox spacing="2.0" GridPane.columnIndex="1">
                                             <children>
-                                                <Label text="Người dẫn đầu" textFill="#64748b"/>
+                                                <Label text="Người dẫn đầu" textFill="#64748b" style="-fx-font-size: 12px;"/>
                                                 <Label fx:id="highestBidderLabel" text="---">
                                                     <font>
-                                                        <Font name="System Bold" size="18.0"/>
+                                                        <Font name="System Bold" size="16.0"/>
                                                     </font>
                                                 </Label>
                                             </children>
                                         </VBox>
-                                        <VBox spacing="4.0" GridPane.rowIndex="1">
+                                        <VBox spacing="2.0" GridPane.rowIndex="1">
                                             <children>
-                                                <Label text="Bước giá tối thiểu" textFill="#64748b"/>
-                                                <Label fx:id="stepPriceLabel" text="0 VNĐ" wrapText="true" minHeight="-Infinity"/>
+                                                <Label text="Bước giá tối thiểu" textFill="#64748b" style="-fx-font-size: 11px;"/>
+                                                <Label fx:id="stepPriceLabel" text="0 VNĐ" style="-fx-font-size: 13px; -fx-font-weight: bold;" wrapText="true" minHeight="-Infinity"/>
                                             </children>
                                         </VBox>
-                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <VBox spacing="2.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                             <children>
-                                                <Label text="Giá đặt tối thiểu tiếp theo" textFill="#64748b"/>
-                                                <Label fx:id="minimumBidLabel" text="0 VNĐ" wrapText="true" minHeight="-Infinity"/>
+                                                <Label text="Giá đặt tối thiểu tiếp theo" textFill="#64748b" style="-fx-font-size: 11px;"/>
+                                                <Label fx:id="minimumBidLabel" text="0 VNĐ" style="-fx-font-size: 13px; -fx-font-weight: bold;" wrapText="true" minHeight="-Infinity"/>
                                             </children>
                                         </VBox>
-                                        <VBox spacing="4.0" GridPane.rowIndex="2">
+                                        <VBox spacing="2.0" GridPane.rowIndex="2">
                                             <children>
-                                                <Label text="Thời gian" textFill="#64748b"/>
-                                                <Label fx:id="scheduleLabel" text="--/--/---- --:--"/>
+                                                <Label text="Thời gian" textFill="#64748b" style="-fx-font-size: 11px;"/>
+                                                <Label fx:id="scheduleLabel" text="--/--/---- --:--" style="-fx-font-size: 12px;"/>
                                             </children>
                                         </VBox>
                                     </children>
                                 </GridPane>
 
-                                <LineChart fx:id="priceChart" minHeight="180.0" prefHeight="220.0" maxHeight="300.0" title="Biến động giá" createSymbols="true" animated="true" VBox.vgrow="ALWAYS">
+                                <LineChart fx:id="priceChart" minHeight="120.0" prefHeight="190.0" maxHeight="230.0" title="Biến động giá" createSymbols="true" animated="true" VBox.vgrow="ALWAYS">
                                     <xAxis>
                                         <CategoryAxis label="Thời gian" side="BOTTOM" />
                                     </xAxis>
@@ -167,58 +167,57 @@
                                     </yAxis>
                                 </LineChart>
 
-                                <VBox spacing="8.0">
+                                <VBox spacing="4.0">
                                     <children>
                                         <Label text="Mô tả sản phẩm" textFill="#64748b">
                                             <font>
-                                                <Font name="System Bold" size="14.0"/>
+                                                <Font name="System Bold" size="13.0"/>
                                             </font>
                                         </Label>
                                         <Label fx:id="descriptionLabel" alignment="TOP_LEFT" minHeight="-Infinity"
-                                               prefWidth="650.0" text="Mô tả chi tiết của sản phẩm ở đây..."
+                                               prefWidth="650.0" text="Mô tả chi tiết của sản phẩm ở đây..." style="-fx-font-size: 12px;"
                                                wrapText="true"/>
                                     </children>
                                 </VBox>
 
-                                <Separator prefWidth="200.0"/>
+                                <Separator />
 
-                                <VBox spacing="12.0" minHeight="-Infinity" VBox.vgrow="NEVER">
+                                <VBox spacing="8.0" minHeight="-Infinity" VBox.vgrow="NEVER">
                                     <children>
                                         <Label text="Đặt giá của bạn" textFill="#0f172a">
                                             <font>
-                                                <Font name="System Bold" size="16.0"/>
+                                                <Font name="System Bold" size="14.0"/>
                                             </font>
                                         </Label>
                                         <HBox spacing="12.0">
                                             <children>
-                                                <TextField fx:id="bidAmountField" prefHeight="48.0" prefWidth="300.0"
+                                                <TextField fx:id="bidAmountField" prefHeight="40.0" prefWidth="280.0"
                                                            promptText="Nhập số tiền muốn đặt..."
-                                                           style="-fx-background-radius: 12; -fx-border-color: #e2e8f0; -fx-border-radius: 12;"/>
+                                                           style="-fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;"/>
                                                 <Button fx:id="btnPlaceBid" mnemonicParsing="false" onAction="#handlePlaceBidAction"
-                                                        prefHeight="48.0" prefWidth="150.0"
-                                                        style="-fx-background-color: #0f766e; -fx-text-fill: white; -fx-background-radius: 12; -fx-font-weight: bold;"
+                                                        prefHeight="40.0" prefWidth="130.0"
+                                                        style="-fx-background-color: #0f766e; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;"
                                                         text="ĐẶT GIÁ"/>
                                             </children>
                                         </HBox>
-                                        <Label fx:id="messageLabel" textFill="#0369a1"/>
+                                        <Label fx:id="messageLabel" style="-fx-font-size: 11px;" textFill="#0369a1"/>
                                     </children>
                                 </VBox>
                             </children>
                         </VBox>
 
-                        <VBox prefWidth="400.0" spacing="16.0"
-                              style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);">
+                        <VBox prefWidth="380.0" spacing="12.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 8, 0, 0, 2);">
                             <padding>
-                                <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
+                                <Insets bottom="16.0" left="20.0" right="20.0" top="16.0"/>
                             </padding>
                             <children>
                                 <Label text="Lịch sử đặt giá">
                                     <font>
-                                        <Font name="System Bold" size="18.0"/>
+                                        <Font name="System Bold" size="16.0"/>
                                     </font>
                                 </Label>
-                                <ListView fx:id="bidHistoryList" minHeight="200.0" prefHeight="400.0"
-                                          style="-fx-background-radius: 12; -fx-border-radius: 12;"
+                                <ListView fx:id="bidHistoryList" style="-fx-background-radius: 8; -fx-border-radius: 8;"
                                           VBox.vgrow="ALWAYS"/>
                             </children>
                         </VBox>
@@ -227,5 +226,5 @@
                 </HBox>
             </children>
         </VBox>
-    </content>
-</ScrollPane>
+    </children>
+</AnchorPane>
