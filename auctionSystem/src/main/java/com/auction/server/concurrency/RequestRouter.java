@@ -24,6 +24,8 @@ import com.auction.shared.network.requests.TopUpRequest;   // IMPORT MỚI
 import com.auction.shared.network.responses.TopUpResponse;  // IMPORT MỚI
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +103,7 @@ public class RequestRouter {
     }
 
     private void handleJoinRoom(JoinRoomRequest request, ClientHandler handler,
-                                       ObjectOutputStream out)
+                                ObjectOutputStream out)
             throws IOException {
         String auctionId = request.getAuctionId();
         String oldAuctionId = handler.getCurrentWatchingAuctionId();
@@ -166,7 +168,7 @@ public class RequestRouter {
      * Xử lý yêu cầu tạo phiên đấu giá từ Client đưa xuống Service.
      */
     private void handleCreateAuction(CreateAuctionRequest request, ClientHandler handler,
-                                            ObjectOutputStream out) throws IOException {
+                                     ObjectOutputStream out) throws IOException {
         ServiceResult<Void> result;
         try {
             String sellerUsername = request.getSellerUsername();
@@ -184,9 +186,42 @@ public class RequestRouter {
 
             Seller seller = new Seller(sellerUsername, "");
 
+            // Tính startTime/endTime server-side nếu client gửi duration
+            LocalDateTime startTime;
+            LocalDateTime endTime;
+
+            if (request.getDurationValue() != null && request.getDurationValue() > 0 && request.getDurationUnit() != null) {
+                startTime = LocalDateTime.now(); // dùng thời gian server để tránh bị gian lận
+                String unit = request.getDurationUnit();
+                long val = request.getDurationValue();
+
+                // ĐÃ SỬA: Chuyển chuỗi sang chữ thường ngay trong biểu thức switch
+                switch (unit.toLowerCase()) {
+                    case "giờ":
+                    case "hours":
+                    case "hour":
+                    case "h":
+                        endTime = startTime.plusHours(val);
+                        break;
+                    case "phút":
+                    case "minutes":
+                    case "minute":
+                    case "m":
+                        endTime = startTime.plusMinutes(val);
+                        break;
+                    default: // "ngày" hoặc "days"
+                        endTime = startTime.plusDays(val);
+                        break;
+                }
+            } else {
+                // fallback: dùng thời gian client gửi (còn giữ hành vi cũ)
+                startTime = request.getStartTime() != null ? request.getStartTime() : LocalDateTime.now();
+                endTime = request.getEndTime() != null ? request.getEndTime() : startTime.plusDays(3);
+            }
+
             Auction newAuction = auctionService.createAuction(
                     item, seller, request.getStartingPrice(), request.getPriceStep(),
-                    request.getStartTime(), request.getEndTime()
+                    startTime, endTime
             );
 
             if (newAuction != null) {

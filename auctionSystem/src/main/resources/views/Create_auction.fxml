@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.CreateAuctionController">
+<AnchorPane prefHeight="550.0" prefWidth="600.0" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.CreateAuctionController">
     <children>
         <VBox spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <padding>
@@ -40,6 +40,7 @@
                     <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="80.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
@@ -81,12 +82,25 @@
                         </Label>
                         <ComboBox fx:id="productTypeCombo" maxWidth="1.1797693134862315E308" style="-fx-padding: 4; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                        <Label text="Thông tin phụ:" textFill="#334155" GridPane.rowIndex="5">
+                        <Label text="Thời lượng:" textFill="#334155" GridPane.rowIndex="5">
                             <font>
                                 <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <TextField fx:id="extraInfoField" promptText="Bảo hành (tháng) / Tên tác giả / Hãng xe..." style="-fx-padding: 8; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                            <children>
+                                <TextField fx:id="durationField" prefWidth="80.0" promptText="3" style="-fx-padding: 8; -fx-background-radius: 5;" />
+                                <ComboBox fx:id="durationUnitCombo" prefWidth="120.0" style="-fx-padding: 4; -fx-background-radius: 5;" />
+                                <Label text="(vd: 3 Ngày)" textFill="#64748b" />
+                            </children>
+                        </HBox>
+
+                        <Label text="Thông tin phụ:" textFill="#334155" GridPane.rowIndex="6">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="extraInfoField" promptText="Bảo hành (tháng) / Tên tác giả / Hãng xe..." style="-fx-padding: 8; -fx-background-radius: 5;" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                     </children>
                 </GridPane>
 

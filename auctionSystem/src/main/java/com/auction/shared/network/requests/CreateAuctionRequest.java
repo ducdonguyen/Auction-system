@@ -5,10 +5,8 @@ import java.time.LocalDateTime;
 
 /**
  * Lớp Đóng gói dữ liệu (DTO) gửi yêu cầu tạo phiên đấu giá mới từ Client lên Server.
- * Lớp này bắt buộc phải implements Serializable để truyền được qua Socket.
  */
 public class CreateAuctionRequest implements Serializable {
-    // Đảm bảo mã định danh phiên bản giống nhau giữa Client và Server để tránh lỗi sê-ri hóa
     private static final long serialVersionUID = 1L;
 
     private String productName;
@@ -18,17 +16,20 @@ public class CreateAuctionRequest implements Serializable {
     private String productType;
     private String extraInfo;     // VD: Nếu là Electronics thì là thời gian bảo hành, Art thì là tên tác giả, v.v
     private String sellerUsername;
+
+    // Client có thể gửi startTime/endTime trực tiếp (hiện tại) OR gửi duration để server tính
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    /**
-     * Constructor mặc định (Không đối số) - Cần thiết cho một số thư viện sê-ri hóa
-     */
+    // MỚI: thời lượng (nullable). Nếu khác null => server sẽ tính start/end dựa trên server time
+    private Long durationValue; // số (ví dụ: 3)
+    private String durationUnit; // "DAYS", "HOURS", "MINUTES" hoặc "Ngày","Giờ","Phút" tùy bạn
+
     public CreateAuctionRequest() {
     }
 
     /**
-     * Constructor đầy đủ tham số để khởi tạo nhanh từ Form nhập liệu.
+     * Constructor cũ (vẫn còn dùng được) - giữ tương thích
      */
     public CreateAuctionRequest(String productName, String description, double startingPrice, double priceStep,
                                 String productType, String extraInfo, String sellerUsername,
@@ -42,6 +43,23 @@ public class CreateAuctionRequest implements Serializable {
         this.sellerUsername = sellerUsername;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    /**
+     * Constructor MỚI: gửi duration thay vì endTime
+     */
+    public CreateAuctionRequest(String productName, String description, double startingPrice, double priceStep,
+                                String productType, String extraInfo, String sellerUsername,
+                                Long durationValue, String durationUnit) {
+        this.productName = productName;
+        this.description = description;
+        this.startingPrice = startingPrice;
+        this.priceStep = priceStep;
+        this.productType = productType;
+        this.extraInfo = extraInfo;
+        this.sellerUsername = sellerUsername;
+        this.durationValue = durationValue;
+        this.durationUnit = durationUnit;
     }
 
     // ==========================================
@@ -118,9 +136,22 @@ public class CreateAuctionRequest implements Serializable {
         this.endTime = endTime;
     }
 
-    /**
-     * Hàm toString hỗ trợ việc ghi Log ở cả phía Client và Server khi debug.
-     */
+    public Long getDurationValue() {
+        return durationValue;
+    }
+
+    public void setDurationValue(Long durationValue) {
+        this.durationValue = durationValue;
+    }
+
+    public String getDurationUnit() {
+        return durationUnit;
+    }
+
+    public void setDurationUnit(String durationUnit) {
+        this.durationUnit = durationUnit;
+    }
+
     @Override
     public String toString() {
         return "CreateAuctionRequest{" +
@@ -128,6 +159,8 @@ public class CreateAuctionRequest implements Serializable {
                 ", productType='" + productType + '\'' +
                 ", startingPrice=" + startingPrice +
                 ", priceStep=" + priceStep +
+                ", durationValue=" + durationValue +
+                ", durationUnit='" + durationUnit + '\'' +
                 '}';
     }
 }
