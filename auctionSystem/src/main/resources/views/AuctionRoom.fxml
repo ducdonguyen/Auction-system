@@ -71,11 +71,22 @@
 
                                 <Label fx:id="sellerLabel" style="-fx-text-fill: #64748b;" text="Người bán: Admin"/>
 
-                                <HBox spacing="12.0">
+                                <HBox spacing="12.0" alignment="CENTER_LEFT">
                                     <children>
                                         <Label fx:id="statusLabel"
                                                style="-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-background-radius: 20; -fx-padding: 4 12;"
                                                text="ĐANG DIỄN RA"/>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <HBox spacing="8.0" alignment="CENTER" style="-fx-background-color: #fee2e2; -fx-background-radius: 8; -fx-padding: 4 12;">
+                                            <children>
+                                                <Label text="Còn lại:" textFill="#991b1b" style="-fx-font-weight: bold;"/>
+                                                <Label fx:id="countdownTimerLabel" text="00:00:00" textFill="#b91c1c">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0"/>
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </HBox>
                                     </children>
                                 </HBox>
 
