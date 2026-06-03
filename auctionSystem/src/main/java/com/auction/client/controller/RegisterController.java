@@ -1,5 +1,6 @@
 package com.auction.client.controller;
 
+import com.auction.client.network.SocketClient;
 import com.auction.client.util.Scene;
 import com.auction.client.util.SceneNavigator;
 import com.auction.server.service.AuthService;
@@ -12,12 +13,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller cho màn hình đăng ký tài khoản.
  */
 public class RegisterController {
-  private final AuthService authService = new AuthService();
+  private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
   @FXML
   private TextField fullNameField;
   @FXML
@@ -44,10 +47,10 @@ public class RegisterController {
 
     // 1. CLIENT-SIDE VALIDATION: Kiểm tra tại chỗ để bảo vệ Server
     if (fullName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()
-        || confirmPassword.isEmpty()) {
+            || confirmPassword.isEmpty()) {
       messageLabel.setText("Vui lòng nhập đầy đủ thông tin.");
       messageLabel.setStyle(defaultStyle);
-      return; // Dừng lại luôn, không gửi lên Server
+      return;
     }
 
     if (!email.contains("@")) {
@@ -62,19 +65,35 @@ public class RegisterController {
       return;
     }
 
-    // 2. GÓI DỮ LIỆU: Chỉ truyền 4 trường cần thiết lên Server
+    // 2. GÓI DỮ LIỆU: Đóng gói thông tin vào Request
     RegistrationRequest request = new RegistrationRequest(fullName, username, email, password);
 
-    // 3. GỌI SERVICE XỬ LÝ MẠNG
-    ServiceResult<UserAccount> result = authService.register(request);
+    // 3. ĐÃ SỬA: TRUYỀN GÓI TIN QUA SOCKET XUYÊN INTERNET (QUA NGROK)
+    try {
+      // Gửi gói tin RegistrationRequest lên Server của em
+      SocketClient.getInstance().sendRequest(request);
 
-    // 4. HIỂN THỊ KẾT QUẢ
-    messageLabel.setText(result.message());
-    messageLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+      // Chờ phản hồi kết quả từ BlockingQueue của SocketClient
+      Object rawResponse = SocketClient.getInstance().receiveResponse();
 
-    // Nếu đăng ký thành công, xóa trắng form cho đẹp
-    if (result.success()) {
-      clearForm();
+      // 4. HIỂN THỊ KẾT QUẢ TRẢ VỀ TỪ SERVER
+      if (rawResponse instanceof ServiceResult<?> result) {
+        messageLabel.setText(result.message());
+        messageLabel.setStyle(result.success() ? "-fx-text-fill: green;" : "-fx-text-fill: red;");
+
+        // Nếu Server báo đăng ký thành công trên Cloud/Database của em, xóa trắng form
+        if (result.success()) {
+          clearForm();
+        }
+      } else {
+        messageLabel.setText("Phản hồi từ Server không hợp lệ.");
+        messageLabel.setStyle(defaultStyle);
+      }
+
+    } catch (Exception e) {
+      logger.error("Lỗi kết nối khi gửi yêu cầu đăng ký tài khoản", e);
+      messageLabel.setText("Lỗi kết nối mạng: Không thể gửi yêu cầu đến Server.");
+      messageLabel.setStyle(defaultStyle);
     }
   }
 
