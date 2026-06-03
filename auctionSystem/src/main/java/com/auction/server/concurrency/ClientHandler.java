@@ -2,6 +2,7 @@ package com.auction.server.concurrency;
 
 import com.auction.server.core.AuctionManager;
 import com.auction.server.core.AuctionObserver;
+import com.auction.server.service.AuthService;
 import com.auction.shared.models.auction.AuctionStatus;
 import com.auction.shared.models.auction.BidTransaction;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +25,7 @@ public class ClientHandler implements Runnable, AuctionObserver {
   private String username;
   private final Socket socket;
   private final RequestRouter requestRouter;
+  private final AuthService authService;
   private ObjectOutputStream out;
 
   // Biến lưu trữ ID của phiên đấu giá mà Client này đang xem
@@ -34,10 +36,12 @@ public class ClientHandler implements Runnable, AuctionObserver {
    *
    * @param socket         Socket kết nối với client.
    * @param requestRouter Bộ định tuyến tiếp nhận và xử lý yêu cầu từ client.
+   * @param authService   Dịch vụ xác thực.
    */
-  public ClientHandler(Socket socket, RequestRouter requestRouter) {
+  public ClientHandler(Socket socket, RequestRouter requestRouter, AuthService authService) {
     this.socket = socket;
     this.requestRouter = requestRouter;
+    this.authService = authService;
   }
 
   public String getCurrentWatchingAuctionId() {
@@ -111,11 +115,16 @@ public class ClientHandler implements Runnable, AuctionObserver {
   @Override
   public void updateNewBid(String auctionId, BidTransaction newBid) {
     try {
-      // Khi AuctionManager gọi hàm này, ClientHandler lập tức "nhồi" dữ liệu mới
-      // vào đường ống mạng gửi thẳng về màn hình Client.
       if (out != null) {
+        // Cập nhật fullName cho Bidder trước khi gửi
+        if (newBid.bidder() != null) {
+          String fullName = authService.getFullName(newBid.bidder().getUsername());
+          if (fullName != null && !fullName.trim().isEmpty()) {
+            newBid.bidder().setFullName(fullName);
+          }
+        }
         out.writeObject(newBid);
-        out.flush(); // Đẩy đi ngay lập tức
+        out.flush();
         logger.info("[ClientHandler] Đã gửi thông báo giá mới về cho Client.");
       }
     } catch (IOException e) {

@@ -1,5 +1,6 @@
 package com.auction.server.concurrency;
 
+import com.auction.server.service.AuthService;
 import com.auction.shared.models.auction.AuctionStatus;
 import com.auction.shared.models.auction.BidTransaction;
 import com.auction.shared.models.auth.Bidder;
@@ -26,6 +27,9 @@ public class ClientHandlerTest {
     private Socket socket;
 
     @Mock
+    private AuthService authService;
+
+    @Mock
     private RequestRouter requestRouter;
 
     @Mock
@@ -36,7 +40,7 @@ public class ClientHandlerTest {
     @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
-        clientHandler = new ClientHandler(socket, requestRouter);
+        clientHandler = new ClientHandler(socket, requestRouter, authService);
 
         // Tiêm mock ObjectOutputStream qua reflection vì biến 'out' được khởi tạo động trong run()
         java.lang.reflect.Field outField = ClientHandler.class.getDeclaredField("out");

@@ -142,7 +142,11 @@ public class AuctionService {
 
             // Khởi tạo đối tượng Bidder mới trực tiếp bằng Username
             Bidder bidder = new Bidder(bidderUsername, "", 0);
-            bidder.setFullName(bidderUsername); // Fallback dùng tạm Username làm tên hiển thị
+            String fullName = authService.getFullName(bidderUsername);
+            if (fullName == null || fullName.trim().isEmpty()) {
+                fullName = bidderUsername;
+            }
+            bidder.setFullName(fullName);
 
             // CONTAINER hứng dữ liệu từ trong Lock mang ra ngoài gửi mạng
             double[] newBalanceRef = {0};

@@ -91,7 +91,7 @@ public class ServerApplication {
             logger.info("--> CÓ KHÁCH! Client mới kết nối từ IP: {}", clientSocket.getInetAddress());
 
             // Chuyển giao requestRouter cho ClientHandler làm việc
-            ClientHandler handler = new ClientHandler(clientSocket, requestRouter);
+            ClientHandler handler = new ClientHandler(clientSocket, requestRouter, authService);
 
             // Giao việc cho ThreadPool (SAU)
             clientPool.submit(handler);
